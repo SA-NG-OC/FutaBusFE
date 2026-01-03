@@ -1,0 +1,132 @@
+/* src/components/EmployeeHeader/EmployeeHeader.module.css */
+
+/* 1. Wrapper chịu trách nhiệm căn chỉnh khoảng cách với lề màn hình */
+.header-wrapper {
+    width: 100%;
+    /* Yêu cầu: Top 32, Right 32, Bottom 28, Left 32 */
+    padding: 32px 32px 0px 32px;
+    background-color: var(--background); /* Màu nền chung của web */
+    transition: background-color 0.2s ease;
+}
+
+/* 2. Card chứa nội dung header (Khối màu trắng nổi lên) */
+.header-card {
+    width: 100%;
+    height: 80px; /* Chiều cao cố định cho đẹp */
+    background-color: var(--background-paper, #ffffff); /* Màu trắng hoặc theo theme */
+    border-radius: 12px; /* Bo góc */
+    
+    /* Hiệu ứng đổ bóng và viền nhẹ */
+    border: 1px solid var(--border-gray, #e5e7eb);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px; /* Padding bên trong card */
+    transition: all 0.2s ease;
+}
+
+/* --- LEFT SECTION --- */
+.welcome-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.welcome-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--foreground);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.welcome-subtitle {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-gray, #717182);
+    margin: 0;
+}
+
+/* --- RIGHT SECTION (ICONS) --- */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px; /* Khoảng cách giữa các icon */
+}
+
+/* Style chung cho các nút icon */
+.icon-button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-gray, #717182);
+    transition: all 0.2s ease;
+}
+
+.icon-button:hover {
+    background-color: var(--bg-hover, #f3f4f6);
+    color: var(--primary, #d83e3e);
+}
+
+/* Riêng nút Notification có badge */
+.notification-button {
+    position: relative;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 16px;
+    height: 16px;
+    background-color: #e16666;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+    border: 2px solid var(--background-paper, #ffffff);
+}
+
+/* Avatar Button (Màu vàng nhạt như ảnh) */
+.avatar-button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background-color: #eaddb6; /* Màu vàng nhạt giống trong ảnh */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    margin-left: 8px; /* Cách xa nhóm icon một chút */
+    transition: opacity 0.2s ease;
+}
+
+.avatar-button:hover {
+    opacity: 0.9;
+}
+
+.avatar-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff; /* Hoặc màu nâu đậm tùy thiết kế */
+}
+
+/* Dark Mode Support (Nếu cần) */
+[data-theme='dark'] .header-card {
+    background-color: #1f2937;
+    border-color: #374151;
+}

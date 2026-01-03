@@ -1,26 +1,109 @@
 @import "tailwindcss";
 
+/* =========================
+   Light Theme (Default)
+   ========================= */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Màu chính */
+  --primary: #D83E3E;
+  --brand-dark-red: #8B1A1A;
+
+  /* Màu text */
+  --text-gray: #364153;
+  --text-white: #ffffff;
+
+  /* Các loại nền */
+  --bg-beige: #F5EFE1;       /* Nền Sidebar cũ */
+  --background-paper: #ffffff; /* Nền của các thẻ nổi (Card) */
+  --bg-hover: #f3f4f6;       /* Màu nền khi hover vào icon */
+  
+  /* Màu đặc biệt */
+  --avatar-yellow: #eaddb6;  /* Màu nền avatar Employee */
+
+  /* Viền */
+  --border-gray: #e5e7eb;
+
+  --text-nav: #4a5565;        /* Màu chữ menu xám xanh */
+  --primary-light: #e16666;   /* Màu hover của menu / active */
+  --primary-hover: #c43535;   /* Màu hover của nút đăng nhập */
+  --primary-active: #b22d2d;  /* Màu active của nút đăng nhập */
 }
 
+/* =========================
+   Dark Theme
+   ========================= */
+.dark {
+  --background: #020617;     /* Nền tối thẫm */
+  --foreground: #e5e7eb;
+
+  --primary: #ef4444;
+  --brand-dark-red: #7f1d1d;
+
+  --text-gray: #9ca3af;
+  --text-white: #ffffff;
+
+  --bg-beige: #0f172a;       /* Chỉnh lại nền sidebar tối cho hợp lý hơn */
+  --background-paper: #1e293b; /* Nền card nổi: sáng hơn nền chính một chút để tạo độ nổi */
+  --bg-hover: #334155;       /* Hover tối */
+
+  --avatar-yellow: #857d62;  /* Màu avatar tối đi một chút cho đỡ chói */
+
+  --border-gray: #374151;    /* Viền sáng hơn nền một chút */
+  --text-nav: #9ca3af;
+  --primary-light: #f87171;
+  --primary-hover: #ef4444; 
+  --primary-active: #dc2626;
+}
+
+/* =========================
+   Tailwind Theme Mapping
+   ========================= */
 @theme inline {
+  /* Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-brand-dark-red: var(--brand-dark-red);
+  
+  --color-text-gray: var(--text-gray);
+  --color-text-white: var(--text-white);
+  
+  --color-bg-beige: var(--bg-beige);
+  --color-background-paper: var(--background-paper); /* Thêm mới */
+  --color-bg-hover: var(--bg-hover);                 /* Thêm mới */
+  --color-avatar-yellow: var(--avatar-yellow);       /* Thêm mới */
+  
+  --color-border-gray: var(--border-gray);
+
+  /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-text-nav: var(--text-nav);
+  --color-primary-light: var(--primary-light);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* =========================
+   Base Styles
+   ========================= */
+html,
+body {
+  width: 100%;
+  height: 100%;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+hr {
+  border-color: var(--border-gray);
 }

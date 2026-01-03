@@ -1,0 +1,179 @@
+/* src/components/ClientHeader/ClientHeader.module.css */
+
+.client-header {
+    width: 100%;
+    background-color: var(--background);
+    position: sticky; /* Sticky để menu luôn bám trên cùng khi lướt đt */
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid var(--border-gray);
+    transition: background-color 0.2s ease;
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 64px; /* Giảm padding dọc một chút cho gọn */
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+}
+
+/* --- LOGO SECTION --- */
+.company-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.logo-icon {
+    width: 44px; /* To hơn chút giống ảnh */
+    height: 44px;
+    background-color: #D63031; /* Màu đỏ đậm của logo */
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.brand-name {
+    font-family: var(--font-sans), 'Inter', sans-serif;
+    font-size: 26px; /* To hơn giống ảnh */
+    font-weight: 700;
+    line-height: 1;
+    color: var(--brand-dark-red);
+    display: flex;
+    align-items: center;
+}
+
+.brand-accent {
+    color: #D63031;
+}
+
+/* --- DESKTOP MENU --- */
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.nav-link {
+    font-family: var(--font-sans), 'Arimo', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-nav);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--primary);
+}
+
+/* --- LOGIN BUTTON --- */
+.nav-buttons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.login-button {
+    background-color: #E1583E; /* Màu cam đỏ giống ảnh mẫu */
+    border: none;
+    border-radius: 8px; /* Bo góc nhẹ hơn giống ảnh */
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.login-button:hover {
+    background-color: #c44d36;
+}
+
+.login-text {
+    font-family: var(--font-sans), 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: white;
+    white-space: nowrap;
+}
+
+/* Mặc định ẩn text mobile trên PC */
+.text-mobile { display: none; }
+
+/* --- HAMBURGER BUTTON (Mobile Only) --- */
+.hamburger-btn {
+    display: none; /* Ẩn trên Desktop */
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-nav);
+    padding: 4px;
+}
+
+/* --- MOBILE MENU DRAWER (Menu ẩn) --- */
+.mobile-menu-overlay {
+    position: fixed;
+    top: 76px; /* Cách top bằng chiều cao header */
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 76px);
+    background-color: var(--background);
+    transform: translateX(100%); /* Mặc định ẩn sang phải */
+    transition: transform 0.3s ease-in-out;
+    z-index: 999;
+    padding: 24px;
+    border-top: 1px solid var(--border-gray);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.mobile-menu-overlay.open {
+    transform: translateX(0); /* Trượt ra */
+}
+
+/* Link trong menu mobile */
+.mobile-nav-link {
+    font-size: 18px;
+    font-weight: 600;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-gray);
+    color: var(--foreground);
+    text-decoration: none;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .nav-container {
+        padding: 12px 16px; /* Padding nhỏ cho mobile */
+        height: 76px;
+    }
+
+    /* Ẩn menu desktop */
+    .nav-menu {
+        display: none;
+    }
+
+    /* Hiện nút hamburger */
+    .hamburger-btn {
+        display: block;
+        margin-right: 5px;
+    }
+
+    /* Chỉnh sửa nút Login cho giống ảnh mobile */
+    .login-button {
+        padding: 8px 16px;
+        margin-left: 10px;
+    }
+
+    /* Đổi text nút login */
+    .text-desktop { display: none; }
+    .text-mobile { display: block; }
+}

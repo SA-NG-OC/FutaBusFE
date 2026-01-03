@@ -1,0 +1,213 @@
+/* --- AdminSidebar.module.css --- */
+
+/* Giữ nguyên các class cũ của PC */
+.admin-sidebar {
+    width: 256px;
+    height: 100vh;
+    background-color: var(--bg-beige);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border-gray);
+    /* Mặc định trên PC thì sticky */
+    position: sticky;
+    top: 0;
+    left: 0;
+    transition: transform 0.3s ease-in-out, background-color 0.2s ease, border-color 0.2s ease;
+    z-index: 1000; /* Đảm bảo sidebar nằm trên các thành phần khác */
+}
+
+/* Các class header, nav, footer */
+.sidebar-header {
+    height: 92.8px;
+    padding: 24px 24px 0.8px 24px;
+    border-bottom: 0.8px solid var(--text-gray);
+    flex-shrink: 0;
+    transition: border-color 0.2s ease;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 44px;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary);
+    border-radius: 10px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-white);
+    transition: background-color 0.2s ease;
+}
+
+.logo-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-name {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    color: var(--brand-dark-red);
+    white-space: nowrap;
+    margin: 0;
+    transition: color 0.2s ease;
+}
+
+.brand-highlight { 
+    color: var(--primary);
+    transition: color 0.2s ease;
+}
+
+.brand-subtitle { 
+    font-size: 14px; 
+    color: var(--text-gray); 
+    margin: 0;
+    transition: color 0.2s ease;
+}
+
+.sidebar-navigation {
+    flex: 1;
+    padding: 24px 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 48px;
+    padding-left: 24px;
+    text-decoration: none;
+    color: var(--text-gray);
+    transition: background-color 0.2s ease, color 0.2s ease;
+    cursor: pointer;
+}
+
+.nav-link:hover { 
+    background-color: rgba(216, 62, 62, 0.1); 
+}
+
+.active { 
+    background-color: var(--primary); 
+    color: var(--text-white) !important;
+}
+
+.nav-icon { 
+    width: 20px; 
+    height: 20px; 
+    flex-shrink: 0; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+}
+
+.nav-text { 
+    font-size: 16px; 
+    white-space: nowrap; 
+}
+
+.sidebar-footer {
+    height: 72.8px;
+    padding: 24.8px 24px 0 24px;
+    border-top: 0.8px solid var(--text-gray);
+    flex-shrink: 0;
+    transition: border-color 0.2s ease;
+}
+
+.logout-link { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    height: 24px; 
+    text-decoration: none; 
+    color: var(--primary); 
+    cursor: pointer;
+    transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.logout-link:hover { 
+    opacity: 0.8; 
+}
+
+.logout-text { 
+    font-size: 16px; 
+    white-space: nowrap; 
+}
+
+/* --- PHẦN MỚI: RESPONSIVE & MOBILE --- */
+
+/* Nút Hamburger (Mặc định ẩn trên PC) */
+.hamburger-btn {
+    display: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1100;
+    background-color: var(--primary);
+    color: var(--text-white);
+    border: none;
+    border-radius: 4px;
+    padding: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background-color 0.2s ease;
+}
+
+.hamburger-btn:hover {
+    opacity: 0.9;
+}
+
+/* Overlay (Lớp nền đen mờ khi mở menu trên mobile) */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 900;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.overlay.show {
+    opacity: 1;
+}
+
+/* Logic Responsive cho màn hình nhỏ (Tablet/Mobile) */
+@media (max-width: 768px) {
+    /* Hiện nút hamburger */
+    .hamburger-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Sidebar chuyển sang dạng Fixed và ẩn sang trái */
+    .admin-sidebar {
+        position: fixed;
+        height: 100%;
+        transform: translateX(-100%); /* Đẩy ra khỏi màn hình */
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+
+    /* Class này được thêm vào khi bấm mở menu */
+    .admin-sidebar.open {
+        transform: translateX(0); /* Trượt vào lại */
+    }
+
+    /* Hiện overlay khi menu mở */
+    .overlay.show {
+        display: block;
+    }
+}
