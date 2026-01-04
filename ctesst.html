@@ -4,60 +4,344 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Navigation - FUBABus</title>
+    <title>Scheduled Trips Table</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400&family=Inter:wght@500;600&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;700&family=Cousine:wght@400&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arimo', sans-serif;
+            background-color: #f5f5f5;
+            padding: 40px;
+        }
+
+        /* Card Container */
+        .card {
+            background-color: white;
+            border: 0.8px solid rgba(0, 0, 0, 0.1);
+            border-radius: 14px;
+            width: 100%;
+            max-width: 960px;
+            padding: 24.8px 0.8px 0.8px 24.8px;
+        }
+
+        /* Card Title */
+        .card-title {
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 16px;
+            color: #2c2c2c;
+            margin-bottom: 30px;
+            position: relative;
+            top: -2.2px;
+        }
+
+        /* Table Container */
+        .table-container {
+            width: 910.4px;
+            overflow-x: auto;
+        }
+
+        /* Table */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        /* Table Header Row */
+        .table thead tr {
+            border-bottom: 0.8px solid rgba(0, 0, 0, 0.1);
+            height: 72.4px;
+        }
+
+        .table th {
+            font-weight: 700;
+            font-size: 16px;
+            line-height: 24px;
+            color: #2c2c2c;
+            text-align: left;
+            padding-left: 16px;
+            position: relative;
+            top: -2.2px;
+        }
+
+        /* Table Body Row */
+        .table tbody tr {
+            border-bottom: 0.8px solid rgba(0, 0, 0, 0.1);
+            height: 96.8px;
+        }
+
+        .table td {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 24px;
+            color: #2c2c2c;
+            padding-left: 16px;
+            vertical-align: middle;
+            position: relative;
+            top: -2.2px;
+        }
+
+        /* Trip ID Column */
+        .trip-id {
+            font-family: 'Cousine', monospace;
+            font-weight: 400;
+            padding-left: 6.2px;
+            width: 64.075px;
+        }
+
+        /* Column Widths */
+        .col-route {
+            width: 109.85px;
+        }
+
+        .col-vehicle {
+            width: 104.425px;
+        }
+
+        .col-driver {
+            width: 93.313px;
+        }
+
+        .col-date {
+            width: 78.075px;
+        }
+
+        .col-departure {
+            width: 108.525px;
+        }
+
+        .col-price {
+            width: 96.65px;
+        }
+
+        .col-status {
+            width: 95.45px;
+        }
+
+        .col-actions {
+            width: 160.038px;
+        }
+
+        /* Vehicle Text */
+        .vehicle-text {
+            position: relative;
+            top: -12px;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 2.8px 8.8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 16px;
+            border: 0.8px solid rgba(0, 0, 0, 0);
+            position: relative;
+            top: 8px;
+        }
+
+        .badge-waiting {
+            background-color: #dbeafe;
+            color: #193cb8;
+        }
+
+        .badge-running {
+            background-color: #dcfce7;
+            color: #016630;
+        }
+
+        /* Status Dropdown Button */
+        .status-dropdown {
+            display: inline-flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: white;
+            border: 0.8px solid rgba(0, 0, 0, 0);
+            border-radius: 8px;
+            height: 36px;
+            padding: 0.8px 12.8px;
+            width: 128px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            position: relative;
+            top: 5px;
+        }
+
+        .status-dropdown:hover {
+            background-color: #f9f9f9;
+        }
+
+        .status-dropdown-text {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 20px;
+            color: #2c2c2c;
+        }
+
+        .dropdown-icon {
+            width: 16px;
+            height: 16px;
+            opacity: 0.5;
+        }
+
+        .dropdown-icon svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            body {
+                padding: 20px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            .table-container {
+                width: 100%;
+                overflow-x: auto;
+            }
+
+            .table {
+                min-width: 910px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .card-title {
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+
+            .table th,
+            .table td {
+                font-size: 14px;
+                padding-left: 8px;
+            }
+
+            .status-dropdown {
+                width: 100px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <header class="customer-nav">
-        <div class="nav-container">
-            <!-- Logo Section -->
-            <div class="company-logo">
-                <div class="logo-icon">
-                    <!-- Bus icon sẽ được thêm vào đây -->
-                    <svg class="bus-icon" fill="none" viewBox="0 0 24 24">
-                        <path d="M8 6V12" stroke="white" stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2" />
-                        <path d="M15 6V12" stroke="white" stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2" />
-                        <path d="M2 12H21.6" stroke="white" stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2" />
-                        <path
-                            d="M3 18V16C3 15.0572 3 14.5858 3.29289 14.2929C3.58579 14 4.05719 14 5 14H18.4C19.3428 14 19.8142 14 20.1071 14.2929C20.4 14.5858 20.4 15.0572 20.4 16V18"
-                            stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
-                        <path
-                            d="M3 12V9C3 6.17157 3 4.75736 3.87868 3.87868C4.75736 3 6.17157 3 9 3H14.4C17.2284 3 18.6426 3 19.5213 3.87868C20.4 4.75736 20.4 6.17157 20.4 9V12"
-                            stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
-                        <path d="M9 18H14" stroke="white" stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2" />
-                        <path d="M5 12V6" stroke="white" stroke-linecap="round" stroke-linejoin="round"
-                            stroke-width="2" />
-                    </svg>
-                </div>
-                <div class="brand-name">
-                    <p>FUBA<span class="brand-accent">Bus</span></p>
-                </div>
-            </div>
+    <div class="card">
+        <h2 class="card-title">Scheduled Trips</h2>
 
-            <!-- Navigation Menu -->
-            <nav class="nav-menu">
-                <a href="#" class="nav-link active">Trang chủ</a>
-                <a href="#" class="nav-link">Lịch Trình</a>
-                <a href="#" class="nav-link">Tra cứu vé</a>
-                <a href="#" class="nav-link">Về chúng tôi</a>
-                <a href="#" class="nav-link">Liên hệ</a>
-            </nav>
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="trip-id">Trip ID</th>
+                        <th class="col-route">Route</th>
+                        <th class="col-vehicle">Vehicle</th>
+                        <th class="col-driver">Driver</th>
+                        <th class="col-date">Date</th>
+                        <th class="col-departure">Departure</th>
+                        <th class="col-price">Price</th>
+                        <th class="col-status">Status</th>
+                        <th class="col-actions">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Row 1 -->
+                    <tr>
+                        <td class="trip-id">TR-001</td>
+                        <td class="col-route">HCM → Da Lat</td>
+                        <td class="col-vehicle">
+                            <div class="vehicle-text">51A-12345<br>(Sleeper)</div>
+                        </td>
+                        <td class="col-driver">Nguyen Van A</td>
+                        <td class="col-date">2025-11-20</td>
+                        <td class="col-departure">06:00</td>
+                        <td class="col-price">250.000₫</td>
+                        <td class="col-status">
+                            <span class="badge badge-waiting">Waiting</span>
+                        </td>
+                        <td class="col-actions">
+                            <button class="status-dropdown">
+                                <span class="status-dropdown-text">Waiting</span>
+                                <div class="dropdown-icon">
+                                    <svg fill="none" viewBox="0 0 16 16">
+                                        <path d="M4 6L8 10L12 6" stroke="#717182" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="1.33333" />
+                                    </svg>
+                                </div>
+                            </button>
+                        </td>
+                    </tr>
 
-            <!-- Login Button -->
-            <div class="nav-buttons">
-                <button class="login-button">Đăng Nhập/Đăng kí</button>
-            </div>
+                    <!-- Row 2 -->
+                    <tr>
+                        <td class="trip-id">TR-002</td>
+                        <td class="col-route">Hanoi → Haiphong</td>
+                        <td class="col-vehicle">
+                            <div class="vehicle-text">51B-67890<br>(VIP)</div>
+                        </td>
+                        <td class="col-driver">Tran Van B</td>
+                        <td class="col-date">2025-11-20</td>
+                        <td class="col-departure">08:30</td>
+                        <td class="col-price">150.000₫</td>
+                        <td class="col-status">
+                            <span class="badge badge-running">Running</span>
+                        </td>
+                        <td class="col-actions">
+                            <button class="status-dropdown">
+                                <span class="status-dropdown-text">Running</span>
+                                <div class="dropdown-icon">
+                                    <svg fill="none" viewBox="0 0 16 16">
+                                        <path d="M4 6L8 10L12 6" stroke="#717182" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="1.33333" />
+                                    </svg>
+                                </div>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <!-- Row 3 -->
+                    <tr>
+                        <td class="trip-id">TR-003</td>
+                        <td class="col-route">Da Nang → Hue</td>
+                        <td class="col-vehicle">
+                            <div class="vehicle-text">29C-11111<br>(Seated)</div>
+                        </td>
+                        <td class="col-driver">Le Van C</td>
+                        <td class="col-date">2025-11-20</td>
+                        <td class="col-departure">07:15</td>
+                        <td class="col-price">120.000₫</td>
+                        <td class="col-status">
+                            <span class="badge badge-running">Running</span>
+                        </td>
+                        <td class="col-actions">
+                            <button class="status-dropdown">
+                                <span class="status-dropdown-text">Running</span>
+                                <div class="dropdown-icon">
+                                    <svg fill="none" viewBox="0 0 16 16">
+                                        <path d="M4 6L8 10L12 6" stroke="#717182" stroke-linecap="round"
+                                            stroke-linejoin="round" stroke-width="1.33333" />
+                                    </svg>
+                                </div>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-    </header>
+    </div>
 </body>
 
 </html>

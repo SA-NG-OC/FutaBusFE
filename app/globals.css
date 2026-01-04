@@ -4,88 +4,189 @@
    Light Theme (Default)
    ========================= */
 :root {
+  /* Nền & Chữ chính */
   --background: #ffffff;
   --foreground: #171717;
 
-  /* Màu chính */
+  /* Màu thương hiệu */
   --primary: #D83E3E;
+  --primary-light: #e16666;
+  --primary-hover: #c43535;
+  --primary-active: #b22d2d;
   --brand-dark-red: #8B1A1A;
 
-  /* Màu text */
+  /* Màu text phụ */
   --text-gray: #364153;
+  --text-nav: #4a5565;
   --text-white: #ffffff;
 
-  /* Các loại nền */
-  --bg-beige: #F5EFE1;       /* Nền Sidebar cũ */
-  --background-paper: #ffffff; /* Nền của các thẻ nổi (Card) */
-  --bg-hover: #f3f4f6;       /* Màu nền khi hover vào icon */
-  
-  /* Màu đặc biệt */
-  --avatar-yellow: #eaddb6;  /* Màu nền avatar Employee */
+  /* Nền Component */
+  --bg-beige: #F5EFE1;         /* Sidebar cũ */
+  --background-paper: #ffffff; /* Card nổi */
+  --bg-hover: #f3f4f6;         /* Hover item */
+  --avatar-yellow: #eaddb6;
+
+  /* Input Form */
+  --input-bg: #ffffff;
+  --input-text: #717182;
+  --input-border: transparent; /* Hoặc #e5e7eb nếu muốn viền */
+  --input-focus: rgba(225, 102, 102, 1);
 
   /* Viền */
   --border-gray: #e5e7eb;
 
-  --text-nav: #4a5565;        /* Màu chữ menu xám xanh */
-  --primary-light: #e16666;   /* Màu hover của menu / active */
-  --primary-hover: #c43535;   /* Màu hover của nút đăng nhập */
-  --primary-active: #b22d2d;  /* Màu active của nút đăng nhập */
+  /* --- Badges & Status --- */
+  --status-active-bg: #dcfce7;
+  --status-active-text: #016630;
+  
+  --badge-bg: #f5efe1;
+  --badge-highlight: #d4c5a9;
+  --badge-text: #2c2c2c;
+
+  /* --- Modal & Overlay --- */
+  --overlay-bg: rgba(0, 0, 0, 0.5);
+  --modal-bg: #f5efe1;
+  --modal-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+  /* --- Buttons --- */
+  --btn-bg-hover: #ecddc0;
+  
+  --btn-cancel-bg: #f5efe1;
+  --btn-cancel-hover: #ecddc0;
+  
+  --btn-delete-bg: #8b1a1a;
+  --btn-delete-hover: #7a1616;
+  
+  --btn-update-bg: #e16666;
+  --btn-update-hover: #d85555;
+
+  /* Warning Box */
+  --warning-bg: #fef2f2;
+  --warning-border: #ffc9c9;
+  --warning-text: #9f0712;
+  --icon-warning-bg: #ffe2e2;
 }
 
 /* =========================
    Dark Theme
    ========================= */
 .dark {
-  --background: #020617;     /* Nền tối thẫm */
-  --foreground: #e5e7eb;
+  /* Nền & Chữ chính */
+  --background: #020617;       /* Nền tối thẫm */
+  --foreground: #e5e7eb;       /* Chữ sáng */
 
+  /* Màu thương hiệu (Giảm chói) */
   --primary: #ef4444;
+  --primary-light: #f87171;
+  --primary-hover: #dc2626;
+  --primary-active: #b91c1c;
   --brand-dark-red: #7f1d1d;
 
+  /* Màu text phụ */
   --text-gray: #9ca3af;
+  --text-nav: #cbd5e1;
   --text-white: #ffffff;
 
-  --bg-beige: #0f172a;       /* Chỉnh lại nền sidebar tối cho hợp lý hơn */
-  --background-paper: #1e293b; /* Nền card nổi: sáng hơn nền chính một chút để tạo độ nổi */
-  --bg-hover: #334155;       /* Hover tối */
+  /* Nền Component */
+  --bg-beige: #0f172a;         /* Sidebar tối */
+  --background-paper: #1e293b; /* Card nổi */
+  --bg-hover: #334155;
+  --avatar-yellow: #857d62;
 
-  --avatar-yellow: #857d62;  /* Màu avatar tối đi một chút cho đỡ chói */
+  /* Input Form */
+  --input-bg: #334155;
+  --input-text: #e2e8f0;
+  --input-border: #475569;
+  --input-focus: rgba(239, 68, 68, 0.5);
 
-  --border-gray: #374151;    /* Viền sáng hơn nền một chút */
-  --text-nav: #9ca3af;
-  --primary-light: #f87171;
-  --primary-hover: #ef4444; 
-  --primary-active: #dc2626;
+  /* Viền */
+  --border-gray: #374151;
+
+  /* --- Badges & Status --- */
+  --status-active-bg: #064e3b; /* Xanh đậm */
+  --status-active-text: #4ade80; /* Xanh lá sáng */
+
+  --badge-bg: #1e293b;
+  --badge-highlight: #475569;
+  --badge-text: #e2e8f0;
+
+  /* --- Modal & Overlay --- */
+  --overlay-bg: rgba(0, 0, 0, 0.7);
+  --modal-bg: #1e293b;
+  --modal-shadow: 0px 10px 20px -3px rgba(0, 0, 0, 0.5);
+
+  /* --- Buttons --- */
+  --btn-bg-hover: #334155;
+
+  --btn-cancel-bg: #334155;
+  --btn-cancel-hover: #475569;
+
+  --btn-delete-bg: #991b1b;
+  --btn-delete-hover: #7f1d1d;
+
+  --btn-update-bg: #ef4444;
+  --btn-update-hover: #dc2626;
+
+  /* Warning Box */
+  --warning-bg: #450a0a;
+  --warning-border: #7f1d1d;
+  --warning-text: #fca5a5;
+  --icon-warning-bg: #7f1d1d;
 }
 
 /* =========================
    Tailwind Theme Mapping
    ========================= */
 @theme inline {
-  /* Colors */
+  /* Colors - Base */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-brand-dark-red: var(--brand-dark-red);
   
+  /* Text */
   --color-text-gray: var(--text-gray);
+  --color-text-nav: var(--text-nav);
   --color-text-white: var(--text-white);
   
+  /* Backgrounds */
   --color-bg-beige: var(--bg-beige);
-  --color-background-paper: var(--background-paper); /* Thêm mới */
-  --color-bg-hover: var(--bg-hover);                 /* Thêm mới */
-  --color-avatar-yellow: var(--avatar-yellow);       /* Thêm mới */
+  --color-background-paper: var(--background-paper);
+  --color-bg-hover: var(--bg-hover);
+  --color-avatar-yellow: var(--avatar-yellow);
   
+  /* Border */
   --color-border-gray: var(--border-gray);
+
+  /* Primary Variants */
+  --color-primary-light: var(--primary-light);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+
+  /* Status & Badges */
+  --color-status-active-bg: var(--status-active-bg);
+  --color-status-active-text: var(--status-active-text);
+  --color-badge-bg: var(--badge-bg);
+  --color-badge-highlight: var(--badge-highlight);
+  --color-badge-text: var(--badge-text);
+  
+  /* Modal & Overlay */
+  --color-overlay-bg: var(--overlay-bg);
+  --color-modal-bg: var(--modal-bg);
+  
+  /* Buttons */
+  --color-btn-bg-hover: var(--btn-bg-hover);
+  --color-btn-cancel-bg: var(--btn-cancel-bg);
+  --color-btn-delete-bg: var(--btn-delete-bg);
+  --color-btn-update-bg: var(--btn-update-bg);
+
+  /* Warning */
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-text: var(--warning-text);
 
   /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-
-  --color-text-nav: var(--text-nav);
-  --color-primary-light: var(--primary-light);
-  --color-primary-hover: var(--primary-hover);
-  --color-primary-active: var(--primary-active);
 }
 
 /* =========================

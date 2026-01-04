@@ -1,0 +1,172 @@
+/* Overlay che toàn màn hình */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--overlay-bg, rgba(0, 0, 0, 0.5));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Đảm bảo nằm trên cùng */
+    padding: 20px;
+    backdrop-filter: blur(2px); /* Hiệu ứng mờ nền nhẹ cho đẹp */
+}
+
+/* Modal Box */
+.modal {
+    background-color: var(--modal-bg, #f5efe1);
+    border: 1px solid var(--border-gray, rgba(0, 0, 0, 0.1));
+    border-radius: 10px;
+    box-shadow: var(--modal-shadow, 0px 10px 15px -3px rgba(0, 0, 0, 0.1));
+    width: 100%;
+    max-width: 520px;
+    position: relative;
+    padding: 24px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+.modal-header {
+    margin-bottom: 16px;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--foreground);
+    margin: 0;
+}
+
+/* Close Button (X) */
+.close-button {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    width: 24px;
+    height: 24px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-gray);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-button:hover {
+    opacity: 1;
+    color: var(--foreground);
+}
+
+/* Form Styles */
+.form-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.form-row .form-field {
+    flex: 1;
+}
+
+.form-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--foreground);
+}
+
+.form-input {
+    background-color: var(--input-bg, #ffffff);
+    border: 1px solid transparent; /* Hoặc var(--border-gray) nếu muốn viền */
+    border-radius: 8px;
+    height: 38px;
+    padding: 4px 12px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--foreground);
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.form-input::placeholder {
+    color: var(--input-text, #717182);
+}
+
+.form-input:focus {
+    box-shadow: 0px 0px 0px 2px var(--input-focus, rgba(225, 102, 102, 0.5));
+    border-color: var(--primary);
+}
+
+/* Buttons */
+.button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.btn {
+    flex: 1;
+    height: 40px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-cancel {
+    background-color: var(--btn-cancel-bg, #f5efe1);
+    border: 1px solid var(--border-gray);
+    color: var(--foreground);
+}
+
+.btn-cancel:hover {
+    background-color: var(--btn-cancel-hover, #ecddc0);
+}
+
+.btn-update {
+    background-color: var(--btn-update-bg, #e16666);
+    color: white;
+}
+
+.btn-update:hover {
+    background-color: var(--btn-update-hover, #d85555);
+}
+
+/* Responsive */
+@media (max-width: 540px) {
+    .form-row {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .button-group {
+        flex-direction: column;
+    }
+}
