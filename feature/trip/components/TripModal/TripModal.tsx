@@ -4,17 +4,8 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import styles from './TripModal.module.css';
 import { FaTimes } from 'react-icons/fa';
-// Import các type dữ liệu dropdown
 import { RouteSelection, VehicleSelection, DriverSelection } from '../../types';
-
-export interface TripFormData {
-    routeId: string;
-    vehicleId: string;
-    driverId: string;
-    date: string;
-    departureTime: string;
-    price: number;
-}
+import { TripFormData } from '../../types';
 
 interface TripModalProps {
     isOpen: boolean;

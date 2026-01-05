@@ -2,16 +2,24 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
+import axios, { AxiosError } from 'axios';
 import {
     TripData, RouteSelection, VehicleSelection, DriverSelection
 } from '../types';
 import { tripApi } from '../api/tripApi';
-import { TripFormData } from '@/feature/trip/components/TripModal/TripModal';
+import { TripFormData, ApiResponse } from '../types';
 
 interface FetchTripsParams {
     page: number;
     status?: string;
     date?: string | null;
+}
+
+// Định nghĩa kiểu lỗi trả về từ Backend (khớp với BE của bạn)
+interface ErrorResponse {
+    success: boolean;
+    message: string;
+    data: any;
 }
 
 export const useTrips = () => {
@@ -27,13 +35,26 @@ export const useTrips = () => {
     const [drivers, setDrivers] = useState<DriverSelection[]>([]);
     const [loadingSelection, setLoadingSelection] = useState(false);
 
-    // --- State cho Create Trip (MỚI) ---
+    // --- State cho Create Trip ---
     const [isCreating, setIsCreating] = useState(false);
 
-    // Lưu params lần cuối để refresh data sau khi update/create
     const lastParamsRef = useRef<FetchTripsParams>({ page: 0 });
 
-    // 1. Fetch Selection Data
+    // --- 2. HELPER: Hàm lấy message lỗi từ Axios ---
+    const getErrorMessage = (error: unknown, defaultMessage: string): string => {
+        if (axios.isAxiosError(error)) {
+            const serverError = error as AxiosError<ApiResponse<any>>;
+            if (serverError.response?.data?.message) {
+                return serverError.response.data.message;
+            }
+        }
+        if (error instanceof Error) {
+            return error.message;
+        }
+        return defaultMessage;
+    };
+
+    // 3. Fetch Selection Data
     const fetchSelectionData = useCallback(async () => {
         setLoadingSelection(true);
         try {
@@ -46,18 +67,19 @@ export const useTrips = () => {
             setVehicles(vehiclesData);
             setDrivers(driversData);
         } catch (error) {
-            alert("Failed to fetch selection data, please try again.");
-            console.error("Failed to fetch selection data", error);
+            // Dùng helper để hiển thị lỗi
+            alert(getErrorMessage(error, "Failed to fetch selection data."));
+            console.error("Fetch Selection Error", error);
         } finally {
             setLoadingSelection(false);
         }
     }, []);
 
-    // 2. Fetch Trips
+    // 4. Fetch Trips
     const fetchTrips = useCallback(async (params: FetchTripsParams) => {
         setLoading(true);
         try {
-            lastParamsRef.current = params; // Lưu lại params hiện tại
+            lastParamsRef.current = params;
             const data = await tripApi.getTrips({
                 page: params.page,
                 status: params.status,
@@ -72,82 +94,72 @@ export const useTrips = () => {
                 setTrips([]);
             }
         } catch (error) {
-            alert("Failed to fetch trips, please try again.");
-            console.error("Failed to fetch trips", error);
+            alert(getErrorMessage(error, "Failed to fetch trips."));
+            console.error("Fetch Trips Error", error);
             setTrips([]);
         } finally {
             setLoading(false);
         }
     }, []);
 
-    // 3. Create Trip (ĐÃ CẬP NHẬT)
+    // 5. Create Trip (ĐÃ SỬA LOGIC BẮT LỖI)
     const createTrip = async (data: TripFormData): Promise<boolean> => {
         setIsCreating(true);
         try {
-            // Gọi API và nhận về Object Trip mới
+            // Gọi API (Axios sẽ throw Error nếu status code là 4xx, 5xx)
             const newTrip = await tripApi.createTrip({
                 ...data,
                 price: Number(data.price)
             });
 
             if (newTrip) {
-                // UX TRICK: Thêm ngay vào đầu danh sách hiện tại
+                // UX: Thêm vào đầu danh sách
                 setTrips((prevTrips) => [newTrip, ...prevTrips]);
-
-                // (Optional) Nếu muốn chuẩn chỉ logic pagination (Vd: danh sách đang full 10 item),
-                // bạn có thể cắt bớt item cuối:
-                // setTrips(prev => [newTrip, ...prev].slice(0, 10));
-
                 return true;
             }
             return false;
         } catch (error) {
-            alert("Failed to create trip.");
+            const msg = getErrorMessage(error, "Failed to create trip.");
+            alert(msg);
             return false;
         } finally {
             setIsCreating(false);
         }
     };
 
-    // 4. Update Status
+    // 6. Update Status
     const updateTripStatus = async (tripId: number, newStatus: string) => {
         try {
             const success = await tripApi.updateStatus(tripId, newStatus);
 
             if (success) {
-                // UX TRICK: Tìm tripId và update status mà không fetch lại
                 setTrips((prevTrips) =>
                     prevTrips.map((trip) =>
                         trip.tripId === tripId
-                            ? { ...trip, status: newStatus } // Copy trip cũ, đè status mới
+                            ? { ...trip, status: newStatus }
                             : trip
                     )
                 );
             }
         } catch (error) {
-            alert("Error updating status.");
+            alert(getErrorMessage(error, "Error updating status."));
         }
     };
 
     return {
-        // List Data
         trips,
         loading,
         currentPage,
         totalPages,
         setPage: setCurrentPage,
         fetchTrips,
-
-        // Selection Data
         routes,
         vehicles,
         drivers,
         loadingSelection,
         fetchSelectionData,
-
-        // Actions
         updateTripStatus,
         createTrip,
-        isCreating, // Export state này ra để Modal dùng hiển thị loading
+        isCreating,
     };
 };

@@ -38,7 +38,7 @@ const getStatusBadgeClass = (status: string | null) => {
 const TripTable = ({ trips, onStatusUpdate }: TripTableProps) => {
 
     // List các status có thể chọn để đổi
-    const statusOptions = ["Waiting", "Running", "Delay", "Completed", "Cancelled"];
+    const statusOptions = ["Waiting", "Running", "Delayed", "Completed", "Cancelled"];
 
     return (
         <div className={styles.card}>
