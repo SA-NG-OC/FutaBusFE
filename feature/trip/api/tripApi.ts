@@ -1,11 +1,25 @@
-import { create } from "domain";
+// src/services/tripApi.ts (hoặc file tương ứng của bạn)
+import axios from "axios";
 import {
-    PageResponse, ApiResponse, TripData,
-    RouteSelection, VehicleSelection, DriverSelection
+    PageResponse,
+    ApiResponse,
+    TripData,
+    RouteSelection,
+    VehicleSelection,
+    DriverSelection,
+    TripFormData
 } from "../types";
-import BackendResponse from "@/shared/utils";
+
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5230';
+
+
+const axiosClient = axios.create({
+    baseURL: API_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
 
 interface GetTripsParams {
     page?: number;
@@ -15,95 +29,86 @@ interface GetTripsParams {
 }
 
 export const tripApi = {
-    /**
-     * 1. GET /trips
-     * Backend trả về trực tiếp Page Object (content, totalPages, number...)
-     */
+
     getTrips: async ({
         page = 0,
         size = 10,
         status,
         date
-    }: GetTripsParams): Promise<PageResponse<TripData>> => { // <--- SỬA RETURN TYPE
-        const params = new URLSearchParams();
-        params.append('page', page.toString());
-        params.append('size', size.toString());
-        params.append('sort', 'updatedAt,desc');
+    }: GetTripsParams): Promise<PageResponse<TripData>> => {
+        const params: Record<string, any> = {
+            page,
+            size
+        };
 
         if (status && status !== 'ALL' && status !== '') {
-            params.append('status', status);
+            params.status = status;
         }
 
         if (date) {
-            params.append('date', date);
+            params.date = date;
         }
 
-        const res = await fetch(`${API_URL}/trips?${params.toString()}`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
+        // Gọi API với kiểu bọc ApiResponse
+        const response = await axiosClient.get<ApiResponse<PageResponse<TripData>>>('/trips', { params });
+
+        // Kiểm tra logic success từ Backend
+        if (!response.data.success) {
+            throw new Error(response.data.message || "Failed to fetch trips");
+        }
+
+        return response.data.data;
+    },
+
+    getTripDates: async (start: string, end: string): Promise<string[]> => {
+        const response = await axiosClient.get<ApiResponse<string[]>>('/trips/calendar-dates', {
+            params: { start, end }
         });
 
-        if (!res.ok) {
-            throw new Error(`Error fetching trips: ${res.statusText}`);
+        if (!response.data.success) {
+            throw new Error(response.data.message);
         }
 
-        // Trả về thẳng JSON (khớp với PageResponse)
-        return res.json();
+        return response.data.data;
     },
 
-    // ... Giữ nguyên getTripDates và updateStatus như cũ ...
-    // ... (Giả sử các API này vẫn trả về ApiResponse có success/message) ...
-
-    getTripDates: async (start: string, end: string): Promise<ApiResponse<string[]>> => {
-        const params = new URLSearchParams({ start, end });
-        const res = await fetch(`${API_URL}/trips/calendar-dates?${params.toString()}`);
-        if (!res.ok) throw new Error(res.statusText);
-        return res.json();
-    },
 
     updateStatus: async (tripId: number, newStatus: string): Promise<boolean> => {
-        const res = await fetch(`${API_URL}/trips/${tripId}/status`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: newStatus }),
-        });
-        return res.ok;
+        const response = await axiosClient.patch<ApiResponse<any>>(`/trips/${tripId}/status`, { status: newStatus });
+
+        if (!response.data.success) {
+            throw new Error(response.data.message);
+        }
+
+        return true;
     },
 
+
     getRoutesSelection: async (): Promise<RouteSelection[]> => {
-        const res = await fetch(`${API_URL}/routes/selection`);
-        if (!res.ok) throw new Error("Failed to fetch routes");
-        return res.json();
+        const response = await axiosClient.get<ApiResponse<RouteSelection[]>>('/routes/selection');
+        if (!response.data.success) throw new Error(response.data.message);
+        return response.data.data;
     },
 
     getVehiclesSelection: async (): Promise<VehicleSelection[]> => {
-        const res = await fetch(`${API_URL}/vehicles/selection`);
-        if (!res.ok) throw new Error("Failed to fetch vehicles");
-        return res.json();
+        const response = await axiosClient.get<ApiResponse<VehicleSelection[]>>('/vehicles/selection');
+        if (!response.data.success) throw new Error(response.data.message);
+        return response.data.data;
     },
 
     getDriversSelection: async (): Promise<DriverSelection[]> => {
-        const res = await fetch(`${API_URL}/drivers/selection`);
-        if (!res.ok) throw new Error("Failed to fetch drivers");
-        return res.json();
+        const response = await axiosClient.get<ApiResponse<DriverSelection[]>>('/drivers/selection');
+        if (!response.data.success) throw new Error(response.data.message);
+        return response.data.data;
     },
 
-    createTrip: async (tripData: any): Promise<TripData | null> => {
-        try {
-            const res = await fetch(`${API_URL}/trips`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(tripData),
-            });
+    createTrip: async (tripData: TripFormData): Promise<TripData> => {
+        const response = await axiosClient.post<ApiResponse<TripData>>('/trips', tripData);
 
-            if (res.ok) {
-                const newTrip: TripData = await res.json();
-                return newTrip; // Trả về object trip đầy đủ từ BE
-            }
-            return null;
-        } catch (error) {
-            console.error("API create error", error);
-            return null;
+        if (!response.data.success) {
+            throw new Error(response.data.message || "Failed to create trip");
         }
+
+        return response.data.data;
     },
 };

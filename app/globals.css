@@ -65,6 +65,22 @@
   --warning-border: #ffc9c9;
   --warning-text: #9f0712;
   --icon-warning-bg: #ffe2e2;
+  /* --- DASHBOARD STAT COLORS (Light Mode) --- */
+  /* Green (Revenue) */
+  --stat-green-bg: #dcfce7;
+  --stat-green-text: #00a63e;
+  
+  /* Blue (Tickets) */
+  --stat-blue-bg: #dbeafe;
+  --stat-blue-text: #2563eb;
+
+  /* Orange (Vehicles) */
+  --stat-orange-bg: #ffedd5;
+  --stat-orange-text: #ea580c;
+
+  /* Purple (Drivers) */
+  --stat-purple-bg: #f3e8ff;
+  --stat-purple-text: #9333ea;
 }
 
 /* =========================
@@ -132,6 +148,22 @@
   --warning-border: #7f1d1d;
   --warning-text: #fca5a5;
   --icon-warning-bg: #7f1d1d;
+  /* --- DASHBOARD STAT COLORS (Dark Mode) --- */
+  /* Green */
+  --stat-green-bg: #064e3b;
+  --stat-green-text: #4ade80;
+
+  /* Blue */
+  --stat-blue-bg: #1e3a8a;
+  --stat-blue-text: #60a5fa;
+
+  /* Orange */
+  --stat-orange-bg: #7c2d12;
+  --stat-orange-text: #fb923c;
+
+  /* Purple */
+  --stat-purple-bg: #581c87;
+  --stat-purple-text: #c084fc;
 }
 
 /* =========================
@@ -187,6 +219,19 @@
   /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* --- Stat Colors Mapping --- */
+  --color-stat-green-bg: var(--stat-green-bg);
+  --color-stat-green-text: var(--stat-green-text);
+
+  --color-stat-blue-bg: var(--stat-blue-bg);
+  --color-stat-blue-text: var(--stat-blue-text);
+
+  --color-stat-orange-bg: var(--stat-orange-bg);
+  --color-stat-orange-text: var(--stat-orange-text);
+
+  --color-stat-purple-bg: var(--stat-purple-bg);
+  --color-stat-purple-text: var(--stat-purple-text);
 }
 
 /* =========================

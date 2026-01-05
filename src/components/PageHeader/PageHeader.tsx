@@ -8,8 +8,8 @@ import ButtonAdd from '../Button/ButtonAdd';
 interface PageHeaderProps {
     title: string;
     subtitle?: string;
-    actionLabel?: string;       // Chữ trên nút (VD: Add Route)
-    onAction?: () => void;      // Hàm xử lý khi bấm nút
+    actionLabel?: string;
+    onAction?: () => void;
 }
 
 const PageHeader = ({ title, subtitle, actionLabel, onAction }: PageHeaderProps) => {

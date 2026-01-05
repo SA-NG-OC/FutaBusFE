@@ -6,9 +6,10 @@ import PageHeader from '@/src/components/PageHeader/PageHeader';
 import TripFilterBar from '@/feature/trip/components/TripFilterBar/TripFilterBar';
 import TripTable from '@/feature/trip/components/TripTable/TripTable';
 import Pagination from '@/src/components/Pagination/Pagination';
-import TripModal, { TripFormData } from '@/feature/trip/components/TripModal/TripModal';
+import TripModal from '@/feature/trip/components/TripModal/TripModal';
 import { useTrips } from '@/feature/trip/hooks/useTrips';
 import { format } from 'date-fns';
+import { TripFormData } from '@/feature/trip/types';
 
 export default function TripSchedulingPage() {
     // State bộ lọc
@@ -69,13 +70,12 @@ export default function TripSchedulingPage() {
         if (success) {
             setIsModalOpen(false);
 
-            // ✅ RESET FILTER
             setFilterState({
                 date: null,
                 status: ''
             });
 
-            setPage(0); // optional: quay về trang đầu
+            setPage(0);
         } else {
             alert("Failed to create trip. Please try again.");
         }
@@ -135,7 +135,6 @@ export default function TripSchedulingPage() {
                 routes={routes}
                 vehicles={vehicles}
                 drivers={drivers}
-                // isCreating (khi bấm Save) hoặc loadingSelection (khi mới mở modal) đều cần hiện loading
                 isLoading={isCreating || loadingSelection}
             />
         </div>
