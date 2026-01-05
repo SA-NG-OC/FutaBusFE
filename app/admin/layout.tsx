@@ -1,7 +1,8 @@
-/* app/admin/layout.tsx */
 import React from 'react';
 import AdminSidebar from '../../src/components/AdminSidebar/AdminSidebar';
 import AdminHeader from '../../src/components/AdminHeader/AdminHeader';
+// Import css module vừa tạo
+import styles from './admin.module.css';
 
 export default function AdminLayout({
     children,
@@ -9,26 +10,18 @@ export default function AdminLayout({
     children: React.ReactNode
 }) {
     return (
-        <div style={{ display: 'flex', flexDirection: 'row', minHeight: '100vh', backgroundColor: 'var(--background)' }}>
-
+        <div className={styles.container}>
             {/* 1. Sidebar */}
             <AdminSidebar />
 
-            {/* 2. Main Area (Chứa Header + Content) */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'var(--background)' }}>
+            {/* 2. Main Area */}
+            <div className={styles['main-area']}>
 
-                {/* Header nằm ở đây */}
+                {/* Header sẽ đứng yên ở trên cùng */}
                 <AdminHeader />
 
-                {/* Nội dung thay đổi (Children) */}
-                <main style={{
-                    flex: 1,
-                    padding: '32px',
-                    overflowY: 'auto',
-                    backgroundColor: 'var(--background)',
-                    color: 'var(--foreground)',
-                    transition: 'background-color 0.2s ease, color 0.2s ease'
-                }}>
+                {/* Nội dung thay đổi (Children) sẽ cuộn độc lập */}
+                <main className={styles['content-area']}>
                     {children}
                 </main>
 

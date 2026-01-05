@@ -1,0 +1,232 @@
+/* src/feature/trip/components/TripFilterBar/TripFilterBar.module.css */
+
+.container {
+    background-color: var(--background-paper, #ffffff);
+    border: 1px solid var(--border-gray, rgba(0, 0, 0, 0.1));
+    border-radius: 14px;
+    padding: 16px;
+    width: 100%;
+    /* max-width: 960px; -> Để full width theo layout cha */
+    margin-top: 32px; /* Cách PageHeader 32px theo yêu cầu */
+}
+
+.trip-scheduling {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap; /* Cho phép xuống dòng trên màn hình nhỏ */
+}
+
+/* Base Button Style */
+.btn {
+    background-color: var(--badge-bg, #f5efe1);
+    border: 1px solid var(--border-gray, rgba(0, 0, 0, 0.1));
+    border-radius: 8px;
+    height: 36px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; /* Khoảng cách giữa icon và text */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn:hover {
+    background-color: var(--btn-bg-hover, #ecddc0);
+}
+
+.btn:active {
+    background-color: var(--btn-active-bg, #e0d0b5); /* Cần thêm biến này hoặc fallback */
+}
+
+/* Icon trong nút */
+.btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    color: var(--foreground, #2c2c2c); /* Icon theo màu text chính */
+}
+
+.btn-text {
+    font-family: var(--font-sans, 'Arimo', sans-serif);
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--foreground, #2c2c2c);
+}
+
+/* --- Select Box Container --- */
+.select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 140px;
+}
+
+/* Style cho thẻ Select */
+.status-select {
+    appearance: none; /* Ẩn mũi tên mặc định của trình duyệt */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    
+    background-color: var(--input-bg, #ffffff);
+    border: 1px solid var(--border-gray, rgba(0, 0, 0, 0.1));
+    border-radius: 8px;
+    height: 36px;
+    width: 100%;
+    padding: 0 36px 0 12px; /* Padding phải chừa chỗ cho icon mũi tên */
+    
+    font-family: var(--font-sans, 'Arimo', sans-serif);
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--foreground, #2c2c2c);
+    
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.status-select:hover {
+    border-color: var(--primary, #d83e3e);
+}
+
+.status-select:focus {
+    box-shadow: 0 0 0 2px rgba(216, 62, 62, 0.1);
+    border-color: var(--primary, #d83e3e);
+}
+
+/* Icon mũi tên custom nằm đè lên select */
+.select-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none; /* Để click xuyên qua icon vào select */
+    color: var(--text-gray, #717182);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .trip-scheduling {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn, .select-wrapper {
+        width: 100%;
+    }
+}
+
+.calendar-wrapper {
+    position: relative; /* Để lịch neo vào nút này */
+}
+
+.calendar-popup {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 8px;
+    z-index: 1000;
+    background-color: var(--background-paper);
+    border: 1px solid var(--border-gray);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 16px;
+    width: 350px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* Ẩn calendar mặc định xấu xí của lib và style lại */
+.calendar-popup :global(.react-calendar) {
+    width: 100%;
+    background: var(--background-paper);
+    border: none;
+    font-family: var(--font-sans, 'Arimo', sans-serif);
+}
+
+.calendar-popup :global(.react-calendar__navigation) {
+    display: flex;
+    margin-bottom: 1em;
+}
+
+.calendar-popup :global(.react-calendar__navigation button) {
+    min-width: 44px;
+    background: none;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 8px;
+    color: var(--foreground);
+    border: none;
+    cursor: pointer;
+}
+
+/* Tên thứ (T2, T3...) */
+.calendar-popup :global(.react-calendar__month-view__weekdays) {
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--text-gray);
+    text-decoration: none;
+}
+
+/* Các ngày */
+.calendar-popup :global(.react-calendar__tile) {
+    max-width: 100%;
+    background: none;
+    text-align: center;
+    line-height: 16px;
+    font-size: 14px;
+    border: none;
+    padding: 10px 6px;
+    position: relative; /* Để đặt dấu chấm */
+    cursor: pointer;
+    border-radius: 8px;
+    color: var(--foreground);
+}
+
+.calendar-popup :global(.react-calendar__tile:enabled:hover),
+.calendar-popup :global(.react-calendar__tile:enabled:focus) {
+    background-color: var(--bg-hover);
+}
+
+/* Ngày được chọn (Active) - Màu xanh đậm giống ảnh */
+.calendar-popup :global(.react-calendar__tile--active) {
+    background-color: #3b5bdb !important; 
+    color: white !important;
+}
+
+/* Ngày hiện tại (Now) */
+.calendar-popup :global(.react-calendar__tile--now) {
+    background-color: var(--bg-today);
+}
+
+/* --- DOT INDICATOR (Dấu chấm) --- */
+.dot-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 4px;
+    height: 4px;
+}
+
+.dot {
+    width: 4px;
+    height: 4px;
+    background-color: var(--primary); /* Màu xanh giống ảnh */
+    border-radius: 50%;
+}
+
+/* Nếu ngày đang được chọn thì dot màu trắng cho nổi */
+.calendar-popup :global(.react-calendar__tile--active) .dot {
+    background-color: white;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

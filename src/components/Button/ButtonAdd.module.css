@@ -1,0 +1,45 @@
+.btn {
+    /* Flexbox để căn giữa và tự động co giãn */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Khoảng cách giữa Icon và Chữ */
+    
+    /* Kích thước */
+    height: 36px;
+    padding: 0 16px; /* Padding 2 bên để chữ không sát mép khi nút giãn ra */
+    min-width: 113px; /* Độ rộng tối thiểu (giống thiết kế cũ) */
+    
+    /* Màu sắc & Border */
+    background-color: var(--primary, #d83e3e); /* Fallback màu nếu chưa có biến */
+    border: none;
+    border-radius: 8px;
+    
+    /* Font chữ giữ nguyên */
+    font-family: var(--font-sans), 'Arimo', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    color: white;
+    
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: nowrap; /* Không cho chữ xuống dòng */
+}
+
+.btn:hover {
+    background-color: var(--primary-hover, #c43535);
+}
+
+.btn:active {
+    background-color: var(--primary-active, #b22d2d);
+}
+
+/* Style cho icon để đảm bảo kích thước chuẩn */
+.icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+}

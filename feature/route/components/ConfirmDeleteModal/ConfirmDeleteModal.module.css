@@ -1,0 +1,183 @@
+/* Overlay */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--overlay-bg, rgba(0, 0, 0, 0.5));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050; /* Cao hơn modal thường chút để chắc chắn */
+    padding: 20px;
+    backdrop-filter: blur(2px);
+}
+
+/* Modal Box */
+.modal {
+    background-color: var(--modal-bg, #f5efe1);
+    border: 1px solid var(--border-gray);
+    border-radius: 10px;
+    box-shadow: var(--modal-shadow);
+    width: 100%;
+    max-width: 520px;
+    position: relative;
+    padding: 24px;
+    animation: shake 0.3s ease-out; /* Hiệu ứng rung nhẹ cảnh báo */
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
+
+/* Close Button */
+.close-button {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    width: 24px;
+    height: 24px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-gray);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.close-button:hover {
+    opacity: 1;
+    color: var(--foreground);
+}
+
+/* Header with Icon */
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.icon-warning {
+    width: 48px;
+    height: 48px;
+    background-color: var(--icon-warning-bg, #ffe2e2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--btn-delete-bg); /* Màu icon đỏ đậm */
+    flex-shrink: 0;
+}
+
+.icon-warning svg {
+    width: 24px;
+    height: 24px;
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--foreground);
+    margin: 0;
+}
+
+/* Content */
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.message-text {
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--text-gray);
+    margin: 0;
+}
+
+.plate-number {
+    font-family: var(--font-mono, monospace); /* Font số cho rõ ràng */
+    font-weight: 700;
+    color: var(--foreground);
+    background-color: var(--bg-hover);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Warning Box */
+.warning-box {
+    background-color: var(--warning-bg, #fef2f2);
+    border: 1px solid var(--warning-border, #ffc9c9);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.warning-text {
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--warning-text, #9f0712);
+    margin: 0;
+}
+
+/* Footer Buttons */
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.btn {
+    height: 40px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0 20px;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-cancel {
+    background-color: var(--btn-cancel-bg);
+    border: 1px solid var(--border-gray);
+    color: var(--foreground);
+}
+
+.btn-cancel:hover {
+    background-color: var(--btn-cancel-hover);
+}
+
+.btn-delete {
+    background-color: var(--btn-delete-bg, #8b1a1a);
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: var(--btn-delete-hover, #7a1616);
+}
+
+/* Responsive */
+@media (max-width: 540px) {
+    .modal-footer {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}

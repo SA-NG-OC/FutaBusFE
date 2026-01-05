@@ -1,0 +1,49 @@
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 24px; /* Tạo khoảng cách với nội dung bên dưới (Table/List) */
+}
+
+.text-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.heading {
+    font-family: var(--font-sans), 'Arimo', sans-serif;
+    font-size: 24px;
+    font-weight: 700; /* Đậm hơn chút cho giống tiêu đề */
+    line-height: 1.2;
+    color: var(--foreground); /* Tự động đổi màu theo theme */
+    margin: 0;
+}
+
+.subtitle {
+    font-family: var(--font-sans), 'Arimo', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--text-gray); /* Màu xám */
+    margin: 0;
+}
+
+/* Responsive: Trên mobile thì nút xuống dòng */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .button-wrapper {
+        width: 100%;
+    }
+    
+    /* Để nút full width trên mobile nếu muốn */
+    .button-wrapper button {
+        width: 100%;
+    }
+}

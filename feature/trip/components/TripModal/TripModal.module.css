@@ -1,0 +1,183 @@
+/* Overlay che toàn màn hình */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--overlay-bg, rgba(0, 0, 0, 0.5));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050; /* Cao hơn các thành phần khác */
+    padding: 20px;
+    backdrop-filter: blur(2px);
+}
+
+/* Modal Container */
+.modal {
+    background-color: var(--modal-bg, #f5efe1);
+    border: 1px solid var(--border-gray);
+    border-radius: 10px;
+    box-shadow: var(--modal-shadow);
+    width: 100%;
+    max-width: 520px;
+    position: relative;
+    padding: 24px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Close Button */
+.close-button {
+    position: absolute;
+    right: 16px;
+    top: 16px;
+    width: 24px;
+    height: 24px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-gray);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.close-button:hover {
+    opacity: 1;
+    color: var(--foreground);
+}
+
+/* Modal Header */
+.modal-header {
+    margin-bottom: 20px;
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--foreground);
+    margin: 0;
+}
+
+/* Form Content */
+.form-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.form-row .form-field {
+    flex: 1;
+}
+
+.form-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--foreground);
+}
+
+/* Inputs & Selects */
+.form-input,
+.form-select {
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-gray); /* Thêm border nhẹ để rõ hơn trong dark mode */
+    border-radius: 8px;
+    height: 40px;
+    padding: 0 12px;
+    font-family: var(--font-sans, sans-serif);
+    font-size: 14px;
+    color: var(--foreground);
+    outline: none;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.form-input:focus,
+.form-select:focus {
+    box-shadow: 0 0 0 2px var(--input-focus);
+    border-color: var(--primary);
+}
+
+.form-input::placeholder {
+    color: var(--input-text);
+}
+
+/* Custom Select Arrow */
+.form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M4%206L8%2010L12%206%22%20stroke%3D%22%23717182%22%20stroke-width%3D%221.33%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+    cursor: pointer;
+}
+
+/* Dark mode fix cho icon mũi tên (nếu cần) - hoặc dùng filter invert */
+/* .form-select option { background-color: var(--input-bg); } */
+
+/* Submit Button */
+.submit-button {
+    background-color: var(--primary);
+    border: none;
+    border-radius: 8px;
+    height: 40px;
+    width: 100%;
+    font-family: var(--font-sans, sans-serif);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-white);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.submit-button:hover {
+    background-color: var(--primary-hover);
+}
+
+.submit-button:active {
+    background-color: var(--primary-active);
+}
+
+.submit-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Error message */
+.error-text {
+    font-size: 12px;
+    color: var(--warning-text);
+    margin-top: 4px;
+}
+
+/* Responsive */
+@media (max-width: 540px) {
+    .form-row {
+        flex-direction: column;
+    }
+}
