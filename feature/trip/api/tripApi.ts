@@ -1,14 +1,13 @@
 // src/services/tripApi.ts (hoặc file tương ứng của bạn)
 import axios from "axios";
 import {
-    PageResponse,
-    ApiResponse,
     TripData,
     RouteSelection,
     VehicleSelection,
     DriverSelection,
     TripFormData
 } from "../types";
+import { ApiResponse, PageResponse } from "@/shared/utils";
 
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5230';
