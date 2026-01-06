@@ -7,7 +7,8 @@ import {
     TripData, RouteSelection, VehicleSelection, DriverSelection
 } from '../types';
 import { tripApi } from '../api/tripApi';
-import { TripFormData, ApiResponse } from '../types';
+import { TripFormData } from '../types';
+import { ApiResponse } from '@/shared/utils';
 
 interface FetchTripsParams {
     page: number;
