@@ -1,0 +1,89 @@
+/* BookingSuccess.module.css */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+}
+.modal {
+  width: 560px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 36px 40px;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.12);
+  text-align: center;
+}
+.iconWrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 9999px;
+  border: 4px solid #00c853; /* green */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px auto;
+}
+.icon {
+  font-size: 28px;
+  color: #00c853;
+}
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+.message {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+.referenceBox {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 18px 22px;
+  margin: 12px 0 22px 0;
+}
+.refLabel {
+  font-size: 12px;
+  color: #9aa0a6;
+  margin-bottom: 8px;
+}
+.refCode {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Segoe UI Mono", monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.primary {
+  background: #e14b45;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.secondary {
+  background: #f3efe8;
+  color: #6b4f3a;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.primary:hover { opacity: 0.95; }
+.secondary:hover { opacity: 0.95; }
+
+@media (max-width: 640px) {
+  .modal { width: calc(100% - 40px); padding: 28px 20px; }
+}

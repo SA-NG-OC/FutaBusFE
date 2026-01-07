@@ -1,0 +1,63 @@
+/* --- Select Box Container --- */
+.select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 140px;
+}
+
+/* Style cho thẻ Select */
+.status-select {
+    appearance: none;
+    /* Ẩn mũi tên mặc định của trình duyệt */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    background-color: var(--input-bg, #ffffff);
+    border: 1px solid var(--border-gray, rgba(0, 0, 0, 0.1));
+    border-radius: 8px;
+    height: 36px;
+    width: 100%;
+    padding: 0 36px 0 12px;
+    /* Padding phải chừa chỗ cho icon mũi tên */
+
+    font-family: var(--font-sans, 'Arimo', sans-serif);
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--foreground, #2c2c2c);
+
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.status-select:hover {
+    border-color: var(--primary, #d83e3e);
+}
+
+.status-select:focus {
+    box-shadow: 0 0 0 2px rgba(216, 62, 62, 0.1);
+    border-color: var(--primary, #d83e3e);
+}
+
+/* Icon mũi tên custom nằm đè lên select */
+.select-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    /* Để click xuyên qua icon vào select */
+    color: var(--text-gray, #717182);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+
+    .select-wrapper {
+        width: 100%;
+    }
+}

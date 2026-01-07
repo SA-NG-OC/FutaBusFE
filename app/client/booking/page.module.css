@@ -1,0 +1,65 @@
+
+/* ====== LAYOUT 2 CỘT ====== */
+.content {
+    width: 100%;
+    margin: 0 auto;
+    padding-bottom: 32px;
+
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+/* Sidebar */
+.filterbar {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    position: sticky;
+    top: 16px;
+}
+
+/* Main content */
+.main {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 0 auto;
+}
+
+/* Header bên phải */
+.mainHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.sort {
+    background: #fff;
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+
+@media (max-width: 1024px) {
+    .content {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        position: static;
+    }
+}
+@media (max-width: 640px) {
+    .searchSummary {
+        margin: 8px;
+        padding: 12px;
+    }
+
+    .mainHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
