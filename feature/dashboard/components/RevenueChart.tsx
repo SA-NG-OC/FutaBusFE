@@ -16,42 +16,45 @@ interface RevenueChartProps {
     data: ChartDataDTO[];
 }
 
+// ... imports giữ nguyên
+
 const RevenueChart = ({ data }: RevenueChartProps) => {
     return (
         <ResponsiveContainer width="100%" height="100%">
             <LineChart
                 data={data}
-                margin={{ top: 5, right: 10, left: 10, bottom: 0 }}
+                margin={{ top: 5, right: 10, left: 0, bottom: 0 }} // Giảm left margin để tiết kiệm chỗ
             >
-                {/* Grid: Dùng var(--border-gray) */}
                 <CartesianGrid strokeDasharray="3 3" vertical={true} stroke="var(--border-gray)" />
 
-                {/* XAxis: Tick dùng var(--text-gray) */}
                 <XAxis
                     dataKey="label"
                     axisLine={true}
                     tickLine={false}
-                    tick={{ fill: 'var(--text-gray)', fontSize: 12 }}
+                    // Responsive font size: 11px cho gọn
+                    tick={{ fill: 'var(--text-gray)', fontSize: 11 }}
                     dy={10}
                     stroke="var(--border-gray)"
+                    // Giảm bớt label nếu quá dày đặc
+                    interval="preserveStartEnd"
                 />
 
-                {/* YAxis */}
                 <YAxis
                     axisLine={true}
                     tickLine={false}
-                    tick={{ fill: 'var(--text-gray)', fontSize: 12 }}
+                    tick={{ fill: 'var(--text-gray)', fontSize: 11 }}
                     tickFormatter={(value) => `${value / 1000000}M`}
                     stroke="var(--border-gray)"
+                    width={35} // Cố định chiều rộng YAxis để không bị nhảy layout
                 />
 
-                {/* Tooltip: Cần style background/border bằng CSS var */}
                 <Tooltip
                     contentStyle={{
-                        backgroundColor: 'var(--background-paper)', // Nền theo theme
-                        borderColor: 'var(--border-gray)',          // Viền theo theme
-                        color: 'var(--foreground)',                 // Chữ theo theme
+                        backgroundColor: 'var(--background-paper)',
+                        borderColor: 'var(--border-gray)',
+                        color: 'var(--foreground)',
                         borderRadius: '8px',
+                        fontSize: '12px', // Tooltip nhỏ gọn
                         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }}
                     itemStyle={{ color: 'var(--foreground)' }}
@@ -68,8 +71,8 @@ const RevenueChart = ({ data }: RevenueChartProps) => {
                     dataKey="value"
                     stroke="var(--primary)"
                     strokeWidth={2}
-                    dot={{ fill: 'var(--background-paper)', stroke: 'var(--primary)', strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6, fill: 'var(--primary)' }}
+                    dot={{ fill: 'var(--background-paper)', stroke: 'var(--primary)', strokeWidth: 2, r: 3 }}
+                    activeDot={{ r: 5, fill: 'var(--primary)' }}
                 />
             </LineChart>
         </ResponsiveContainer>
