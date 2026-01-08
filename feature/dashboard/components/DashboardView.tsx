@@ -1,5 +1,4 @@
 'use client';
-
 import React from 'react';
 import PageHeader from '@/src/components/PageHeader/PageHeader';
 import StatCard from '@/feature/dashboard/components/StatCard';
@@ -9,7 +8,6 @@ import RevenueChart from '@/feature/dashboard/components/RevenueChart';
 import TicketSalesChart from '@/feature/dashboard/components/TicketSalesChart';
 import TripTable from '@/feature/dashboard/components/TripTable';
 import { useDashboard } from '../hooks/useDashboard';
-import { useDashboard2 } from '../hooks/useDashboard2';
 
 const DashboardView = () => {
     const {
@@ -24,15 +22,11 @@ const DashboardView = () => {
         totalPages
     } = useDashboard();
 
-    const today = new Date().toLocaleDateString('vi-VN');
+    const formatCurrency = (amount: number) =>
+        new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-    };
-
-    const formatNumber = (num: number) => {
-        return new Intl.NumberFormat('vi-VN').format(num);
-    };
+    const formatNumber = (num: number) =>
+        new Intl.NumberFormat('vi-VN').format(num);
 
     const formatTrend = (growth: number | undefined) => {
         if (growth === undefined) return "...";
@@ -40,10 +34,12 @@ const DashboardView = () => {
     };
 
     return (
-        <div className="w-full pb-10 bg-background text-foreground transition-colors duration-200">
-            <PageHeader title="Overview Dashboard" />
+        // Responsive Padding: p-4 mobile, p-6 tablet+
+        <div className="w-full bg-background text-foreground transition-colors duration-200">
+            <PageHeader title="Overview Dashboard" subtitle='Overview of your bus ticket management system' />
 
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* STATS GRID: 1 cột (mobile) -> 2 cột (tablet) -> 4 cột (desktop lớn) */}
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
                 <StatCard
                     variant="green"
                     icon={<IconRevenue />}
@@ -78,29 +74,26 @@ const DashboardView = () => {
                 />
             </div>
 
-            <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* CHARTS GRID: 1 cột (mobile/tablet) -> 2 cột (desktop) */}
+            <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                 <ChartCard
-                    title={`Revenue Trends`}
+                    title="Revenue Trends"
                     isLoading={loadingChart}
                 >
                     <RevenueChart data={chartData?.revenueTrends || []} />
                 </ChartCard>
 
                 <ChartCard
-                    title={`Weekly Ticket Sales`}
+                    title="Weekly Ticket Sales"
                     isLoading={loadingChart}
                 >
                     <TicketSalesChart data={chartData?.weeklySales || []} />
                 </ChartCard>
             </div>
 
-            <div className="mt-6 bg-background-paper rounded-lg shadow-sm p-6 transition-colors duration-200">
-                <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-medium leading-6 text-foreground">
-                        Trips Today ({today})
-                    </h3>
-                </div>
-
+            {/* TRIP TABLE SECTION */}
+            <div className="mt-6">
+                {/* Table Component tự handle khung viền của nó */}
                 <TripTable
                     data={trips}
                     isLoading={loadingTrips}

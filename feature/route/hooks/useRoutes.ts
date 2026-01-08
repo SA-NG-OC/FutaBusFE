@@ -1,53 +1,56 @@
-import { useState, useCallback, useEffect } from 'react';
-import { routeApi } from '../api/routeApi';
-// Giả sử types import đúng
-import { RouteData, RouteRequest } from '../types';
+import { useState, useCallback, useEffect } from "react";
+import { routeApi } from "../api/routeApi";
+import { RouteData, RouteRequest } from "../types";
 
 export const useRoutes = () => {
-    // ... State cũ (Giữ nguyên)
+    // ===== DATA STATE =====
     const [routes, setRoutes] = useState<RouteData[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
+    const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    // ... State Modal (Giữ nguyên)
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    // ===== PAGINATION =====
+    const [currentPage, setCurrentPage] = useState<number>(0);
+    const [totalPages, setTotalPages] = useState<number>(0);
+
+    // ===== MODAL STATE =====
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
     const [selectedRoute, setSelectedRoute] = useState<RouteData | null>(null);
 
-    // 1. Fetch data (Giữ nguyên)
+    // ===== FETCH ROUTES =====
     const fetchRoutes = useCallback(async (page: number) => {
         try {
             setLoading(true);
-            const jsonData = await routeApi.getAll(page, 3);
-            if (jsonData.success) {
-                setRoutes(jsonData.data.content);
-                setTotalPages(jsonData.data.totalPages);
-                setCurrentPage(jsonData.data.number);
-            }
-        } catch (err) {
-            console.error(err);
-            setError("Failed to load routes");
+            setError(null);
+
+            const pageData = await routeApi.getAll(page, 10);
+
+            setRoutes(pageData.data.content);
+            setTotalPages(pageData.data.totalPages);
+            setCurrentPage(pageData.data.number);
+
+        } catch (err: any) {
+            console.error("Fetch routes failed", err);
+            setError(err.message || "Failed to load routes");
         } finally {
             setLoading(false);
         }
     }, []);
 
-    // ... Handlers cho Modal (Giữ nguyên: openAdd, openEdit, openDelete, closeModal) ...
+    // ===== MODAL CONTROLS =====
     const openAddModal = () => {
         setSelectedRoute(null);
         setIsModalOpen(true);
     };
 
-    const openEditModal = (id: number) => {
-        const route = routes.find(r => r.routeId === id) || null;
+    const openEditModal = (routeId: number) => {
+        const route = routes.find(r => r.routeId === routeId) || null;
         setSelectedRoute(route);
         setIsModalOpen(true);
     };
 
-    const openDeleteModal = (id: number) => {
-        const route = routes.find(r => r.routeId === id) || null;
+    const openDeleteModal = (routeId: number) => {
+        const route = routes.find(r => r.routeId === routeId) || null;
         setSelectedRoute(route);
         setIsDeleteModalOpen(true);
     };
@@ -58,63 +61,94 @@ export const useRoutes = () => {
         setSelectedRoute(null);
     };
 
-    // --- 2. LOGIC SAVE ĐÃ TỐI ƯU ---
+    // ===== SAVE (CREATE / UPDATE) =====
     const handleSaveRoute = async (formData: RouteRequest) => {
         try {
+            setLoading(true);
+            setError(null);
+
             if (selectedRoute) {
                 // === UPDATE ===
-                const response = await routeApi.update(selectedRoute.routeId, formData);
+                const updatedRoute = await routeApi.update(
+                    selectedRoute.routeId,
+                    formData
+                );
 
-                const updatedItem = (response.data || response) as unknown as RouteData;
-
-                setRoutes((prevRoutes) =>
-                    prevRoutes.map((item) =>
-                        item.routeId === selectedRoute.routeId ? updatedItem : item
+                setRoutes(prev =>
+                    prev.map(route =>
+                        route.routeId === selectedRoute.routeId
+                            ? updatedRoute
+                            : route
                     )
                 );
             } else {
                 // === CREATE ===
-                const response = await routeApi.create(formData);
+                const newRoute = await routeApi.create(formData);
 
-                const newItem = (response.data || response) as unknown as RouteData;
-
-                setRoutes((prevRoutes) => [newItem, ...prevRoutes]);
+                setRoutes(prev => [newRoute, ...prev]);
             }
 
             closeModal();
         } catch (err: any) {
-            console.error("Save failed", err);
-            alert(err.message || "Failed to save route");
+            console.error("Save route failed", err);
+            setError(err.message || "Failed to save route");
+            throw err;
+        } finally {
+            setLoading(false);
         }
     };
 
-    // --- 3. LOGIC DELETE ĐÃ TỐI ƯU ---
+    // ===== DELETE =====
     const handleDeleteConfirm = async () => {
         if (!selectedRoute) return;
+
         try {
+            setLoading(true);
+            setError(null);
+
             await routeApi.delete(selectedRoute.routeId);
 
-            // Cập nhật state trực tiếp: Lọc bỏ item vừa xóa
-            setRoutes((prevRoutes) =>
-                prevRoutes.filter((item) => item.routeId !== selectedRoute.routeId)
+            setRoutes(prev =>
+                prev.filter(route => route.routeId !== selectedRoute.routeId)
             );
 
             closeModal();
-            // KHÔNG GỌI fetchRoutes(currentPage) NỮA
-        } catch (err) {
-            console.error("Delete failed", err);
-            alert("Failed to delete route");
+        } catch (err: any) {
+            console.error("Delete route failed", err);
+            setError(err.message || "Failed to delete route");
+        } finally {
+            setLoading(false);
         }
     };
 
+    // ===== INITIAL LOAD & PAGE CHANGE =====
     useEffect(() => {
         fetchRoutes(currentPage);
     }, [currentPage, fetchRoutes]);
 
     return {
-        routes, loading, error, currentPage, totalPages, setCurrentPage,
-        isModalOpen, isDeleteModalOpen, selectedRoute,
-        openAddModal, openEditModal, openDeleteModal, closeModal,
-        handleSaveRoute, handleDeleteConfirm
+        // data
+        routes,
+        loading,
+        error,
+
+        // pagination
+        currentPage,
+        totalPages,
+        setCurrentPage,
+
+        // modal state
+        isModalOpen,
+        isDeleteModalOpen,
+        selectedRoute,
+
+        // actions
+        openAddModal,
+        openEditModal,
+        openDeleteModal,
+        closeModal,
+        handleSaveRoute,
+        handleDeleteConfirm,
+        fetchRoutes,
     };
 };

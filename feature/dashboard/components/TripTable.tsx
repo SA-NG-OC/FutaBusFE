@@ -23,51 +23,54 @@ const getStatusBadgeClasses = (status: string) => {
 };
 
 const TripTable = ({ data, isLoading, pagination }: TripTableProps) => {
+    const today = new Date().toLocaleDateString('vi-VN');
 
     if (isLoading) {
         return (
             <div className="bg-background-paper border border-border-gray rounded-[14px] w-full p-6 shadow-sm min-h-[300px] flex items-center justify-center">
-                <p className="text-text-gray">Loading trips data...</p>
+                <p className="text-text-gray animate-pulse">Loading trips data...</p>
             </div>
         );
     }
 
     return (
-        <div className="bg-background-paper border border-border-gray rounded-[14px] w-full p-6 shadow-sm overflow-hidden">
-            <h2 className="text-foreground text-base font-normal mb-6">Today's Trips</h2>
-            <div className="w-full overflow-x-auto">
+        <div className="bg-background-paper border border-border-gray rounded-[14px] w-full p-4 md:p-6 shadow-sm overflow-hidden">
+            <h2 className="text-foreground text-base font-normal mb-4 md:mb-6">
+                Trips Today <span className="text-text-gray text-sm ml-2">({today})</span>
+            </h2>
+
+            {/* Wrapper cho Scroll ngang trên mobile */}
+            <div className="w-full overflow-x-auto custom-scrollbar">
                 <table className="w-full min-w-[700px] border-collapse">
                     <thead>
-                        <tr className="border-b border-border-gray h-12">
-                            {/* ĐỔI: font-bold -> font-medium (Tiêu đề bảng nhạt lại) */}
-                            <th className="text-left font-medium text-foreground pl-4 pb-2 w-[15%]">Trip ID</th>
-                            <th className="text-left font-medium text-foreground pl-4 pb-2 w-[30%]">Route</th>
-                            <th className="text-left font-medium text-foreground pl-4 pb-2 w-[20%]">Status</th>
-                            <th className="text-left font-medium text-foreground pl-4 pb-2 w-[20%]">Departure</th>
-                            <th className="text-left font-medium text-foreground pl-4 pb-2 w-[15%]">Seats</th>
+                        <tr className="border-b border-border-gray h-10 md:h-12">
+                            <th className="text-left font-medium text-foreground pl-4 pb-2 w-[15%] text-sm">Trip ID</th>
+                            <th className="text-left font-medium text-foreground pl-4 pb-2 w-[30%] text-sm">Route</th>
+                            <th className="text-left font-medium text-foreground pl-4 pb-2 w-[20%] text-sm">Status</th>
+                            <th className="text-left font-medium text-foreground pl-4 pb-2 w-[20%] text-sm">Departure</th>
+                            <th className="text-left font-medium text-foreground pl-4 pb-2 w-[15%] text-sm">Seats</th>
                         </tr>
                     </thead>
                     <tbody>
                         {data && data.length > 0 ? (
                             data.map((trip, index) => (
                                 <tr key={index} className="border-b border-border-gray h-12 last:border-b-0 hover:bg-bg-hover transition-colors">
-                                    {/* ĐỔI: Xóa class font-mono để dùng font Arimo cho ID luôn */}
-                                    <td className="text-foreground pl-4 py-3">{trip.tripIdDisplay}</td>
-                                    <td className="text-foreground pl-4 py-3">{trip.routeName}</td>
+                                    <td className="text-foreground pl-4 py-3 text-sm whitespace-nowrap">{trip.tripIdDisplay}</td>
+                                    <td className="text-foreground pl-4 py-3 text-sm min-w-[150px]">{trip.routeName}</td>
                                     <td className="pl-4 py-3">
-                                        <span className={`inline-block px-2 py-1 rounded-[4px] text-sm font-normal leading-5 whitespace-nowrap ${getStatusBadgeClasses(trip.status)}`}>
+                                        <span className={`inline-block px-2 py-1 rounded-[4px] text-xs font-normal leading-4 whitespace-nowrap ${getStatusBadgeClasses(trip.status)}`}>
                                             {trip.status}
                                         </span>
                                     </td>
-                                    <td className="text-foreground pl-4 py-3">
+                                    <td className="text-foreground pl-4 py-3 text-sm whitespace-nowrap">
                                         {trip.departure ? trip.departure.substring(0, 5) : '--:--'}
                                     </td>
-                                    <td className="text-foreground pl-4 py-3">{trip.seatsInfo}</td>
+                                    <td className="text-foreground pl-4 py-3 text-sm whitespace-nowrap">{trip.seatsInfo}</td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={5} className="text-center py-8 text-text-gray">No trips found for today</td>
+                                <td colSpan={5} className="text-center py-8 text-text-gray text-sm">No trips found for today</td>
                             </tr>
                         )}
                     </tbody>
