@@ -1,185 +1,112 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import Calendar from 'react-calendar';
-// THÊM: startOfWeek, endOfWeek
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
-import styles from './TripFilterBar.module.css';
-import { FaCalendarAlt, FaClock, FaChevronDown, FaTimes } from 'react-icons/fa';
-import { tripApi } from '../../api/tripApi';
+import React, { useState, useRef, useEffect } from "react";
+import { format, addDays, subDays } from "date-fns";
+import { vi } from "date-fns/locale";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css"; // Import CSS gốc của thư viện
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaSearch,
+  FaCalendarAlt,
+} from "react-icons/fa";
+import styles from "./TripFilterBar.module.css";
 
 interface TripFilterBarProps {
-    onFilterChange: (date: Date | null, status: string) => void;
-    initialStatus?: string;
-    initialDate?: Date | null;
+  currentDate: Date;
+  onDateChange: (date: Date) => void;
+  onSearch: (term: string) => void;
 }
 
 const TripFilterBar = ({
-    onFilterChange,
-    initialStatus = '',
-    initialDate = new Date()
+  currentDate,
+  onDateChange,
+  onSearch,
 }: TripFilterBarProps) => {
-    const [showCalendar, setShowCalendar] = useState(false);
-    const [date, setDate] = useState<Date | null>(initialDate);
-    const [selectedStatus, setSelectedStatus] = useState<string>(initialStatus);
-    const [highlightedDates, setHighlightedDates] = useState<string[]>([]);
-    const calendarRef = useRef<HTMLDivElement>(null);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const calendarRef = useRef<HTMLDivElement>(null);
 
-    // --- SỬA ĐOẠN NÀY ---
-    const fetchTripDates = async (currentDate: Date) => {
-        try {
-            // Xác định phạm vi hiển thị thực tế trên lịch (Grid view)
-            const monthStart = startOfMonth(currentDate);
-            const monthEnd = endOfMonth(currentDate);
-
-            // Lấy rộng ra đầu tuần và cuối tuần để bao phủ cả những ngày mờ của tháng trước/sau
-            // weekStartsOn: 1 tương ứng với Thứ Hai (phù hợp locale="vi-VN")
-            const visibleStart = startOfWeek(monthStart, { weekStartsOn: 1 });
-            const visibleEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
-
-            const start = format(visibleStart, 'yyyy-MM-dd');
-            const end = format(visibleEnd, 'yyyy-MM-dd');
-
-            console.log(`Fetching dots from ${start} to ${end}`); // Debug xem range đúng chưa
-
-            const response = await tripApi.getTripDates(start, end);
-            if (response.success) {
-                setHighlightedDates(response.data);
-            }
-        } catch (error) {
-            console.error("Failed to fetch calendar dates", error);
-        }
-    };
-    // --------------------
-
-    useEffect(() => {
-        fetchTripDates(new Date());
-
-        const handleClickOutside = (event: MouseEvent) => {
-            if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
-                setShowCalendar(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    const triggerFilterChange = (newDate: Date | null, newStatus: string) => {
-        if (onFilterChange) {
-            onFilterChange(newDate, newStatus);
-        }
-    };
-
-    const handleDateChange = (value: any) => {
-        const selectedDate = value as Date;
-        setDate(selectedDate);
+  // Xử lý click ra ngoài để đóng lịch
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        calendarRef.current &&
+        !calendarRef.current.contains(event.target as Node)
+      ) {
         setShowCalendar(false);
-        triggerFilterChange(selectedDate, selectedStatus);
+      }
     };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-    const handleTodayClick = () => {
-        const today = new Date();
-        setDate(today);
-        triggerFilterChange(today, selectedStatus);
-    };
+  const handleDateChange = (value: any) => {
+    onDateChange(value as Date);
+    setShowCalendar(false); // Chọn xong tự đóng
+  };
 
-    const handleClearDate = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setDate(null);
-        triggerFilterChange(null, selectedStatus);
-    };
+  const handlePrevDay = () => onDateChange(subDays(currentDate, 1));
+  const handleNextDay = () => onDateChange(addDays(currentDate, 1));
+  const handleToday = () => onDateChange(new Date());
 
-    const handleStatusSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const newStatus = e.target.value;
-        setSelectedStatus(newStatus);
-        triggerFilterChange(date, newStatus);
-    };
-
-    const handleActiveStartDateChange = ({ activeStartDate }: { activeStartDate: Date | null }) => {
-        if (activeStartDate) fetchTripDates(activeStartDate);
-    };
-
-    const tileContent = ({ date, view }: { date: Date, view: string }) => {
-        if (view === 'month') {
-            const dateStr = format(date, 'yyyy-MM-dd');
-            if (highlightedDates.includes(dateStr)) {
-                return (
-                    <div className={styles['dot-container']}>
-                        <div className={styles['dot']}></div>
-                    </div>
-                );
-            }
-        }
-        return null;
-    };
-
-    return (
-        <div className={styles.container}>
-            <div className={styles['trip-scheduling']}>
-                <div className={styles['calendar-wrapper']} ref={calendarRef}>
-                    <button
-                        className={`${styles.btn} ${showCalendar ? styles.active : ''}`}
-                        onClick={() => setShowCalendar(!showCalendar)}
-                    >
-                        <div className={styles['btn-icon']}>
-                            <FaCalendarAlt />
-                        </div>
-                        <span className={styles['btn-text']}>
-                            {date ? format(date, 'dd/MM/yyyy') : 'All Dates'}
-                        </span>
-                        {date && (
-                            <div
-                                className={styles['clear-date-btn']}
-                                onClick={handleClearDate}
-                                title="Clear date filter"
-                            >
-                                <FaTimes />
-                            </div>
-                        )}
-                    </button>
-
-                    {showCalendar && (
-                        <div className={styles['calendar-popup']}>
-                            <Calendar
-                                onChange={handleDateChange}
-                                value={date || new Date()}
-                                tileContent={tileContent}
-                                onActiveStartDateChange={handleActiveStartDateChange}
-                                locale="vi-VN"
-                                next2Label={null}
-                                prev2Label={null}
-                            />
-                        </div>
-                    )}
-                </div>
-
-                <button className={styles.btn} onClick={handleTodayClick}>
-                    <div className={styles['btn-icon']}>
-                        <FaClock />
-                    </div>
-                    <span className={styles['btn-text']}>Today</span>
-                </button>
-
-                <div className={styles['select-wrapper']}>
-                    <select
-                        className={styles['status-select']}
-                        onChange={handleStatusSelect}
-                        value={selectedStatus}
-                    >
-                        <option value="">All Statuses</option>
-                        <option value="Waiting">Waiting</option>
-                        <option value="Running">Running</option>
-                        <option value="Cancelled">Cancelled</option>
-                        <option value="Completed">Completed</option>
-                        <option value="Delay">Delay</option>
-                    </select>
-                    <div className={styles['select-icon']}>
-                        <FaChevronDown size={12} />
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className={styles.filterContainer}>
+      {/* Top Bar: Search */}
+      <div className={styles.topBar}>
+        <div className={styles.searchWrapper}>
+          <FaSearch className={styles.searchIcon} />
+          <input
+            type="text"
+            placeholder="Search by route name..."
+            className={styles.searchInput}
+            onChange={(e) => onSearch(e.target.value)}
+          />
         </div>
-    );
+        <button className={styles.clearBtn} onClick={handleToday}>
+          Today
+        </button>
+      </div>
+
+      {/* Date Navigation Bar */}
+      <div className={styles.dateNav}>
+        <button className={styles.navBtn} onClick={handlePrevDay}>
+          <FaChevronLeft />
+        </button>
+
+        {/* Khu vực hiển thị ngày + Click mở lịch */}
+        <div className={styles.calendarWrapper} ref={calendarRef}>
+          <div
+            className={`${styles.dateDisplay} ${
+              showCalendar ? styles.active : ""
+            }`}
+            onClick={() => setShowCalendar(!showCalendar)}
+          >
+            <FaCalendarAlt className={styles.iconCalendar} />
+            <span className={styles.dateText}>
+              {format(currentDate, "EEEE, d 'Tháng' M, yyyy", { locale: vi })}
+            </span>
+          </div>
+
+          {/* POPUP CALENDAR */}
+          {showCalendar && (
+            <div className={styles.calendarPopup}>
+              <Calendar
+                onChange={handleDateChange}
+                value={currentDate}
+                locale="vi-VN"
+                className={styles.reactCalendar}
+              />
+            </div>
+          )}
+        </div>
+
+        <button className={styles.navBtn} onClick={handleNextDay}>
+          <FaChevronRight />
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default TripFilterBar;
