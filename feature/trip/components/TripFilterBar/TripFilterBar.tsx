@@ -43,8 +43,8 @@ const TripFilterBar = ({
             console.log(`Fetching dots from ${start} to ${end}`); // Debug xem range đúng chưa
 
             const response = await tripApi.getTripDates(start, end);
-            if (response.success) {
-                setHighlightedDates(response.data);
+            if (response) {
+                setHighlightedDates(response);
             }
         } catch (error) {
             console.error("Failed to fetch calendar dates", error);

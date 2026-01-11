@@ -1,3 +1,4 @@
+// src/components/TripModal.tsx
 'use client';
 
 import React, { useEffect } from 'react';
@@ -11,11 +12,11 @@ interface TripModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (data: TripFormData) => void;
-    // Dữ liệu dropdown được truyền vào từ hook
     routes: RouteSelection[];
     vehicles: VehicleSelection[];
     drivers: DriverSelection[];
-    isLoading?: boolean; // Trạng thái loading khi submit
+    subDrivers: DriverSelection[]; // <--- 1. Thêm props danh sách phụ xe
+    isLoading?: boolean;
 }
 
 const TripModal = ({
@@ -25,12 +26,13 @@ const TripModal = ({
     routes = [],
     vehicles = [],
     drivers = [],
+    subDrivers = [], // <--- 2. Nhận props
     isLoading = false
 }: TripModalProps) => {
 
+    // Đảm bảo TripFormData trong file types.ts đã có trường subDriverId
     const { register, handleSubmit, reset, formState: { errors } } = useForm<TripFormData>();
 
-    // Reset form khi đóng/mở
     useEffect(() => {
         if (!isOpen) reset();
     }, [isOpen, reset]);
@@ -44,17 +46,14 @@ const TripModal = ({
     return (
         <div className={styles.overlay}>
             <div className={styles.modal}>
-                {/* Close Button */}
                 <button className={styles['close-button']} onClick={onClose} type="button">
                     <FaTimes />
                 </button>
 
-                {/* Header */}
                 <div className={styles['modal-header']}>
                     <h2 className={styles['modal-title']}>Schedule New Trip</h2>
                 </div>
 
-                {/* Form */}
                 <form className={styles['form-content']} onSubmit={handleSubmit(onFormSubmit)}>
 
                     {/* Select Route */}
@@ -107,6 +106,40 @@ const TripModal = ({
                         </div>
                     </div>
 
+                    {/* Select Sub-Driver & Price (Gộp chung hàng mới) */}
+                    <div className={styles['form-row']}>
+                        {/* 3. Thêm field Sub-Driver */}
+                        <div className={styles['form-field']}>
+                            <label className={styles['form-label']}>Assign Sub-Driver</label>
+                            <select
+                                className={styles['form-select']}
+                                {...register('subDriverId')} // Không bắt buộc (required) nếu không cần
+                            >
+                                <option value="">No sub-driver</option>
+                                {subDrivers.map(d => (
+                                    <option key={d.driverId} value={d.driverId}>
+                                        {d.driverName} ({d.driverLicense})
+                                    </option>
+                                ))}
+                            </select>
+                            {/* Nếu muốn bắt buộc thì thêm required và hiển thị lỗi ở đây */}
+                        </div>
+
+                        <div className={styles['form-field']}>
+                            <label className={styles['form-label']}>Ticket Price (₫) <span style={{ color: 'var(--primary)' }}>*</span></label>
+                            <input
+                                type="number"
+                                className={styles['form-input']}
+                                placeholder="250000"
+                                {...register('price', {
+                                    required: 'Please enter price',
+                                    min: { value: 0, message: 'Price must be positive' }
+                                })}
+                            />
+                            {errors.price && <span className={styles['error-text']}>{errors.price.message}</span>}
+                        </div>
+                    </div>
+
                     {/* Date & Time */}
                     <div className={styles['form-row']}>
                         <div className={styles['form-field']}>
@@ -130,22 +163,6 @@ const TripModal = ({
                         </div>
                     </div>
 
-                    {/* Price */}
-                    <div className={styles['form-field']}>
-                        <label className={styles['form-label']}>Ticket Price (₫) <span style={{ color: 'var(--primary)' }}>*</span></label>
-                        <input
-                            type="number"
-                            className={styles['form-input']}
-                            placeholder="250000"
-                            {...register('price', {
-                                required: 'Please enter price',
-                                min: { value: 0, message: 'Price must be positive' }
-                            })}
-                        />
-                        {errors.price && <span className={styles['error-text']}>{errors.price.message}</span>}
-                    </div>
-
-                    {/* Submit Button */}
                     <button type="submit" className={styles['submit-button']} disabled={isLoading}>
                         {isLoading ? 'Saving...' : 'Schedule Trip'}
                     </button>

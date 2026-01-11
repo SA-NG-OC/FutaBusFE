@@ -33,6 +33,7 @@ export interface TripFormData {
     routeId: string;
     vehicleId: string;
     driverId: string;
+    subDriverId: string;
     date: string;
     departureTime: string;
     price: number;
