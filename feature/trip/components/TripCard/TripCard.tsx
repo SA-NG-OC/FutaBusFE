@@ -18,20 +18,21 @@ const TripCard = ({ trip, onStatusUpdate }: TripCardProps) => {
   const formatTime = (timeStr: string) => timeStr?.substring(0, 5) || "--:--";
 
   const getStatusClass = (status: string) => {
-    const s = status.toLowerCase();
+    const s = status ? status.toLowerCase() : "";
     if (s === "running") return styles.running;
     if (s === "completed") return styles.completed;
     if (s === "cancelled") return styles.cancelled;
     return styles.waiting;
   };
 
-  const total = trip.totalSeats || 40;
+  // Logic hiển thị an toàn: Nếu API trả về null/0 thì fallback về 40 để UI đẹp
+  const total = trip.totalSeats && trip.totalSeats > 0 ? trip.totalSeats : 40;
   const booked = trip.bookedSeats || 0;
   const checkedIn = trip.checkedInSeats || 0;
 
   return (
     <div className={styles.card}>
-      {/* Header */}
+      {/* Header: Route Info & Status */}
       <div className={styles.header}>
         <div className={styles.routeInfo}>
           <div className={styles.routeIcon}>
@@ -47,7 +48,7 @@ const TripCard = ({ trip, onStatusUpdate }: TripCardProps) => {
         </span>
       </div>
 
-      {/* Time Section */}
+      {/* Time Section: Departure - Arrival */}
       <div className={styles.timeSection}>
         <div className={styles.timePoint}>
           <span className={styles.label}>Departure</span>
@@ -68,7 +69,7 @@ const TripCard = ({ trip, onStatusUpdate }: TripCardProps) => {
         </div>
       </div>
 
-      {/* Info Grid */}
+      {/* Info Grid: Vehicle, Driver & Stats */}
       <div className={styles.infoGrid}>
         <div className={styles.infoItem}>
           <FaBus className={styles.icon} /> <span>{trip.vehicleInfo}</span>
@@ -77,7 +78,7 @@ const TripCard = ({ trip, onStatusUpdate }: TripCardProps) => {
           <FaUser className={styles.icon} /> <span>{trip.driverName}</span>
         </div>
 
-        {/* Stats Row: Sử dụng CSS Dot thay vì Text */}
+        {/* Stats Row: Hiển thị số lượng ghế */}
         <div className={styles.statsRow}>
           <div className={styles.statItem}>
             <span className={`${styles.dot} ${styles.checkInColor}`}></span>
@@ -96,7 +97,7 @@ const TripCard = ({ trip, onStatusUpdate }: TripCardProps) => {
 
       <hr className={styles.divider} />
 
-      {/* Footer */}
+      {/* Footer: Price & Quick Action */}
       <div className={styles.footer}>
         <div className={styles.price}>
           Price: <span>{formatCurrency(trip.price)}</span>

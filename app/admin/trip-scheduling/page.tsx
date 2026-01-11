@@ -29,6 +29,7 @@ export default function TripSchedulingPage() {
     routes,
     vehicles,
     drivers,
+    subDrivers,
     fetchSelectionData,
     loadingSelection,
   } = useTrips();
@@ -130,6 +131,7 @@ export default function TripSchedulingPage() {
         routes={routes}
         vehicles={vehicles}
         drivers={drivers}
+        subDrivers={subDrivers}
         isLoading={isCreating || loadingSelection}
       />
     </div>
