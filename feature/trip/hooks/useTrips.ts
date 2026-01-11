@@ -16,13 +16,6 @@ interface FetchTripsParams {
     date?: string | null;
 }
 
-// Định nghĩa kiểu lỗi trả về từ Backend (khớp với BE của bạn)
-interface ErrorResponse {
-    success: boolean;
-    message: string;
-    data: any;
-}
-
 export const useTrips = () => {
     // --- State cho Danh sách ---
     const [trips, setTrips] = useState<TripData[]>([]);
@@ -34,6 +27,7 @@ export const useTrips = () => {
     const [routes, setRoutes] = useState<RouteSelection[]>([]);
     const [vehicles, setVehicles] = useState<VehicleSelection[]>([]);
     const [drivers, setDrivers] = useState<DriverSelection[]>([]);
+    const [subDrivers, setSubDrivers] = useState<DriverSelection[]>([]); // <--- 1. Thêm State SubDrivers
     const [loadingSelection, setLoadingSelection] = useState(false);
 
     // --- State cho Create Trip ---
@@ -41,7 +35,6 @@ export const useTrips = () => {
 
     const lastParamsRef = useRef<FetchTripsParams>({ page: 0 });
 
-    // --- 2. HELPER: Hàm lấy message lỗi từ Axios ---
     const getErrorMessage = (error: unknown, defaultMessage: string): string => {
         if (axios.isAxiosError(error)) {
             const serverError = error as AxiosError<ApiResponse<any>>;
@@ -59,16 +52,20 @@ export const useTrips = () => {
     const fetchSelectionData = useCallback(async () => {
         setLoadingSelection(true);
         try {
+            // <--- 2. Cập nhật Promise.all để lấy dữ liệu SubDriver
+            // Nếu API lấy phụ xe riêng thì dùng api riêng, nếu chung với tài xế thì gọi getDriversSelection
             const [routesData, vehiclesData, driversData] = await Promise.all([
                 tripApi.getRoutesSelection(),
                 tripApi.getVehiclesSelection(),
-                tripApi.getDriversSelection()
+                tripApi.getDriversSelection(),
             ]);
+
             setRoutes(routesData);
             setVehicles(vehiclesData);
             setDrivers(driversData);
+            setSubDrivers(driversData); // <--- 3. Gán dữ liệu cho SubDriver (dùng chung danh sách tài xế)
+
         } catch (error) {
-            // Dùng helper để hiển thị lỗi
             alert(getErrorMessage(error, "Failed to fetch selection data."));
             console.error("Fetch Selection Error", error);
         } finally {
@@ -76,7 +73,6 @@ export const useTrips = () => {
         }
     }, []);
 
-    // 4. Fetch Trips
     const fetchTrips = useCallback(async (params: FetchTripsParams) => {
         setLoading(true);
         try {
@@ -103,18 +99,17 @@ export const useTrips = () => {
         }
     }, []);
 
-    // 5. Create Trip (ĐÃ SỬA LOGIC BẮT LỖI)
+    // 5. Create Trip
     const createTrip = async (data: TripFormData): Promise<boolean> => {
         setIsCreating(true);
         try {
-            // Gọi API (Axios sẽ throw Error nếu status code là 4xx, 5xx)
             const newTrip = await tripApi.createTrip({
                 ...data,
-                price: Number(data.price)
+                price: Number(data.price),
+                // subDriverId đã có sẵn trong data nếu form gửi lên đúng tên
             });
 
             if (newTrip) {
-                // UX: Thêm vào đầu danh sách
                 setTrips((prevTrips) => [newTrip, ...prevTrips]);
                 return true;
             }
@@ -128,11 +123,9 @@ export const useTrips = () => {
         }
     };
 
-    // 6. Update Status
     const updateTripStatus = async (tripId: number, newStatus: string) => {
         try {
             const success = await tripApi.updateStatus(tripId, newStatus);
-
             if (success) {
                 setTrips((prevTrips) =>
                     prevTrips.map((trip) =>
@@ -157,6 +150,7 @@ export const useTrips = () => {
         routes,
         vehicles,
         drivers,
+        subDrivers, // <--- 4. Return subDrivers để component sử dụng
         loadingSelection,
         fetchSelectionData,
         updateTripStatus,
