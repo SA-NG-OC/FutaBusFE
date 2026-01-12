@@ -61,7 +61,6 @@ export default function TripSchedulingPage() {
   return (
     <div
       style={{
-        padding: "8px 12px",
         backgroundColor: "var(--background)",
         color: "var(--foreground)",
         minHeight: "100vh",
