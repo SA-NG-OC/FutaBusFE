@@ -94,19 +94,28 @@ const RouteModal = ({ isOpen, onClose, onSubmit, initialData, title }: RouteModa
 
             // --- D. Xử lý Điểm Dừng (Intermediate Stops) ---
             if (initialData.stopNames && Array.isArray(initialData.stopNames)) {
-                // Map toàn bộ stopNames sang SelectOption
+
+                const normalizedOrigin = initialData.originName?.toLowerCase().trim();
+                const normalizedDestination = initialData.destinationName?.toLowerCase().trim();
+
                 const mappedStops = initialData.stopNames
+                    .filter(name => {
+                        const normalized = name.toLowerCase().trim();
+                        return (
+                            normalized !== normalizedOrigin &&
+                            normalized !== normalizedDestination
+                        );
+                    })
                     .map(name => findOption(name))
                     .filter((item): item is SelectOption => !!item);
 
-                // Khử trùng lặp (phòng BE gửi trùng)
                 const uniqueStops = mappedStops.filter(
                     (stop, index, self) =>
                         index === self.findIndex(t => t.value === stop.value)
                 );
-
                 setValue('intermediateStopIds', uniqueStops);
             }
+
 
         } else if (isOpen && !initialData) {
             // Reset form khi Add New

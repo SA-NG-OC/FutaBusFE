@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap');
 @import "tailwindcss";
 
 /* =========================
@@ -65,6 +66,34 @@
   --warning-border: #ffc9c9;
   --warning-text: #9f0712;
   --icon-warning-bg: #ffe2e2;
+  /* --- DASHBOARD STAT COLORS (Light Mode) --- */
+  /* Green (Revenue) */
+  --stat-green-bg: #dcfce7;
+  --stat-green-text: #00a63e;
+  
+  /* Blue (Tickets) */
+  --stat-blue-bg: #dbeafe;
+  --stat-blue-text: #2563eb;
+
+  /* Orange (Vehicles) */
+  --stat-orange-bg: #ffedd5;
+  --stat-orange-text: #ea580c;
+
+  /* Purple (Drivers) */
+  --stat-purple-bg: #f3e8ff;
+  --stat-purple-text: #9333ea;
+
+  /* --- STATUS BADGES (Light Mode) --- */
+  --badge-running-bg: #dcfce7;
+  --badge-running-text: #016630;
+  --badge-waiting-bg: #dbeafe;
+  --badge-waiting-text: #193cb8;
+  --badge-delayed-bg: #ffe2e2;
+  --badge-delayed-text: #9f0712;
+  --badge-completed-bg: #f1f5f9;
+  --badge-completed-text: #475569;
+  --badge-cancelled-bg: #e4e4e7;
+  --badge-cancelled-text: #52525b;
 }
 
 /* =========================
@@ -132,6 +161,33 @@
   --warning-border: #7f1d1d;
   --warning-text: #fca5a5;
   --icon-warning-bg: #7f1d1d;
+  /* --- DASHBOARD STAT COLORS (Dark Mode) --- */
+  /* Green */
+  --stat-green-bg: #064e3b;
+  --stat-green-text: #4ade80;
+
+  /* Blue */
+  --stat-blue-bg: #1e3a8a;
+  --stat-blue-text: #60a5fa;
+
+  /* Orange */
+  --stat-orange-bg: #7c2d12;
+  --stat-orange-text: #fb923c;
+
+  /* Purple */
+  --stat-purple-bg: #581c87;
+  --stat-purple-text: #c084fc;
+  /* --- STATUS BADGES (Dark Mode) --- */
+  --badge-running-bg: #064e3b;
+  --badge-running-text: #4ade80;
+  --badge-waiting-bg: #1e3a8a;
+  --badge-waiting-text: #60a5fa;
+  --badge-delayed-bg: #7f1d1d;
+  --badge-delayed-text: #fca5a5;
+  --badge-completed-bg: #334155;
+  --badge-completed-text: #94a3b8;
+  --badge-cancelled-bg: #27272a;
+  --badge-cancelled-text: #a1a1aa;
 }
 
 /* =========================
@@ -187,6 +243,35 @@
   /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* --- Stat Colors Mapping --- */
+  --color-stat-green-bg: var(--stat-green-bg);
+  --color-stat-green-text: var(--stat-green-text);
+
+  --color-stat-blue-bg: var(--stat-blue-bg);
+  --color-stat-blue-text: var(--stat-blue-text);
+
+  --color-stat-orange-bg: var(--stat-orange-bg);
+  --color-stat-orange-text: var(--stat-orange-text);
+
+  --color-stat-purple-bg: var(--stat-purple-bg);
+  --color-stat-purple-text: var(--stat-purple-text);
+
+  /* --- Badge Colors Mapping --- */
+  --color-badge-running-bg: var(--badge-running-bg);
+  --color-badge-running-text: var(--badge-running-text);
+
+  --color-badge-waiting-bg: var(--badge-waiting-bg);
+  --color-badge-waiting-text: var(--badge-waiting-text);
+
+  --color-badge-delayed-bg: var(--badge-delayed-bg);
+  --color-badge-delayed-text: var(--badge-delayed-text);
+
+  --color-badge-completed-bg: var(--badge-completed-bg);
+  --color-badge-completed-text: var(--badge-completed-text);
+
+  --color-badge-cancelled-bg: var(--badge-cancelled-bg);
+  --color-badge-cancelled-text: var(--badge-cancelled-text);
 }
 
 /* =========================
