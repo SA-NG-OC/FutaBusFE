@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap");
 @import "tailwindcss";
 
 /* =========================
@@ -9,55 +9,59 @@
   --background: #ffffff;
   --foreground: #171717;
 
+  /* Semantic Mapping (Thêm mới để dùng chung) */
+  --text-primary: #171717;
+  --text-secondary: #64748b; /* Xám vừa phải cho phụ đề */
+  --bg-secondary: #f8fafc; /* Nền xám rất nhạt cho các block phụ */
+
   /* Màu thương hiệu */
-  --primary: #D83E3E;
+  --primary: #d83e3e;
   --primary-light: #e16666;
   --primary-hover: #c43535;
   --primary-active: #b22d2d;
-  --brand-dark-red: #8B1A1A;
+  --brand-dark-red: #8b1a1a;
 
-  /* Màu text phụ */
+  /* Màu text phụ cũ (Giữ lại để tương thích) */
   --text-gray: #364153;
   --text-nav: #4a5565;
   --text-white: #ffffff;
 
   /* Nền Component */
-  --bg-beige: #F5EFE1;         /* Sidebar cũ */
-  --background-paper: #ffffff; /* Card nổi */
-  --bg-hover: #f3f4f6;         /* Hover item */
+  --bg-beige: #f5efe1;
+  --background-paper: #ffffff;
+  --bg-hover: #f3f4f6;
   --avatar-yellow: #eaddb6;
 
   /* Input Form */
   --input-bg: #ffffff;
-  --input-text: #717182;
-  --input-border: transparent; /* Hoặc #e5e7eb nếu muốn viền */
-  --input-focus: rgba(225, 102, 102, 1);
+  --input-text: #171717;
+  --input-placeholder: #94a3b8;
+  --input-border: #e2e8f0; /* Đặt mặc định có màu để hiện viền */
+  --input-focus: rgba(216, 62, 62, 0.25);
 
   /* Viền */
-  --border-gray: #e5e7eb;
+  --border-gray: #e2e8f0;
 
   /* --- Badges & Status --- */
   --status-active-bg: #dcfce7;
   --status-active-text: #016630;
-  
+
   --badge-bg: #f5efe1;
   --badge-highlight: #d4c5a9;
   --badge-text: #2c2c2c;
 
   /* --- Modal & Overlay --- */
   --overlay-bg: rgba(0, 0, 0, 0.5);
-  --modal-bg: #f5efe1;
-  --modal-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --modal-bg: #ffffff; /* Modal nền trắng cho sạch */
+  --modal-shadow: 0px 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0px 8px 10px -6px rgba(0, 0, 0, 0.1);
 
   /* --- Buttons --- */
   --btn-bg-hover: #ecddc0;
-  
-  --btn-cancel-bg: #f5efe1;
-  --btn-cancel-hover: #ecddc0;
-  
+  --btn-cancel-bg: #f1f5f9;
+  --btn-cancel-hover: #e2e8f0;
   --btn-delete-bg: #8b1a1a;
   --btn-delete-hover: #7a1616;
-  
   --btn-update-bg: #e16666;
   --btn-update-hover: #d85555;
 
@@ -66,33 +70,27 @@
   --warning-border: #ffc9c9;
   --warning-text: #9f0712;
   --icon-warning-bg: #ffe2e2;
-  /* --- DASHBOARD STAT COLORS (Light Mode) --- */
-  /* Green (Revenue) */
+
+  /* --- DASHBOARD STAT COLORS --- */
   --stat-green-bg: #dcfce7;
   --stat-green-text: #00a63e;
-  
-  /* Blue (Tickets) */
   --stat-blue-bg: #dbeafe;
   --stat-blue-text: #2563eb;
-
-  /* Orange (Vehicles) */
   --stat-orange-bg: #ffedd5;
   --stat-orange-text: #ea580c;
-
-  /* Purple (Drivers) */
   --stat-purple-bg: #f3e8ff;
   --stat-purple-text: #9333ea;
 
-  /* --- STATUS BADGES (Light Mode) --- */
+  /* --- STATUS BADGES --- */
   --badge-running-bg: #dcfce7;
-  --badge-running-text: #016630;
+  --badge-running-text: #166534;
   --badge-waiting-bg: #dbeafe;
-  --badge-waiting-text: #193cb8;
+  --badge-waiting-text: #1e40af;
   --badge-delayed-bg: #ffe2e2;
   --badge-delayed-text: #9f0712;
   --badge-completed-bg: #f1f5f9;
   --badge-completed-text: #475569;
-  --badge-cancelled-bg: #e4e4e7;
+  --badge-cancelled-bg: #f4f4f5;
   --badge-cancelled-text: #52525b;
 }
 
@@ -101,10 +99,15 @@
    ========================= */
 .dark {
   /* Nền & Chữ chính */
-  --background: #020617;       /* Nền tối thẫm */
-  --foreground: #e5e7eb;       /* Chữ sáng */
+  --background: #020617;
+  --foreground: #e2e8f0;
 
-  /* Màu thương hiệu (Giảm chói) */
+  /* Semantic Mapping */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --bg-secondary: #0f172a; /* Nền tối hơn nền card */
+
+  /* Màu thương hiệu */
   --primary: #ef4444;
   --primary-light: #f87171;
   --primary-hover: #dc2626;
@@ -117,42 +120,40 @@
   --text-white: #ffffff;
 
   /* Nền Component */
-  --bg-beige: #0f172a;         /* Sidebar tối */
-  --background-paper: #1e293b; /* Card nổi */
+  --bg-beige: #0f172a;
+  --background-paper: #1e293b;
   --bg-hover: #334155;
   --avatar-yellow: #857d62;
 
   /* Input Form */
-  --input-bg: #334155;
-  --input-text: #e2e8f0;
-  --input-border: #475569;
-  --input-focus: rgba(239, 68, 68, 0.5);
+  --input-bg: #0f172a; /* Nền input tối thẫm */
+  --input-text: #f1f5f9;
+  --input-placeholder: #64748b;
+  --input-border: #334155; /* Viền input rõ ràng */
+  --input-focus: rgba(239, 68, 68, 0.4);
 
   /* Viền */
-  --border-gray: #374151;
+  --border-gray: #334155;
 
   /* --- Badges & Status --- */
-  --status-active-bg: #064e3b; /* Xanh đậm */
-  --status-active-text: #4ade80; /* Xanh lá sáng */
+  --status-active-bg: #064e3b;
+  --status-active-text: #4ade80;
 
   --badge-bg: #1e293b;
   --badge-highlight: #475569;
   --badge-text: #e2e8f0;
 
   /* --- Modal & Overlay --- */
-  --overlay-bg: rgba(0, 0, 0, 0.7);
+  --overlay-bg: rgba(0, 0, 0, 0.8);
   --modal-bg: #1e293b;
-  --modal-shadow: 0px 10px 20px -3px rgba(0, 0, 0, 0.5);
+  --modal-shadow: 0px 10px 25px -5px rgba(0, 0, 0, 0.5);
 
   /* --- Buttons --- */
   --btn-bg-hover: #334155;
-
   --btn-cancel-bg: #334155;
   --btn-cancel-hover: #475569;
-
   --btn-delete-bg: #991b1b;
   --btn-delete-hover: #7f1d1d;
-
   --btn-update-bg: #ef4444;
   --btn-update-hover: #dc2626;
 
@@ -161,117 +162,28 @@
   --warning-border: #7f1d1d;
   --warning-text: #fca5a5;
   --icon-warning-bg: #7f1d1d;
-  /* --- DASHBOARD STAT COLORS (Dark Mode) --- */
-  /* Green */
+
+  /* --- STAT COLORS (Dark) --- */
   --stat-green-bg: #064e3b;
   --stat-green-text: #4ade80;
-
-  /* Blue */
-  --stat-blue-bg: #1e3a8a;
+  --stat-blue-bg: #172554;
   --stat-blue-text: #60a5fa;
-
-  /* Orange */
-  --stat-orange-bg: #7c2d12;
+  --stat-orange-bg: #451a03;
   --stat-orange-text: #fb923c;
-
-  /* Purple */
   --stat-purple-bg: #581c87;
   --stat-purple-text: #c084fc;
-  /* --- STATUS BADGES (Dark Mode) --- */
+
+  /* --- BADGES (Dark) --- */
   --badge-running-bg: #064e3b;
   --badge-running-text: #4ade80;
-  --badge-waiting-bg: #1e3a8a;
+  --badge-waiting-bg: #172554;
   --badge-waiting-text: #60a5fa;
-  --badge-delayed-bg: #7f1d1d;
+  --badge-delayed-bg: #450a0a;
   --badge-delayed-text: #fca5a5;
   --badge-completed-bg: #334155;
   --badge-completed-text: #94a3b8;
   --badge-cancelled-bg: #27272a;
-  --badge-cancelled-text: #a1a1aa;
-}
-
-/* =========================
-   Tailwind Theme Mapping
-   ========================= */
-@theme inline {
-  /* Colors - Base */
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-brand-dark-red: var(--brand-dark-red);
-  
-  /* Text */
-  --color-text-gray: var(--text-gray);
-  --color-text-nav: var(--text-nav);
-  --color-text-white: var(--text-white);
-  
-  /* Backgrounds */
-  --color-bg-beige: var(--bg-beige);
-  --color-background-paper: var(--background-paper);
-  --color-bg-hover: var(--bg-hover);
-  --color-avatar-yellow: var(--avatar-yellow);
-  
-  /* Border */
-  --color-border-gray: var(--border-gray);
-
-  /* Primary Variants */
-  --color-primary-light: var(--primary-light);
-  --color-primary-hover: var(--primary-hover);
-  --color-primary-active: var(--primary-active);
-
-  /* Status & Badges */
-  --color-status-active-bg: var(--status-active-bg);
-  --color-status-active-text: var(--status-active-text);
-  --color-badge-bg: var(--badge-bg);
-  --color-badge-highlight: var(--badge-highlight);
-  --color-badge-text: var(--badge-text);
-  
-  /* Modal & Overlay */
-  --color-overlay-bg: var(--overlay-bg);
-  --color-modal-bg: var(--modal-bg);
-  
-  /* Buttons */
-  --color-btn-bg-hover: var(--btn-bg-hover);
-  --color-btn-cancel-bg: var(--btn-cancel-bg);
-  --color-btn-delete-bg: var(--btn-delete-bg);
-  --color-btn-update-bg: var(--btn-update-bg);
-
-  /* Warning */
-  --color-warning-bg: var(--warning-bg);
-  --color-warning-text: var(--warning-text);
-
-  /* Fonts */
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-
-  /* --- Stat Colors Mapping --- */
-  --color-stat-green-bg: var(--stat-green-bg);
-  --color-stat-green-text: var(--stat-green-text);
-
-  --color-stat-blue-bg: var(--stat-blue-bg);
-  --color-stat-blue-text: var(--stat-blue-text);
-
-  --color-stat-orange-bg: var(--stat-orange-bg);
-  --color-stat-orange-text: var(--stat-orange-text);
-
-  --color-stat-purple-bg: var(--stat-purple-bg);
-  --color-stat-purple-text: var(--stat-purple-text);
-
-  /* --- Badge Colors Mapping --- */
-  --color-badge-running-bg: var(--badge-running-bg);
-  --color-badge-running-text: var(--badge-running-text);
-
-  --color-badge-waiting-bg: var(--badge-waiting-bg);
-  --color-badge-waiting-text: var(--badge-waiting-text);
-
-  --color-badge-delayed-bg: var(--badge-delayed-bg);
-  --color-badge-delayed-text: var(--badge-delayed-text);
-
-  --color-badge-completed-bg: var(--badge-completed-bg);
-  --color-badge-completed-text: var(--badge-completed-text);
-
-  --color-badge-cancelled-bg: var(--badge-cancelled-bg);
-  --color-badge-cancelled-text: var(--badge-cancelled-text);
+  --badge-cancelled-text: #71717a;
 }
 
 /* =========================

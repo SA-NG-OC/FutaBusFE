@@ -1,0 +1,396 @@
+/* ... (Giữ nguyên Overlay & Modal) ... */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--overlay-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1200;
+  backdrop-filter: blur(3px);
+  padding: 20px;
+}
+
+.modal {
+  background-color: var(--bg-beige);
+  width: 100%;
+  max-width: 900px;
+  border-radius: 16px;
+  box-shadow: var(--modal-shadow);
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  max-height: 90vh;
+  border: 1px solid var(--border-gray);
+  overflow: hidden;
+}
+
+/* HEADER */
+.header {
+  padding: 16px 24px; /* Giảm padding một chút */
+  background-color: var(--bg-beige);
+  border-bottom: 1px solid var(--border-gray);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+.titleGroup h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  font-weight: 800;
+} /* Giảm size title */
+
+.routeRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.routeName {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.statusBadge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  transition: 0.2s;
+}
+.closeBtn:hover {
+  color: var(--text-primary);
+  transform: scale(1.1);
+}
+
+/* BODY */
+.modalBody {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* LEFT COLUMN - Thu gọn lại */
+.leftColumn {
+  flex: 1;
+  padding: 20px; /* Giảm padding */
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Giảm khoảng cách giữa các khối */
+  border-right: 1px solid var(--border-gray);
+  overflow-y: auto;
+  min-width: 300px;
+}
+
+.rightColumn {
+  flex: 1.5;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: var(--background-paper);
+  overflow-y: auto;
+}
+
+/* --- STATS CARDS (Tinh chỉnh nhỏ gọn hơn) --- */
+.statsRow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.statCard {
+  background-color: var(--background-paper);
+  border-radius: 10px;
+  padding: 12px 16px; /* Giảm padding */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  border: 1px solid transparent;
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.statLabel {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* [UPDATE] Giảm size số liệu xuống cho tinh tế */
+.statValue {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+/* [UPDATE] Giảm size icon */
+.statIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.cardBlue {
+  border-left: 4px solid #3b82f6;
+}
+.iconBlue {
+  background-color: #eff6ff;
+  color: #3b82f6;
+}
+.cardRed {
+  border-left: 4px solid #ef4444;
+}
+.iconRed {
+  background-color: #fef2f2;
+  color: #ef4444;
+}
+.cardGreen {
+  border-left: 4px solid #22c55e;
+}
+.iconGreen {
+  background-color: #f0fdf4;
+  color: #22c55e;
+}
+
+/* --- INFO GRID (Tinh chỉnh chữ nhỏ lại) --- */
+.infoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.infoCard {
+  background-color: var(--background-paper);
+  padding: 10px 14px; /* Giảm padding */
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: 1px solid var(--border-gray);
+  transition: all 0.2s;
+}
+.infoCard.editable:hover {
+  border-color: var(--primary);
+  background-color: var(--bg-hover);
+  cursor: pointer;
+}
+
+.infoLabel {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* [UPDATE] Size chữ nội dung nhỏ lại (0.9rem) */
+.infoValue {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.infoValue.price {
+  color: var(--primary);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.editSelect,
+.editInput {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid var(--primary);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  outline: none;
+}
+
+/* MAP & TABS */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 0;
+}
+.tabBtn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border-gray);
+  background-color: var(--input-bg);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: 0.2s;
+}
+.tabBtn.active {
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.mapContainer {
+  flex: 1;
+  background-color: #e5e7eb;
+  border-radius: 12px;
+  min-height: 250px;
+  position: relative;
+  overflow: hidden;
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg");
+  background-size: cover;
+  background-position: center;
+  border: 1px solid var(--border-gray);
+}
+.mapPlaceholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-weight: 600;
+  background-color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(1px);
+  font-size: 0.85rem;
+}
+
+.routeOverlay {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  background-color: var(--background-paper);
+  padding: 12px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--border-gray);
+}
+
+/* FOOTER */
+.footer {
+  padding: 16px 24px;
+  background-color: var(--bg-beige);
+  border-top: 1px solid var(--border-gray);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+.deleteBtn {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 8px 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.deleteBtn:hover {
+  background-color: #ef4444;
+  color: white;
+}
+
+.rightActions {
+  display: flex;
+  gap: 10px;
+}
+.cancelBtn {
+  padding: 8px 16px;
+  border: 1px solid var(--border-gray);
+  background-color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: 0.2s;
+}
+.cancelBtn:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.editBtn {
+  padding: 8px 20px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(216, 62, 62, 0.3);
+  transition: 0.2s;
+}
+.editBtn:hover {
+  background-color: var(--primary-hover);
+}
+.editBtn:disabled {
+  background-color: var(--text-secondary);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .modalBody {
+    flex-direction: column-reverse;
+  }
+  .leftColumn {
+    border-right: none;
+    border-top: 1px solid var(--border-gray);
+    min-width: auto;
+  }
+  .rightColumn {
+    min-height: 250px;
+    flex: none;
+  }
+}

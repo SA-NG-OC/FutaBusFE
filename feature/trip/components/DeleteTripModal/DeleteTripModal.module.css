@@ -1,0 +1,215 @@
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1300; /* Cao hơn TripDetailsModal (1200) */
+  backdrop-filter: blur(2px);
+  padding: 16px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal {
+  background-color: var(--bg-beige);
+  width: 100%;
+  max-width: 480px;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border-gray);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: scaleUp 0.2s ease-out;
+}
+
+/* Header: Icon + Title */
+.header {
+  padding: 24px 24px 10px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.iconWrapper {
+  width: 48px;
+  height: 48px;
+  background-color: #fee2e2; /* Đỏ rất nhạt */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.warningIcon {
+  color: #dc2626; /* Đỏ tươi */
+  font-size: 1.5rem;
+}
+
+.headerText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.headerText h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.headerText p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  margin-top: -4px;
+}
+
+/* Body Content */
+.body {
+  padding: 10px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.confirmText {
+  font-size: 1rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.confirmText strong {
+  font-weight: 700;
+}
+
+/* Summary Box (Màu xám) */
+.summaryBox {
+  background-color: var(--background-paper); /* Hoặc màu xám nhạt tùy theme */
+  border: 1px solid var(--border-gray);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summaryRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.summaryIcon {
+  color: var(--text-secondary);
+  width: 16px;
+  text-align: center;
+}
+
+.summaryPrice {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* Warning Box (Màu đỏ) */
+.warningBox {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 16px;
+  color: #991b1b; /* Đỏ đậm */
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.warningBox strong {
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+/* Footer Actions */
+.footer {
+  padding: 16px 24px;
+  background-color: var(--bg-beige); /* Cùng màu nền modal */
+  border-top: 1px solid var(--border-gray);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cancelBtn {
+  padding: 10px 20px;
+  border: 1px solid var(--border-gray);
+  background-color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: 0.2s;
+}
+.cancelBtn:hover {
+  background-color: var(--bg-hover);
+}
+
+.deleteBtn {
+  padding: 10px 24px;
+  background-color: #991b1b; /* Đỏ đậm như ảnh */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.2s;
+  box-shadow: 0 4px 6px -1px rgba(153, 27, 27, 0.3);
+}
+.deleteBtn:hover {
+  background-color: #7f1d1d;
+}
+.deleteBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes scaleUp {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

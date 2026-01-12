@@ -1,75 +1,87 @@
-/* src/feature/trip/components/TripTimeline/TripTimeline.module.css */
-
 .timelineContainer {
   display: flex;
   flex-direction: column;
-  padding-bottom: 40px;
-  width: 100%;
+  padding: 10px 0;
+  position: relative;
+}
+
+.timelineGroup {
+  display: flex;
+  gap: 20px;
+  position: relative;
+}
+
+/* Cột thời gian bên trái */
+.timeColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 70px;
+  position: relative;
+}
+
+.timeBadge {
+  background-color: var(--background-paper);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  border: 1px solid var(--border-gray);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  z-index: 2;
+  margin-bottom: 4px; /* Khoảng cách tới chấm tròn */
+}
+
+/* Đường kẻ dọc chạy xuyên suốt */
+.timeColumn::after {
+  content: "";
+  position: absolute;
+  top: 35px; /* Bắt đầu ngay dưới timeBadge */
+  bottom: -20px; /* Kéo dài xuống group tiếp theo */
+  width: 2px;
+  background-color: #e5e7eb; /* Màu xám nhạt */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+/* Ẩn đường kẻ ở item cuối cùng để không bị lòi ra */
+.timelineGroup:last-child .timeColumn::after {
+  display: none;
+}
+
+/* CHẤM TRÒN (Target Style) */
+.timelineDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  /* Lõi đỏ */
+  background-color: var(--primary);
+  /* Viền trắng dày tạo khoảng cách */
+  border: 3px solid var(--background-paper);
+  /* Viền đỏ mỏng bên ngoài cùng (box-shadow) */
+  box-shadow: 0 0 0 1px var(--primary);
+
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 45px; /* Vị trí chấm tròn so với đỉnh */
+  z-index: 3;
+}
+
+/* Cột Cards bên phải */
+.cardsColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 30px;
 }
 
 .emptyState {
   text-align: center;
-  padding: 60px 20px;
-  color: var(--text-gray);
-  font-size: 16px;
-  background: var(--background-paper);
-  border-radius: 12px;
-  border: 1px dashed var(--border-gray);
-  margin-top: 20px;
-}
-
-/* --- Row chứa cặp [Time - Card] --- */
-.timelineRow {
-  display: flex;
-  gap: 20px;
-  position: relative;
-  /* Không set height cố định để nó tự giãn theo Card */
-}
-
-/* --- Cột trái: Time --- */
-.timeColumn {
-  width: 80px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 0; /* Căn chỉnh với đỉnh card */
-}
-
-.hour {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--foreground); /* Màu sáng khi dark mode */
-  background: var(--bg-hover);
-  padding: 4px 8px;
-  border-radius: 6px;
-  z-index: 2;
-  margin-bottom: 4px;
-  border: 1px solid var(--border-gray);
-}
-
-.dot {
-  width: 12px;
-  height: 12px;
-  background-color: var(--primary);
-  border-radius: 50%;
-  border: 2px solid var(--background); /* Viền tiệp màu nền trang */
-  box-shadow: 0 0 0 2px var(--primary-light);
-  z-index: 2;
-  margin-bottom: -2px; /* Kéo line lên dính vào dot */
-}
-
-.line {
-  width: 2px;
-  background-color: var(--border-gray);
-  flex-grow: 1; /* Tự động kéo dài hết chiều cao còn lại của Row */
-  min-height: 20px; /* Đảm bảo luôn có line ngắn kể cả khi card rất ngắn */
-  z-index: 1;
-}
-
-/* --- Cột phải: Card Wrapper --- */
-.cardWrapper {
-  flex: 1; /* Chiếm hết chiều rộng còn lại */
-  padding-bottom: 30px; /* Tạo khoảng cách giữa các card */
-  min-width: 0; /* Tránh lỗi flex item bị tràn */
+  padding: 40px;
+  color: var(--text-secondary);
+  font-style: italic;
 }
