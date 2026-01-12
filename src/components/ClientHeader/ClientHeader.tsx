@@ -13,10 +13,10 @@ const ClientHeader = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const navItems = [
-        { name: 'Trang chủ', path: '/' },
+        { name: 'Trang chủ', path: '/home' },
         { name: 'Lịch Trình', path: '/schedule' },
         { name: 'Tra cứu vé', path: '/lookup' },
-        { name: 'Về chúng tôi', path: '/about' },
+        { name: 'Về chúng tôi', path: '/about-us' },
         { name: 'Liên hệ', path: '/contact' },
     ];
 

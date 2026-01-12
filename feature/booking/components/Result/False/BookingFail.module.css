@@ -1,0 +1,90 @@
+/* BookingFalse.module.css */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+}
+.modal {
+  width: 560px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 36px 40px;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.12);
+  text-align: center;
+}
+.iconWrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 9999px;
+  border: 4px solid #ef4444; /* red */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px auto;
+}
+.icon {
+  font-size: 28px;
+  color: #ef4444;
+}
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+.message {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+.errorBox {
+  background: #fff5f5;
+  border-radius: 8px;
+  padding: 18px 22px;
+  margin: 12px 0 22px 0;
+  border: 1px solid #fee2e2;
+}
+.errLabel {
+  font-size: 12px;
+  color: #9aa0a6;
+  margin-bottom: 8px;
+}
+.errCode {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Segoe UI Mono", monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: #b91c1c;
+}
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.retry {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.back {
+  background: #f3f4f6;
+  color: #374151;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.retry:hover { opacity: 0.95; }
+.back:hover { opacity: 0.95; }
+
+@media (max-width: 640px) {
+  .modal { width: calc(100% - 40px); padding: 28px 20px; }
+}
