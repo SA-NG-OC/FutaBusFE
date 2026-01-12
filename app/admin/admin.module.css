@@ -22,7 +22,7 @@
 
 .content-area {
   flex: 1;
-  padding: 16px;
+  padding: 32px;
   overflow-y: auto; /* Chỉ vùng này được cuộn */
   background-color: var(--background);
   color: var(--foreground);
