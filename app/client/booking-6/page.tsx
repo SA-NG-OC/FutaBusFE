@@ -3,6 +3,7 @@ import BookingFalse from "@/feature/booking/components/Result/False/BookingFail"
 import BookingSuccess from "@/feature/booking/components/Result/Success/BookingSuccess";
 import React from "react";
 import { useSearchParams } from "next/navigation";
+import Container from "@/src/components/ClientContainer/ClientContainer";
 
 export default function ClientBookingResultPage() {
   const [loading, setLoading] = React.useState(true);
@@ -64,12 +65,12 @@ export default function ClientBookingResultPage() {
   const isFail = status === "fail";
 
   return (
-    <div>
+    <Container>
       {isFail ? (
         <BookingFalse isOpen reference="ERR-402" />
       ) : (
         <BookingSuccess isOpen reference="BT-70981 954" />
       )}
-    </div>
+    </Container>
   );
 }

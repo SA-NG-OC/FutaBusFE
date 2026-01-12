@@ -5,6 +5,7 @@ import TripSearch from "@/feature/booking/components/TripSearch/TripSearch";
 import TripSort from "@/feature/booking/components/TripSort/TripSort";
 import styles from "./page.module.css";
 import React, { useState } from "react";
+import Container from "@/src/components/ClientContainer/ClientContainer";
 
 export default function ClientBookingPage() {
   const [sort, setSort] = useState("recommended");
@@ -16,7 +17,7 @@ export default function ClientBookingPage() {
   };
 
   return (
-    <div className={styles.main}>
+    <Container className="flex flex-col space-y-5 mx-auto">
       <TripSearch />
       <div className={styles.content}>
         <div className={styles.filter}>
@@ -32,6 +33,6 @@ export default function ClientBookingPage() {
           </div>
         </div>
       </div>
-    </div>
+    </Container>
   );
 }
