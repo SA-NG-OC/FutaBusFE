@@ -1,0 +1,112 @@
+/* TripCard.module.css */
+.card {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px 22px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.06) inset, 0 4px 18px rgba(15,23,42,0.06);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+.left, .center, .right {
+  display: flex;
+  flex-direction: column;
+}
+.left { flex: 1 1 55%; }
+.center { flex: 0 0 18%; align-items: center; }
+.right { flex: 0 0 25%; align-items: flex-end; }
+
+.header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.logo {
+  width: 48px;
+  height: 48px;
+  background: #fff0ef;
+  color: #d94a43;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 20px;
+}
+.company {
+  font-weight: 600;
+  font-size: 16px;
+  color: #2b2b2b;
+}
+.badge {
+  display: inline-block;
+  margin-left: 8px;
+  background: #eadfd6;
+  color: #8a5f4b;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+.section {
+  color: #6b7280;
+  font-size: 13px;
+}
+.label {
+  font-size: 12px;
+  color: #9aa0a6;
+  margin-bottom: 6px;
+}
+.time {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2b2b2b;
+}
+.city {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 6px;
+}
+.seats {
+  margin-top: 10px;
+  color: #6b7280;
+  font-size: 13px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.center .durationLabel {
+  font-size: 12px;
+  color: #9aa0a6;
+  margin-bottom: 6px;
+}
+.center .duration {
+  background: transparent;
+  color: #9aa0a6;
+  font-weight: 600;
+}
+.right .price {
+  color: #d94a43;
+  font-weight: 700;
+  font-size: 20px;
+}
+.selectBtn {
+  margin-top: 10px;
+  background: #e14b45;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.selectBtn:hover { opacity: 0.95; }
+
+.arrivalLabel { font-size: 12px; color: #9aa0a6; margin-top: 14px; }
+
+@media (max-width: 900px) {
+  .card { flex-direction: column; gap: 12px; }
+  .left, .center, .right { align-items: flex-start; }
+  .right { align-items: flex-start; }
+}
