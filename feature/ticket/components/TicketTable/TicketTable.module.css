@@ -1,0 +1,166 @@
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ticketTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.ticketTable thead {
+  background-color: #f8f9fa;
+}
+
+.ticketTable th {
+  padding: 16px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #dee2e6;
+  white-space: nowrap;
+}
+
+.ticketTable tbody tr {
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s;
+}
+
+.ticketTable tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.ticketTable td {
+  padding: 16px 12px;
+  color: #212529;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  min-width: 80px;
+}
+
+/* Payment Status Styles */
+.statusPaid {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.statusCash {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.statusPending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+/* Ticket Status Styles */
+.statusConfirmed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.statusCancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.statusUsed {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.actionButtons button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: #f8f9fa;
+}
+
+.actionButtons button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.actionButtons button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.viewButton {
+  color: #6c757d;
+}
+
+.viewButton:hover:not(:disabled) {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.confirmButton {
+  color: #28a745;
+}
+
+.confirmButton:hover:not(:disabled) {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.cancelButton {
+  color: #dc3545;
+}
+
+.cancelButton:hover:not(:disabled) {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .ticketTable {
+    font-size: 13px;
+  }
+
+  .ticketTable th,
+  .ticketTable td {
+    padding: 12px 8px;
+  }
+
+  .badge {
+    padding: 3px 8px;
+    font-size: 11px;
+    min-width: 70px;
+  }
+}
+
+@media (max-width: 768px) {
+  .tableContainer {
+    overflow-x: scroll;
+  }
+
+  .ticketTable {
+    min-width: 900px;
+  }
+}
