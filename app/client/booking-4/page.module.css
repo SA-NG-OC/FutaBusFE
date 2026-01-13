@@ -1,0 +1,119 @@
+.backButton {
+  margin-bottom: 20px;
+}
+
+.backButton button {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s;
+}
+
+.backButton button:hover {
+  color: #1f2937;
+}
+
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.continueButton {
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  display: block;
+}
+
+.continueButton:hover:not(:disabled) {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.continueButton:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.totalFloating {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #ef4444;
+  color: white;
+  border-radius: 12px;
+  padding: 16px 24px;
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+  z-index: 100;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.totalContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.totalLabel {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.totalAmount {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+@media (max-width: 1024px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+
+  .continueButton {
+    max-width: 100%;
+  }
+
+  .totalFloating {
+    bottom: 16px;
+    right: 16px;
+    padding: 12px 20px;
+  }
+
+  .totalLabel {
+    font-size: 14px;
+  }
+
+  .totalAmount {
+    font-size: 18px;
+  }
+}
