@@ -1,11 +1,16 @@
+/* PageHeader.module.css */
+
 .container {
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    margin-bottom: 24px; /* Tạo khoảng cách với nội dung bên dưới (Table/List) */
+    margin-bottom: 24px;
+    gap: 24px; /* Khoảng cách tối thiểu giữa Text và Actions */
+    flex-wrap: wrap; /* Cho phép xuống dòng khi màn hình nhỏ */
 }
 
+/* --- TEXT SECTION (Giữ nguyên) --- */
 .text-section {
     display: flex;
     flex-direction: column;
@@ -15,9 +20,9 @@
 .heading {
     font-family: var(--font-sans), 'Arimo', sans-serif;
     font-size: 24px;
-    font-weight: 700; /* Đậm hơn chút cho giống tiêu đề */
+    font-weight: 700;
     line-height: 1.2;
-    color: var(--foreground); /* Tự động đổi màu theo theme */
+    color: var(--foreground);
     margin: 0;
 }
 
@@ -26,11 +31,63 @@
     font-size: 16px;
     font-weight: 400;
     line-height: 1.5;
-    color: var(--text-gray); /* Màu xám */
+    color: var(--text-gray);
     margin: 0;
 }
 
-/* Responsive: Trên mobile thì nút xuống dòng */
+/* --- ACTIONS WRAPPER (Mới: Để gom Search và Nút) --- */
+.actions-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px; /* Khoảng cách giữa ô tìm kiếm và nút */
+}
+
+/* --- SEARCH STYLES (Được port từ AdminHeader sang) --- */
+.search-container {
+    position: relative;
+    width: 260px; /* Độ rộng vừa phải, không quá dài như AdminHeader */
+    height: 40px; /* Chiều cao khớp với các nút button chuẩn */
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: var(--text-gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.search-input {
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-beige); /* Màu nền be như bạn yêu cầu */
+    border: 1px solid var(--border-gray);
+    border-radius: 8px;
+    padding: 4px 12px 4px 40px; /* Padding trái né icon */
+    font-size: 14px;
+    color: var(--foreground);
+    outline: none;
+    transition: all 0.2s ease;
+    font-family: var(--font-sans), 'Arimo', sans-serif;
+}
+
+.search-input::placeholder {
+    color: var(--text-gray);
+}
+
+.search-input:focus {
+    border-color: var(--primary); /* Màu đỏ chủ đạo khi focus */
+    background-color: var(--background);
+}
+
+/* --- RESPONSIVE --- */
 @media (max-width: 768px) {
     .container {
         flex-direction: column;
@@ -38,12 +95,23 @@
         gap: 16px;
     }
 
+    .actions-wrapper {
+        width: 100%;
+        flex-direction: column; /* Xếp chồng Search và Button */
+        gap: 12px;
+    }
+
+    .search-container {
+        width: 100%; /* Full width trên mobile */
+    }
+
     .button-wrapper {
         width: 100%;
     }
     
-    /* Để nút full width trên mobile nếu muốn */
+    /* Nút full width trên mobile */
     .button-wrapper button {
-        width: 100%;
+        width: 100% !important; 
+        justify-content: center;
     }
 }

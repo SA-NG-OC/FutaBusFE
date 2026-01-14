@@ -24,12 +24,14 @@ const TicketSalesChart = ({ data }: TicketSalesProps) => {
                 margin={{ top: 5, right: 10, left: 0, bottom: 0 }}
                 barSize={32}
             >
+                {/* Grid: Dùng var(--border-gray) */}
                 <CartesianGrid strokeDasharray="3 3" vertical={true} stroke="var(--border-gray)" />
 
                 <XAxis
                     dataKey="label"
                     axisLine={true}
                     tickLine={false}
+                    // Tick: Dùng var(--text-gray)
                     tick={{ fill: 'var(--text-gray)', fontSize: 12 }}
                     dy={10}
                     stroke="var(--border-gray)"
@@ -43,7 +45,8 @@ const TicketSalesChart = ({ data }: TicketSalesProps) => {
                 />
 
                 <Tooltip
-                    cursor={{ fill: 'var(--bg-hover)' }} // Màu hover cột
+                    // Cursor hover: Dùng var(--bg-hover)
+                    cursor={{ fill: 'var(--bg-hover)' }}
                     contentStyle={{
                         backgroundColor: 'var(--background-paper)',
                         borderColor: 'var(--border-gray)',
@@ -56,6 +59,7 @@ const TicketSalesChart = ({ data }: TicketSalesProps) => {
 
                 <Bar
                     dataKey="value"
+                    // Bar Color: Dùng var(--primary)
                     fill="var(--primary)"
                     radius={[2, 2, 0, 0]}
                 />

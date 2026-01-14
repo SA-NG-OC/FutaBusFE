@@ -12,18 +12,23 @@ export const useRoutes = () => {
     const [currentPage, setCurrentPage] = useState<number>(0);
     const [totalPages, setTotalPages] = useState<number>(0);
 
+    // ===== SEARCH STATE (Mới) =====
+    const [keyword, setKeyword] = useState<string>("");
+
     // ===== MODAL STATE =====
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
     const [selectedRoute, setSelectedRoute] = useState<RouteData | null>(null);
 
-    // ===== FETCH ROUTES =====
-    const fetchRoutes = useCallback(async (page: number) => {
+    // ===== FETCH ROUTES (Cập nhật nhận thêm keyword) =====
+    const fetchRoutes = useCallback(async (page: number, searchKw: string) => {
         try {
             setLoading(true);
             setError(null);
 
-            const pageData = await routeApi.getAll(page, 10);
+            // Gọi API với keyword (nếu có)
+            // Lưu ý: Đảm bảo routeApi.getAll đã được sửa để nhận tham số thứ 3 là keyword
+            const pageData = await routeApi.getAll(page, 10, searchKw);
 
             setRoutes(pageData.data.content);
             setTotalPages(pageData.data.totalPages);
@@ -37,7 +42,14 @@ export const useRoutes = () => {
         }
     }, []);
 
-    // ===== MODAL CONTROLS =====
+    // ===== SEARCH HANDLER (Mới) =====
+    const handleSearch = (value: string) => {
+        setKeyword(value);
+        setCurrentPage(0); // Reset về trang đầu tiên khi tìm kiếm
+        // Lưu ý: Nếu muốn tối ưu, bạn có thể dùng debounce ở đây để tránh gọi API liên tục
+    };
+
+    // ===== MODAL CONTROLS (Giữ nguyên) =====
     const openAddModal = () => {
         setSelectedRoute(null);
         setIsModalOpen(true);
@@ -61,33 +73,18 @@ export const useRoutes = () => {
         setSelectedRoute(null);
     };
 
-    // ===== SAVE (CREATE / UPDATE) =====
+    // ===== SAVE (CREATE / UPDATE) (Giữ nguyên) =====
     const handleSaveRoute = async (formData: RouteRequest) => {
         try {
             setLoading(true);
             setError(null);
-
             if (selectedRoute) {
-                // === UPDATE ===
-                const updatedRoute = await routeApi.update(
-                    selectedRoute.routeId,
-                    formData
-                );
-
-                setRoutes(prev =>
-                    prev.map(route =>
-                        route.routeId === selectedRoute.routeId
-                            ? updatedRoute
-                            : route
-                    )
-                );
+                const updatedRoute = await routeApi.update(selectedRoute.routeId, formData);
+                setRoutes(prev => prev.map(r => r.routeId === selectedRoute.routeId ? updatedRoute : r));
             } else {
-                // === CREATE ===
                 const newRoute = await routeApi.create(formData);
-
                 setRoutes(prev => [newRoute, ...prev]);
             }
-
             closeModal();
         } catch (err: any) {
             console.error("Save route failed", err);
@@ -98,20 +95,14 @@ export const useRoutes = () => {
         }
     };
 
-    // ===== DELETE =====
+    // ===== DELETE (Giữ nguyên) =====
     const handleDeleteConfirm = async () => {
         if (!selectedRoute) return;
-
         try {
             setLoading(true);
             setError(null);
-
             await routeApi.delete(selectedRoute.routeId);
-
-            setRoutes(prev =>
-                prev.filter(route => route.routeId !== selectedRoute.routeId)
-            );
-
+            setRoutes(prev => prev.filter(r => r.routeId !== selectedRoute.routeId));
             closeModal();
         } catch (err: any) {
             console.error("Delete route failed", err);
@@ -121,10 +112,16 @@ export const useRoutes = () => {
         }
     };
 
-    // ===== INITIAL LOAD & PAGE CHANGE =====
+    // ===== INITIAL LOAD & PAGE CHANGE & SEARCH =====
+    // useEffect sẽ chạy khi currentPage HOẶC keyword thay đổi
     useEffect(() => {
-        fetchRoutes(currentPage);
-    }, [currentPage, fetchRoutes]);
+        // Có thể thêm setTimeout (debounce) ở đây nếu muốn đợi user gõ xong mới search
+        const timer = setTimeout(() => {
+            fetchRoutes(currentPage, keyword);
+        }, 300); // Delay 300ms để tránh spam API khi gõ phím
+
+        return () => clearTimeout(timer);
+    }, [currentPage, keyword, fetchRoutes]);
 
     return {
         // data
@@ -136,6 +133,10 @@ export const useRoutes = () => {
         currentPage,
         totalPages,
         setCurrentPage,
+
+        // search (Mới)
+        keyword,
+        handleSearch,
 
         // modal state
         isModalOpen,

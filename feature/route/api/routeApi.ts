@@ -38,8 +38,17 @@ export const routeApi = {
     },
 
     // 1. Lấy danh sách (GET)
-    getAll: async (page: number, size: number = 10): Promise<Res> => {
-        const res = await fetch(`${API_URL}/routes?page=${page}&size=${size}`, {
+    getAll: async (page: number, size: number = 10, keyword?: string): Promise<Res> => {
+
+        // Tạo URL cơ bản
+        let url = `${API_URL}/routes?page=${page}&size=${size}`;
+
+        // Nếu có keyword thì nối thêm vào đuôi
+        if (keyword) {
+            url += `&keyword=${encodeURIComponent(keyword)}`;
+        }
+
+        const res = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

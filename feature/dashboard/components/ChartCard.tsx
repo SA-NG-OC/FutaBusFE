@@ -9,10 +9,11 @@ interface ChartCardProps {
 
 const ChartCard = ({ title, children, action, isLoading = false }: ChartCardProps) => {
     return (
-        // Responsive Height: h-[300px] mobile -> h-[400px] desktop
-        <div className="bg-background-paper border border-border-gray rounded-[14px] w-full h-[300px] md:h-[400px] p-4 md:p-6 flex flex-col relative shadow-sm transition-colors duration-200">
+        // SỬA: Dùng trực tiếp bg-[var(--background-paper)] và border-[var(--border-gray)]
+        <div className="bg-[var(--background-paper)] border border-[var(--border-gray)] rounded-[14px] w-full h-[300px] md:h-[400px] p-4 md:p-6 flex flex-col relative shadow-sm transition-colors duration-200">
             <div className="flex justify-between items-center mb-4 md:mb-6">
-                <h2 className="text-foreground text-sm md:text-base font-medium truncate">
+                {/* SỬA: Dùng text-[var(--foreground)] */}
+                <h2 className="text-[var(--foreground)] text-sm md:text-base font-medium truncate">
                     {title}
                 </h2>
                 {!isLoading && action && <div>{action}</div>}
@@ -25,7 +26,9 @@ const ChartCard = ({ title, children, action, isLoading = false }: ChartCardProp
                             {[40, 70, 50, 80, 60, 30, 90].map((h, i) => (
                                 <div
                                     key={i}
-                                    className="w-full bg-gray-200 dark:bg-gray-700 rounded-t-md"
+                                    // SỬA: Thay bg-gray-200... bằng bg-[var(--bg-hover)]
+                                    // Nó sẽ lấy màu #f3f4f6 (Light) hoặc #334155 (Dark) từ CSS của bạn
+                                    className="w-full bg-[var(--bg-hover)] rounded-t-md"
                                     style={{ height: `${h}%` }}
                                 ></div>
                             ))}
