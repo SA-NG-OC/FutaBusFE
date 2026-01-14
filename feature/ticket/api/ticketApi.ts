@@ -100,4 +100,71 @@ export const ticketApi = {
     if (!res.ok) throw new Error("Failed to cancel booking");
     return res.json();
   },
+
+  // ================================
+  // 🎫 MY TICKETS - Get user's bookings with filter
+  // Backend: GET /bookings/my-tickets?status=&page=&size=
+  // ================================
+  getMyTickets: async (
+    token: string,
+    status?: "Upcoming" | "Completed" | "Cancelled",
+    page: number = 0,
+    size: number = 20
+  ): Promise<ApiResponse<BookingPageResponse>> => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      size: size.toString(),
+    });
+
+    if (status) {
+      params.append("status", status);
+    }
+
+    const res = await fetch(`${API_BASE_URL}/bookings/my-tickets?${params}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        throw new Error("Unauthorized - Token không hợp lệ hoặc đã hết hạn");
+      }
+      throw new Error("Failed to fetch my tickets");
+    }
+    return res.json();
+  },
+
+  // ================================
+  // 📊 MY TICKETS COUNT - Get ticket counts by status
+  // Backend: GET /bookings/my-tickets/count
+  // ================================
+  getMyTicketsCount: async (
+    token: string
+  ): Promise<
+    ApiResponse<{
+      upcomingCount: number;
+      completedCount: number;
+      cancelledCount: number;
+      totalCount: number;
+    }>
+  > => {
+    const res = await fetch(`${API_BASE_URL}/bookings/my-tickets/count`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        throw new Error("Unauthorized - Token không hợp lệ hoặc đã hết hạn");
+      }
+      throw new Error("Failed to fetch ticket counts");
+    }
+    return res.json();
+  },
 };
