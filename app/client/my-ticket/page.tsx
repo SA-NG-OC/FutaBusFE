@@ -1,99 +1,78 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
+import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 import TicketCard from "@/feature/ticket/components/TicketCard";
-
-type TabType = "upcoming" | "completed" | "cancelled";
-
-interface TicketData {
-  id: number;
-  bookingReference: string;
-  status: "Upcoming" | "Completed" | "Cancelled";
-  from: string;
-  to: string;
-  date: string;
-  departureTime: string;
-  seats: string;
-  price: number;
-}
+import { useMyTickets } from "@/feature/ticket/hooks/useMyTickets";
+import { useAuth } from "@/src/context/AuthContext";
 
 export default function MyTicketsPage() {
-  const [activeTab, setActiveTab] = useState<TabType>("upcoming");
+  const router = useRouter();
+  const {
+    token,
+    isAuthenticated,
+    isLoading: authLoading,
+    openLoginModal,
+  } = useAuth();
 
-  // Mock data - Thay bằng API call thực tế
-  const mockTickets: TicketData[] = [
-    {
-      id: 1,
-      bookingReference: "BT-12345678",
-      status: "Upcoming",
-      from: "Ho Chi Minh City",
-      to: "Da Lat",
-      date: "2025-11-25",
-      departureTime: "06:00",
-      seats: "A5",
-      price: 500000,
-    },
-    {
-      id: 2,
-      bookingReference: "BT-87654321",
-      status: "Upcoming",
-      from: "Ha Noi",
-      to: "Hai Phong",
-      date: "2025-12-01",
-      departureTime: "08:30",
-      seats: "B3, B4",
-      price: 350000,
-    },
-    {
-      id: 3,
-      bookingReference: "BT-11223344",
-      status: "Completed",
-      from: "Ho Chi Minh City",
-      to: "Vung Tau",
-      date: "2025-10-15",
-      departureTime: "07:00",
-      seats: "C1",
-      price: 150000,
-    },
-    {
-      id: 4,
-      bookingReference: "BT-99887766",
-      status: "Cancelled",
-      from: "Da Nang",
-      to: "Hue",
-      date: "2025-10-20",
-      departureTime: "09:00",
-      seats: "A2",
-      price: 200000,
-    },
-  ];
+  // Redirect or show login modal if not authenticated
+  React.useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      // Open login modal instead of redirecting
+      openLoginModal();
+      // Optionally redirect to home page
+      router.push("/client/home");
+    }
+  }, [authLoading, isAuthenticated, openLoginModal, router]);
 
-  const filterTickets = (status: string) => {
-    return mockTickets.filter((ticket) => ticket.status === status);
+  const {
+    tickets,
+    counts,
+    loading,
+    error,
+    currentPage,
+    totalPages,
+    isFirst,
+    isLast,
+    activeTab,
+    setActiveTab,
+    setPage,
+  } = useMyTickets(token);
+
+  const handleViewDetails = (bookingCode: string) => {
+    console.log("View details for booking:", bookingCode);
+    // Navigate to ticket lookup with booking code
+    router.push(`/client/ticket-lookup?code=${bookingCode}`);
   };
 
-  const upcomingTickets = filterTickets("Upcoming");
-  const completedTickets = filterTickets("Completed");
-  const cancelledTickets = filterTickets("Cancelled");
-
-  const getActiveTickets = () => {
-    switch (activeTab) {
-      case "upcoming":
-        return upcomingTickets;
-      case "completed":
-        return completedTickets;
-      case "cancelled":
-        return cancelledTickets;
-      default:
-        return [];
+  const handlePreviousPage = () => {
+    if (!isFirst) {
+      setPage(currentPage - 1);
     }
   };
 
-  const handleViewDetails = (ticketId: number) => {
-    console.log("View details for ticket:", ticketId);
-    // Navigate to ticket details page
-    // router.push(`/client/my-ticket/${ticketId}`);
+  const handleNextPage = () => {
+    if (!isLast) {
+      setPage(currentPage + 1);
+    }
   };
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loadingState}>
+          <div className={styles.spinner}></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If not authenticated, redirect will happen in useEffect
+  if (!isAuthenticated || !token) {
+    return null;
+  }
 
   return (
     <div className={styles.container}>
@@ -104,44 +83,74 @@ export default function MyTicketsPage() {
       <div className={styles.tabs}>
         <button
           className={`${styles.tab} ${
-            activeTab === "upcoming" ? styles.tabActive : ""
+            activeTab === "Upcoming" ? styles.tabActive : ""
           }`}
-          onClick={() => setActiveTab("upcoming")}
+          onClick={() => setActiveTab("Upcoming")}
         >
-          Upcoming ({upcomingTickets.length})
+          Upcoming ({counts.upcomingCount})
         </button>
         <button
           className={`${styles.tab} ${
-            activeTab === "completed" ? styles.tabActive : ""
+            activeTab === "Completed" ? styles.tabActive : ""
           }`}
-          onClick={() => setActiveTab("completed")}
+          onClick={() => setActiveTab("Completed")}
         >
-          Completed ({completedTickets.length})
+          Completed ({counts.completedCount})
         </button>
         <button
           className={`${styles.tab} ${
-            activeTab === "cancelled" ? styles.tabActive : ""
+            activeTab === "Cancelled" ? styles.tabActive : ""
           }`}
-          onClick={() => setActiveTab("cancelled")}
+          onClick={() => setActiveTab("Cancelled")}
         >
-          Cancelled ({cancelledTickets.length})
+          Cancelled ({counts.cancelledCount})
         </button>
       </div>
 
+      {error && (
+        <div className={styles.errorState}>
+          <p className={styles.errorText}>{error}</p>
+        </div>
+      )}
+
       <div className={styles.ticketList}>
-        {getActiveTickets().length > 0 ? (
-          getActiveTickets().map((ticket) => (
+        {loading ? (
+          <div className={styles.loadingState}>
+            <div className={styles.spinner}></div>
+            <p>Loading tickets...</p>
+          </div>
+        ) : tickets.length > 0 ? (
+          tickets.map((booking) => (
             <TicketCard
-              key={ticket.id}
-              bookingReference={ticket.bookingReference}
-              status={ticket.status}
-              from={ticket.from}
-              to={ticket.to}
-              date={ticket.date}
-              departureTime={ticket.departureTime}
-              seats={ticket.seats}
-              price={ticket.price}
-              onViewDetails={() => handleViewDetails(ticket.id)}
+              key={booking.bookingId}
+              bookingReference={booking.bookingCode}
+              status={
+                activeTab === "Upcoming"
+                  ? "Upcoming"
+                  : activeTab === "Completed"
+                  ? "Completed"
+                  : "Cancelled"
+              }
+              from={
+                booking.tripInfo.pickupLocationName ||
+                booking.tripInfo.routeName.split(" - ")[0]
+              }
+              to={
+                booking.tripInfo.dropoffLocationName ||
+                booking.tripInfo.routeName.split(" - ")[1]
+              }
+              date={new Date(booking.tripInfo.departureTime).toLocaleDateString(
+                "vi-VN"
+              )}
+              departureTime={new Date(
+                booking.tripInfo.departureTime
+              ).toLocaleTimeString("vi-VN", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+              seats={booking.tickets.map((t) => t.seatNumber).join(", ")}
+              price={booking.totalAmount}
+              onViewDetails={() => handleViewDetails(booking.bookingCode)}
             />
           ))
         ) : (
@@ -160,13 +169,38 @@ export default function MyTicketsPage() {
                 d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
               />
             </svg>
-            <p className={styles.emptyText}>No {activeTab} tickets found</p>
+            <p className={styles.emptyText}>
+              No {activeTab.toLowerCase()} tickets found
+            </p>
             <p className={styles.emptySubtext}>
-              Your {activeTab} tickets will appear here
+              Your {activeTab.toLowerCase()} tickets will appear here
             </p>
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {!loading && tickets.length > 0 && totalPages > 1 && (
+        <div className={styles.pagination}>
+          <button
+            className={styles.paginationBtn}
+            onClick={handlePreviousPage}
+            disabled={isFirst}
+          >
+            Previous
+          </button>
+          <span className={styles.pageInfo}>
+            Page {currentPage + 1} of {totalPages}
+          </span>
+          <button
+            className={styles.paginationBtn}
+            onClick={handleNextPage}
+            disabled={isLast}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
