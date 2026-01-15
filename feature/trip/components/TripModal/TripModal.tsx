@@ -1,27 +1,154 @@
+// src/components/TripModal.tsx
 "use client";
 
-import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import React, { useEffect, useRef, useState } from "react";
+import { useForm, Controller } from "react-hook-form";
 import styles from "./TripModal.module.css";
-import { FaTimes } from "react-icons/fa";
+import {
+  FaTimes,
+  FaChevronDown,
+  FaSearch,
+  FaBus,
+  FaUser,
+  FaRegMoneyBillAlt,
+  FaMapMarkerAlt,
+} from "react-icons/fa";
 import {
   RouteSelection,
   VehicleSelection,
   DriverSelection,
   TripFormData,
+  TripModalProps,
 } from "@/feature/trip/types";
 
-interface TripModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (data: TripFormData) => void;
-  routes: RouteSelection[];
-  vehicles: VehicleSelection[];
-  drivers: DriverSelection[];
-  subDrivers: DriverSelection[];
-  isLoading?: boolean;
+// --- INTERNAL CUSTOM SELECT COMPONENT ---
+interface CustomSelectProps<T> {
+  options: T[];
+  value: string | number | undefined;
+  onChange: (value: string | number) => void; // Đã sửa -> thành =>
+  placeholder: string;
+  icon: React.ReactNode;
+  renderOption: (option: T) => React.ReactNode; // Đã sửa -> thành =>
+  renderSelected: (option: T) => React.ReactNode; // Đã sửa -> thành =>
+  keyExtractor: (option: T) => string | number; // Đã sửa -> thành =>
+  searchKeys?: (keyof T)[];
 }
 
+function CustomSelect<T>({
+  options,
+  value,
+  onChange,
+  placeholder,
+  icon,
+  renderOption,
+  renderSelected,
+  keyExtractor,
+  searchKeys = [],
+}: CustomSelectProps<T>) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find(
+    (opt) => keyExtractor(opt).toString() === value?.toString()
+  );
+
+  const filteredOptions = options.filter((opt) => {
+    if (!searchQuery) return true;
+    if (searchKeys.length === 0) return true;
+    const query = searchQuery.toLowerCase();
+    return searchKeys.some((key) =>
+      String(opt[key]).toLowerCase().includes(query)
+    );
+  });
+
+  return (
+    <div className={styles["custom-select-container"]} ref={containerRef}>
+      <div
+        className={`${styles["select-trigger"]} ${isOpen ? styles.open : ""}`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <div className={styles["trigger-content"]}>
+          <span className={styles["trigger-icon"]}>{icon}</span>
+          {selectedOption ? (
+            <span className={styles["trigger-text"]}>
+              {renderSelected(selectedOption)}
+            </span>
+          ) : (
+            <span className={styles.placeholder}>{placeholder}</span>
+          )}
+        </div>
+        <FaChevronDown className={styles["chevron-icon"]} />
+      </div>
+
+      {isOpen && (
+        <div className={styles["select-dropdown"]}>
+          {searchKeys.length > 0 && (
+            <div className={styles["search-container"]}>
+              <FaSearch className={styles["search-icon"]} />
+              <input
+                type="text"
+                className={styles["search-input"]}
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          )}
+          <div className={styles["options-list"]}>
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((opt) => {
+                const key = keyExtractor(opt);
+                const isSelected = key.toString() === value?.toString();
+                return (
+                  <div
+                    key={key}
+                    className={`${styles["option-item"]} ${
+                      isSelected ? styles.selected : ""
+                    }`}
+                    onClick={() => {
+                      onChange(key);
+                      setIsOpen(false);
+                      setSearchQuery("");
+                    }}
+                  >
+                    {renderOption(opt)}
+                  </div>
+                );
+              })
+            ) : (
+              <div
+                className={styles["option-item"]}
+                style={{
+                  justifyContent: "center",
+                  color: "var(--text-secondary)",
+                }}
+              >
+                No results found
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// --- MAIN COMPONENT ---
 const TripModal = ({
   isOpen,
   onClose,
@@ -33,13 +160,13 @@ const TripModal = ({
   isLoading = false,
 }: TripModalProps) => {
   const {
+    control,
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm<TripFormData>();
 
-  // Reset form khi mở modal
   useEffect(() => {
     if (isOpen) reset();
   }, [isOpen, reset]);
@@ -47,24 +174,16 @@ const TripModal = ({
   if (!isOpen) return null;
 
   const onFormSubmit = (data: TripFormData) => {
-    // 1. Validate Frontend: Không cho chọn ngày giờ quá khứ
-    // (Lưu ý: Nếu chỉ chọn ngày, departureTime cần ghép vào để so sánh chính xác)
     const selectedDateTime = new Date(`${data.date}T${data.departureTime}`);
     const now = new Date();
-
     if (selectedDateTime < now) {
-      alert(
-        "Departure time cannot be in the past! Please choose a future time."
-      );
+      alert("Departure time cannot be in the past!");
       return;
     }
-
-    // 2. Validate Frontend: Tài xế và Phụ xe không được trùng nhau
     if (data.subDriverId && data.driverId === data.subDriverId) {
-      alert("Main Driver and Sub Driver cannot be the same person!");
+      alert("Main Driver and Sub Driver cannot be the same!");
       return;
     }
-
     onSubmit(data);
   };
 
@@ -87,22 +206,40 @@ const TripModal = ({
           className={styles["form-content"]}
           onSubmit={handleSubmit(onFormSubmit)}
         >
-          {/* --- Select Route --- */}
+          {/* Select Route */}
           <div className={styles["form-field"]}>
             <label className={styles["form-label"]}>
               Select Route <span style={{ color: "var(--primary)" }}>*</span>
             </label>
-            <select
-              className={styles["form-select"]}
-              {...register("routeId", { required: "Please select a route" })}
-            >
-              <option value="">Choose route</option>
-              {routes.map((r) => (
-                <option key={r.routeId} value={r.routeId}>
-                  {r.routeName}
-                </option>
-              ))}
-            </select>
+            <Controller
+              name="routeId"
+              control={control}
+              rules={{ required: "Please select a route" }}
+              render={({ field }) => (
+                <CustomSelect
+                  options={routes}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Choose a route..."
+                  icon={<FaMapMarkerAlt />}
+                  keyExtractor={(r) => r.routeId}
+                  searchKeys={["routeName"]}
+                  renderSelected={(r) => r.routeName}
+                  renderOption={(r) => (
+                    <>
+                      <div className={styles["option-icon"]}>
+                        <FaMapMarkerAlt />
+                      </div>
+                      <div className={styles["option-content"]}>
+                        <span className={styles["option-primary-text"]}>
+                          {r.routeName}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                />
+              )}
+            />
             {errors.routeId && (
               <span className={styles["error-text"]}>
                 {errors.routeId.message}
@@ -110,26 +247,47 @@ const TripModal = ({
             )}
           </div>
 
-          {/* --- Select Vehicle & Driver --- */}
+          {/* Select Vehicle & Driver */}
           <div className={styles["form-row"]}>
             <div className={styles["form-field"]}>
               <label className={styles["form-label"]}>
                 Select Vehicle{" "}
                 <span style={{ color: "var(--primary)" }}>*</span>
               </label>
-              <select
-                className={styles["form-select"]}
-                {...register("vehicleId", {
-                  required: "Please select a vehicle",
-                })}
-              >
-                <option value="">Choose vehicle</option>
-                {vehicles.map((v) => (
-                  <option key={v.vehicleId} value={v.vehicleId}>
-                    {v.licensePlate} - {v.vehicleTypeName}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                name="vehicleId"
+                control={control}
+                rules={{ required: "Please select a vehicle" }}
+                render={({ field }) => (
+                  <CustomSelect
+                    options={vehicles}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Choose vehicle..."
+                    icon={<FaBus />}
+                    keyExtractor={(v) => v.vehicleId}
+                    searchKeys={["licensePlate", "vehicleTypeName"]}
+                    renderSelected={(v) =>
+                      `${v.licensePlate} (${v.vehicleTypeName})`
+                    }
+                    renderOption={(v) => (
+                      <>
+                        <div className={styles["option-icon"]}>
+                          <FaBus />
+                        </div>
+                        <div className={styles["option-content"]}>
+                          <span className={styles["option-primary-text"]}>
+                            {v.licensePlate}
+                          </span>
+                          <span className={styles["option-secondary-text"]}>
+                            {v.vehicleTypeName}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  />
+                )}
+              />
               {errors.vehicleId && (
                 <span className={styles["error-text"]}>
                   {errors.vehicleId.message}
@@ -141,19 +299,38 @@ const TripModal = ({
               <label className={styles["form-label"]}>
                 Assign Driver <span style={{ color: "var(--primary)" }}>*</span>
               </label>
-              <select
-                className={styles["form-select"]}
-                {...register("driverId", {
-                  required: "Please select a driver",
-                })}
-              >
-                <option value="">Choose driver</option>
-                {drivers.map((d) => (
-                  <option key={d.driverId} value={d.driverId}>
-                    {d.driverName} ({d.driverLicense})
-                  </option>
-                ))}
-              </select>
+              <Controller
+                name="driverId"
+                control={control}
+                rules={{ required: "Please select a driver" }}
+                render={({ field }) => (
+                  <CustomSelect
+                    options={drivers}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Choose driver..."
+                    icon={<FaUser />}
+                    keyExtractor={(d) => d.driverId}
+                    searchKeys={["driverName", "driverLicense"]}
+                    renderSelected={(d) => d.driverName}
+                    renderOption={(d) => (
+                      <>
+                        <div className={styles["option-icon"]}>
+                          <FaUser />
+                        </div>
+                        <div className={styles["option-content"]}>
+                          <span className={styles["option-primary-text"]}>
+                            {d.driverName}
+                          </span>
+                          <span className={styles["option-secondary-text"]}>
+                            Lic: {d.driverLicense}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  />
+                )}
+              />
               {errors.driverId && (
                 <span className={styles["error-text"]}>
                   {errors.driverId.message}
@@ -162,21 +339,41 @@ const TripModal = ({
             </div>
           </div>
 
-          {/* --- Sub-Driver & Price --- */}
+          {/* Sub-Driver & Price */}
           <div className={styles["form-row"]}>
             <div className={styles["form-field"]}>
               <label className={styles["form-label"]}>Assign Sub-Driver</label>
-              <select
-                className={styles["form-select"]}
-                {...register("subDriverId")}
-              >
-                <option value="">No sub-driver</option>
-                {subDrivers.map((d) => (
-                  <option key={d.driverId} value={d.driverId}>
-                    {d.driverName} ({d.driverLicense})
-                  </option>
-                ))}
-              </select>
+              <Controller
+                name="subDriverId"
+                control={control}
+                render={({ field }) => (
+                  <CustomSelect
+                    options={subDrivers}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Optional..."
+                    icon={<FaUser style={{ opacity: 0.7 }} />}
+                    keyExtractor={(d) => d.driverId}
+                    searchKeys={["driverName", "driverLicense"]}
+                    renderSelected={(d) => d.driverName}
+                    renderOption={(d) => (
+                      <>
+                        <div className={styles["option-icon"]}>
+                          <FaUser style={{ opacity: 0.7 }} />
+                        </div>
+                        <div className={styles["option-content"]}>
+                          <span className={styles["option-primary-text"]}>
+                            {d.driverName}
+                          </span>
+                          <span className={styles["option-secondary-text"]}>
+                            Lic: {d.driverLicense}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  />
+                )}
+              />
             </div>
 
             <div className={styles["form-field"]}>
@@ -184,15 +381,28 @@ const TripModal = ({
                 Ticket Price (₫){" "}
                 <span style={{ color: "var(--primary)" }}>*</span>
               </label>
-              <input
-                type="number"
-                className={styles["form-input"]}
-                placeholder="e.g. 250000"
-                {...register("price", {
-                  required: "Please enter ticket price",
-                  min: { value: 0, message: "Price must be positive" },
-                })}
-              />
+              <div style={{ position: "relative" }}>
+                <FaRegMoneyBillAlt
+                  style={{
+                    position: "absolute",
+                    left: "16px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: "var(--text-secondary)",
+                    fontSize: "1.1rem",
+                  }}
+                />
+                <input
+                  type="number"
+                  className={styles["form-input"]}
+                  style={{ paddingLeft: "48px", width: "100%" }}
+                  placeholder="e.g. 250000"
+                  {...register("price", {
+                    required: "Please enter ticket price",
+                    min: { value: 0, message: "Price must be positive" },
+                  })}
+                />
+              </div>
               {errors.price && (
                 <span className={styles["error-text"]}>
                   {errors.price.message}
@@ -201,7 +411,7 @@ const TripModal = ({
             </div>
           </div>
 
-          {/* --- Date & Time --- */}
+          {/* Date & Time */}
           <div className={styles["form-row"]}>
             <div className={styles["form-field"]}>
               <label className={styles["form-label"]}>
@@ -211,7 +421,6 @@ const TripModal = ({
                 type="date"
                 className={styles["form-input"]}
                 {...register("date", { required: "Please select a date" })}
-                // Validate chặn chọn ngày cũ trên UI
                 min={new Date().toISOString().split("T")[0]}
               />
               {errors.date && (

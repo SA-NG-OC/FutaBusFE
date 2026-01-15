@@ -35,7 +35,7 @@ const DashboardView = () => {
 
     return (
         // Responsive Padding: p-4 mobile, p-6 tablet+
-        <div className="w-full bg-background text-foreground transition-colors duration-200">
+        <div className="w-full bg-[var(--background)] text-[var(--foreground)] transition-colors duration-200">
             <PageHeader title="Overview Dashboard" subtitle='Overview of your bus ticket management system' />
 
             {/* STATS GRID: 1 cột (mobile) -> 2 cột (tablet) -> 4 cột (desktop lớn) */}

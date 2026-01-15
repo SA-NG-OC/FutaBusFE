@@ -16,7 +16,7 @@
 
 /* Modal Box */
 .modal {
-    background-color: var(--modal-bg, #f5efe1);
+    background-color: var(--bg-beige, #f5efe1);
     border: 1px solid var(--border-gray);
     border-radius: 10px;
     box-shadow: var(--modal-shadow);

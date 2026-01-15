@@ -16,7 +16,7 @@
 
 /* Modal Box */
 .modal {
-    background-color: var(--modal-bg, #f5efe1);
+    background-color: var(--bg-beige, #f5efe1);
     border: 1px solid var(--border-gray, rgba(0, 0, 0, 0.1));
     border-radius: 10px;
     box-shadow: var(--modal-shadow, 0px 10px 15px -3px rgba(0, 0, 0, 0.1));
@@ -99,7 +99,7 @@
 
 .form-input {
     background-color: var(--input-bg, #ffffff);
-    border: 1px solid transparent; /* Hoặc var(--border-gray) nếu muốn viền */
+    border: 1px solid var(--border-gray, rgba(0, 0, 0, 0.1));
     border-radius: 8px;
     height: 38px;
     padding: 4px 12px;

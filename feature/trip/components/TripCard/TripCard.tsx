@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styles from "./TripCard.module.css";
 import { TripData } from "../../types";
-import { FaBus, FaUser, FaRegClock } from "react-icons/fa";
+import { FaBus, FaUser, FaRegClock, FaChevronDown } from "react-icons/fa";
 
 interface TripCardProps {
   trip: TripData;
@@ -25,14 +25,53 @@ const TripCard = ({ trip, onStatusUpdate }: TripCardProps) => {
     return styles.waiting;
   };
 
-  // Logic hiển thị an toàn: Nếu API trả về null/0 thì fallback về 40 để UI đẹp
   const total = trip.totalSeats && trip.totalSeats > 0 ? trip.totalSeats : 40;
   const booked = trip.bookedSeats || 0;
   const checkedIn = trip.checkedInSeats || 0;
 
+  // --- LOGIC CUSTOM STATUS DROPDOWN ---
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const statusOptions = [
+    { value: "Waiting", label: "Waiting", dotClass: styles.dotWaiting },
+    { value: "Running", label: "Running", dotClass: styles.dotRunning },
+    { value: "Completed", label: "Completed", dotClass: styles.dotCompleted },
+    { value: "Cancelled", label: "Cancelled", dotClass: styles.dotCancelled },
+  ];
+
+  // Đóng dropdown khi click ra ngoài
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // [FIX] Thêm e.stopPropagation() để không mở Modal chi tiết
+  const toggleDropdown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  // [FIX] Thêm e.stopPropagation() khi chọn item
+  const handleStatusClick = (e: React.MouseEvent, newStatus: string) => {
+    e.stopPropagation();
+    if (newStatus !== trip.status) {
+      onStatusUpdate(trip.tripId, newStatus);
+    }
+    setIsDropdownOpen(false);
+  };
+
   return (
     <div className={styles.card}>
-      {/* Header: Route Info & Status */}
+      {/* Header */}
       <div className={styles.header}>
         <div className={styles.routeInfo}>
           <div className={styles.routeIcon}>
@@ -48,7 +87,7 @@ const TripCard = ({ trip, onStatusUpdate }: TripCardProps) => {
         </span>
       </div>
 
-      {/* Time Section: Departure - Arrival */}
+      {/* Time Section */}
       <div className={styles.timeSection}>
         <div className={styles.timePoint}>
           <span className={styles.label}>Departure</span>
@@ -69,7 +108,7 @@ const TripCard = ({ trip, onStatusUpdate }: TripCardProps) => {
         </div>
       </div>
 
-      {/* Info Grid: Vehicle, Driver & Stats */}
+      {/* Info Grid */}
       <div className={styles.infoGrid}>
         <div className={styles.infoItem}>
           <FaBus className={styles.icon} /> <span>{trip.vehicleInfo}</span>
@@ -78,7 +117,6 @@ const TripCard = ({ trip, onStatusUpdate }: TripCardProps) => {
           <FaUser className={styles.icon} /> <span>{trip.driverName}</span>
         </div>
 
-        {/* Stats Row: Hiển thị số lượng ghế */}
         <div className={styles.statsRow}>
           <div className={styles.statItem}>
             <span className={`${styles.dot} ${styles.checkInColor}`}></span>
@@ -97,21 +135,41 @@ const TripCard = ({ trip, onStatusUpdate }: TripCardProps) => {
 
       <hr className={styles.divider} />
 
-      {/* Footer: Price & Quick Action */}
+      {/* Footer */}
       <div className={styles.footer}>
         <div className={styles.price}>
           Price: <span>{formatCurrency(trip.price)}</span>
         </div>
-        <select
-          className={styles.statusSelect}
-          value={trip.status}
-          onChange={(e) => onStatusUpdate(trip.tripId, e.target.value)}
-        >
-          <option value="Waiting">Waiting</option>
-          <option value="Running">Running</option>
-          <option value="Completed">Completed</option>
-          <option value="Cancelled">Cancelled</option>
-        </select>
+
+        {/* --- CUSTOM STATUS DROPDOWN --- */}
+        <div className={styles.statusContainer} ref={dropdownRef}>
+          <div
+            className={styles.statusTrigger}
+            onClick={toggleDropdown} // [UPDATED]
+          >
+            <span className={styles.statusText}>{trip.status}</span>
+            <FaChevronDown className={styles.statusIcon} />
+          </div>
+
+          {isDropdownOpen && (
+            <div className={styles.statusMenu}>
+              {statusOptions.map((option) => (
+                <div
+                  key={option.value}
+                  className={`${styles.statusItem} ${
+                    trip.status === option.value ? styles.active : ""
+                  }`}
+                  onClick={(e) => handleStatusClick(e, option.value)} // [UPDATED]
+                >
+                  <span
+                    className={`${styles.statusDot} ${option.dotClass}`}
+                  ></span>
+                  {option.label}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

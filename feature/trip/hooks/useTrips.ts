@@ -140,6 +140,39 @@ export const useTrips = () => {
     }
   };
 
+  const deleteTrip = async (tripId: number): Promise<boolean> => {
+    if (!confirm("Are you sure you want to delete this trip?")) return false;
+    try {
+      await tripApi.deleteTrip(tripId);
+      // Cập nhật lại danh sách trips ngay lập tức (xóa khỏi mảng)
+      setTrips((prev) => prev.filter((t) => t.tripId !== tripId));
+      return true;
+    } catch (error) {
+      alert(getErrorMessage(error, "Failed to delete trip"));
+      return false;
+    }
+  };
+
+  const updateTripInfo = async (
+    tripId: number,
+    data: any
+  ): Promise<boolean> => {
+    try {
+      const updatedTrip = await tripApi.updateTripInfo(tripId, data);
+      if (updatedTrip) {
+        // Cập nhật lại item trong danh sách trips
+        setTrips((prev) =>
+          prev.map((t) => (t.tripId === tripId ? updatedTrip : t))
+        );
+        return true;
+      }
+      return false;
+    } catch (error) {
+      alert(getErrorMessage(error, "Failed to update trip info"));
+      return false;
+    }
+  };
+
   return {
     trips,
     loading,
@@ -150,11 +183,13 @@ export const useTrips = () => {
     routes,
     vehicles,
     drivers,
-    subDrivers, // <--- 4. Return subDrivers để component sử dụng
+    subDrivers,
     loadingSelection,
     fetchSelectionData,
     updateTripStatus,
     createTrip,
     isCreating,
+    deleteTrip,
+    updateTripInfo,
   };
 };

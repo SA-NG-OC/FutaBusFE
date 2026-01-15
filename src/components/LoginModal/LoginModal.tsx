@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { COLORS } from '@/shared/constants/colors';
 import styles from './LoginModal.module.css';
@@ -31,6 +32,7 @@ type LoginMode = 'phone' | 'email';
  */
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const { login } = useAuth();
+  const router = useRouter();
   const [loginMode, setLoginMode] = useState<LoginMode>('phone');
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -57,14 +59,13 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   };
 
   const handleForgotPassword = () => {
-    // TODO: Implement forgot password flow
-    alert('Chức năng quên mật khẩu sẽ được triển khai');
+    onClose();
+    router.push('/auth/forgot-password');
   };
 
   const handleSignUp = () => {
     onClose();
-    // TODO: Navigate to sign up page or open sign up modal
-    alert('Chức năng đăng ký sẽ được triển khai');
+    router.push('/auth/signup');
   };
 
   if (!isOpen) return null;

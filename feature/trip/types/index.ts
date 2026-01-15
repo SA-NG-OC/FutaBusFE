@@ -58,3 +58,14 @@ export interface ApiResponse<T> {
   message: string;
   data: T;
 }
+
+export interface TripModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: TripFormData) => void;
+  routes: RouteSelection[];
+  vehicles: VehicleSelection[];
+  drivers: DriverSelection[];
+  subDrivers: DriverSelection[];
+  isLoading?: boolean;
+}

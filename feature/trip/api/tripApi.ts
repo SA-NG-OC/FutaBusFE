@@ -109,4 +109,21 @@ export const tripApi = {
       return [];
     }
   },
+
+  deleteTrip: async (tripId: number) => {
+    const response = await axiosClient.delete<ApiResponse<any>>(
+      `/trips/${tripId}`
+    );
+    if (!response.data.success) throw new Error(response.data.message);
+    return true;
+  },
+
+  updateTripInfo: async (tripId: number, data: any) => {
+    const response = await axiosClient.put<ApiResponse<TripData>>(
+      `/trips/${tripId}`,
+      data
+    );
+    if (!response.data.success) throw new Error(response.data.message);
+    return response.data.data;
+  },
 };
