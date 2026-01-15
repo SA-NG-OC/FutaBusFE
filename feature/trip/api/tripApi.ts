@@ -18,7 +18,101 @@ const axiosClient = axios.create({
   },
 });
 
+export interface GetTripsParams {
+  page?: number;
+  size?: number;
+
+  sortBy?: "price" | "departureTime" | "rating";
+  sortDir?: "asc" | "desc";
+
+  search?: string;
+  originId?: number;
+  destId?: number;
+  date?: string; // yyyy-MM-dd
+
+  minPrice?: number;
+  maxPrice?: number;
+
+  timeRanges?: Array<"Morning" | "Afternoon" | "Evening" | "Night">;
+  vehicleTypes?: string[];
+}
+
+
 export const tripApi = {
+
+  getTripsForBooking: async ({
+  page = 0,
+  size = 10,
+
+  sortBy = "departureTime",
+  sortDir = "asc",
+
+  search,
+  originId,
+  destId,
+  date,
+
+  minPrice,
+  maxPrice,
+
+  timeRanges,
+  vehicleTypes,
+}: GetTripsParams): Promise<PageResponse<TripData>> => {
+  const params: any = {
+    page,
+    size,
+    sortBy,
+    sortDir,
+  };
+
+  // search
+  if (search?.trim()) params.search = search;
+
+  // location
+  if (originId) params.originId = originId;
+  if (destId) params.destId = destId;
+
+  // date
+  if (date) params.date = date;
+
+  // price filter
+  if (minPrice !== undefined) params.minPrice = minPrice;
+  if (maxPrice !== undefined) params.maxPrice = maxPrice;
+
+  // Build query string manually for array parameters
+  const queryParams = new URLSearchParams();
+  
+  // Add basic params
+  Object.keys(params).forEach(key => {
+    queryParams.append(key, params[key]);
+  });
+
+  // time ranges (multiple) - repeat param for each value
+  if (timeRanges?.length) {
+    timeRanges.forEach(range => {
+      queryParams.append('timeRanges', range);
+    });
+  }
+
+  // vehicle types (multiple) - repeat param for each value
+  if (vehicleTypes?.length) {
+    vehicleTypes.forEach(type => {
+      queryParams.append('vehicleTypes', type);
+    });
+  }
+
+  const response = await axiosClient.get<
+    ApiResponse<PageResponse<TripData>>
+  >(`/trips?${queryParams.toString()}`);
+
+  if (!response.data.success) {
+    throw new Error(response.data.message);
+  }
+
+  return response.data.data;
+},
+
+
   // 1. Get List Trips
   getTrips: async ({
     page = 0,
