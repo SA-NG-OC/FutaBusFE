@@ -1,4 +1,10 @@
-import { ApiResponse, BookingPageResponse, BookingData } from "../types";
+import {
+  ApiResponse,
+  BookingPageResponse,
+  BookingData,
+  TicketDetailResponse,
+  BookingListItem,
+} from "../types";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5230";
@@ -46,22 +52,43 @@ export const ticketApi = {
   },
 
   // ================================
-  // GET BY CUSTOMER ID
+  // SEARCH BY PHONE
   // ================================
-  getBookingsByCustomer: async (customerId: number) => {
-    const res = await fetch(`${API_BASE_URL}/bookings/customer/${customerId}`, {
+  getBookingsByPhone: async (
+    phone: string
+  ): Promise<ApiResponse<BookingListItem[]>> => {
+    const res = await fetch(`${API_BASE_URL}/bookings/phone/${phone}`, {
       method: "GET",
+      headers: { "Content-Type": "application/json" },
     });
 
-    if (!res.ok) throw new Error("Failed to fetch bookings");
+    if (!res.ok) throw new Error("Failed to fetch bookings by phone");
     return res.json();
   },
 
   // ================================
-  // GET BY PHONE
+  // SEARCH BY EMAIL
   // ================================
-  getBookingsByPhone: async (phone: string) => {
-    const res = await fetch(`${API_BASE_URL}/bookings/phone/${phone}`, {
+  getBookingsByEmail: async (
+    email: string
+  ): Promise<ApiResponse<BookingListItem[]>> => {
+    const res = await fetch(
+      `${API_BASE_URL}/bookings/email/${encodeURIComponent(email)}`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    if (!res.ok) throw new Error("Failed to fetch bookings by email");
+    return res.json();
+  },
+
+  // ================================
+  // GET BY CUSTOMER ID
+  // ================================
+  getBookingsByCustomer: async (customerId: number) => {
+    const res = await fetch(`${API_BASE_URL}/bookings/customer/${customerId}`, {
       method: "GET",
     });
 
@@ -164,6 +191,26 @@ export const ticketApi = {
         throw new Error("Unauthorized - Token không hợp lệ hoặc đã hết hạn");
       }
       throw new Error("Failed to fetch ticket counts");
+    }
+    return res.json();
+  },
+
+  // ================================
+  // GET TICKET DETAIL BY CODE
+  // ================================
+  getTicketDetailByCode: async (
+    ticketCode: string
+  ): Promise<ApiResponse<BookingListItem>> => {
+    const res = await fetch(`${API_BASE_URL}/bookings/ticket/${ticketCode}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!res.ok) {
+      if (res.status === 404) {
+        throw new Error("Không tìm thấy vé");
+      }
+      throw new Error("Failed to fetch ticket detail");
     }
     return res.json();
   },
