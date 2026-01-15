@@ -12,16 +12,16 @@ import {
   FaUsers,
   FaShoppingCart,
   FaCheckCircle,
-  FaMap,
   FaCalendarAlt,
   FaBus,
   FaUser,
-  FaCalendarDay,
   FaRegMoneyBillAlt,
   FaTrash,
 } from "react-icons/fa";
 // Import modal xác nhận xóa
 import DeleteTripModal from "../DeleteTripModal/DeleteTripModal";
+// [NEW] Import Map Component
+import TripMap from "@/src/components/TrackingMap/index";
 
 interface TripDetailsModalProps {
   isOpen: boolean;
@@ -56,12 +56,10 @@ const TripDetailsModal = ({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // --- EFFECTS ---
-  // 1. Reset state và load data khi mở modal
   useEffect(() => {
     if (isOpen && trip) {
       setIsEditing(false);
 
-      // Tìm ID tương ứng từ tên (Fallback nếu API list chưa trả về ID)
       const foundVehicle = vehicles.find((v: VehicleSelection) =>
         trip.vehicleInfo?.includes(v.licensePlate)
       );
@@ -78,7 +76,6 @@ const TripDetailsModal = ({
     }
   }, [isOpen, trip, vehicles, drivers]);
 
-  // 2. Lắng nghe phím ESC để đóng/hủy
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -97,11 +94,16 @@ const TripDetailsModal = ({
   const bookedSeats = trip.bookedSeats ?? 0;
   const checkedInSeats = trip.checkedInSeats ?? 0;
 
-  // Logic chặn xóa: Nếu có vé đã đặt -> Chặn
   const hasBookings = bookedSeats > 0;
-
-  // Logic chặn sửa: Chỉ cho sửa khi Waiting/Delayed
   const canEdit = ["Waiting", "Delayed"].includes(trip.status);
+
+  // [NEW] Xử lý thông tin Route cho Map
+  // Giả sử routeName dạng "HCM -> Da Lat" hoặc "HCM - Da Lat"
+  const routeParts = trip.routeName
+    ? trip.routeName.split(/->|-/).map((s) => s.trim())
+    : [];
+  const origin = routeParts[0] || "Origin";
+  const destination = routeParts[1] || "Destination";
 
   // --- HANDLERS ---
   const handleSave = async () => {
@@ -142,7 +144,6 @@ const TripDetailsModal = ({
     );
   };
 
-  // Helper render ô thông tin
   const renderInfoCard = (
     icon: React.ReactNode,
     label: string,
@@ -156,7 +157,7 @@ const TripDetailsModal = ({
           canEdit && isEditing ? styles.editable : ""
         }`}
         onClick={() => {
-          /* Placeholder for focus logic */
+          /* Focus logic */
         }}
       >
         <div className={styles.infoLabel}>
@@ -223,7 +224,6 @@ const TripDetailsModal = ({
 
   return (
     <>
-      {/* MAIN MODAL */}
       <div className={styles.overlay} onClick={onClose}>
         <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
           {/* HEADER */}
@@ -256,7 +256,7 @@ const TripDetailsModal = ({
 
           {/* BODY */}
           <div className={styles.modalBody}>
-            {/* LEFT COLUMN: Stats & Info */}
+            {/* LEFT COLUMN */}
             <div className={styles.leftColumn}>
               <div className={styles.statsRow}>
                 <div className={`${styles.statCard} ${styles.cardBlue}`}>
@@ -303,7 +303,7 @@ const TripDetailsModal = ({
                 )}
                 <div className={styles.infoCard}>
                   <div className={styles.infoLabel}>
-                    <FaCalendarDay /> Date & Time
+                    <FaCalendarAlt /> Date & Time
                   </div>
                   <div className={styles.infoValue}>
                     {formatDateTimePretty(trip.date, trip.departureTime)}
@@ -319,63 +319,23 @@ const TripDetailsModal = ({
               </div>
             </div>
 
-            {/* RIGHT COLUMN: Map & Tabs */}
+            {/* RIGHT COLUMN - [UPDATED] Map Only */}
             <div className={styles.rightColumn}>
-              <div className={styles.tabs}>
-                <button className={`${styles.tabBtn} ${styles.active}`}>
-                  <FaMap /> Map View
-                </button>
-                <button className={styles.tabBtn}>
-                  <FaCalendarAlt /> Calendar View
-                </button>
-              </div>
-              <div className={styles.mapContainer}>
-                <div className={styles.mapPlaceholder}>
-                  (Map Integration Placeholder)
-                </div>
-                <div className={styles.routeOverlay}>
-                  <div>
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "var(--text-secondary)",
-                      }}
-                    >
-                      Route
-                    </div>
-                    <div
-                      style={{ fontWeight: 700, color: "var(--text-primary)" }}
-                    >
-                      {trip.routeName}
-                    </div>
-                  </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "var(--text-secondary)",
-                      }}
-                    >
-                      Duration
-                    </div>
-                    <div
-                      style={{ fontWeight: 700, color: "var(--text-primary)" }}
-                    >
-                      {trip.departureTime?.substring(0, 5)} -{" "}
-                      {trip.arrivalTime?.substring(0, 5)}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Component TripMap mới */}
+              <TripMap
+                tripId={trip.tripId}
+                routeInfo={{
+                  origin: origin,
+                  destination: destination,
+                  startTime: trip.departureTime?.substring(0, 5) || "--:--",
+                  endTime: trip.arrivalTime?.substring(0, 5) || "--:--",
+                }}
+              />
             </div>
           </div>
 
           {/* FOOTER */}
           <div className={styles.footer}>
-            {/* LOGIC NÚT DELETE:
-                           - Nếu có booking (hasBookings = true) -> Disable nút và hiện style cảnh báo.
-                           - Nếu không có booking -> Enable nút xóa bình thường.
-                        */}
             {hasBookings ? (
               <button
                 className={styles.deleteBtn}
@@ -387,7 +347,7 @@ const TripDetailsModal = ({
                   border: "1px solid var(--border-gray)",
                   boxShadow: "none",
                 }}
-                title="Cannot delete trip with active bookings. Please cancel trip instead."
+                title="Cannot delete trip with active bookings."
                 disabled
               >
                 <FaTrash /> Delete (Has Bookings)
@@ -441,7 +401,6 @@ const TripDetailsModal = ({
         </div>
       </div>
 
-      {/* DELETE CONFIRMATION MODAL */}
       <DeleteTripModal
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
