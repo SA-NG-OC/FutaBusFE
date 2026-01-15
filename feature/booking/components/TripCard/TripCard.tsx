@@ -1,99 +1,89 @@
 import React from "react";
-import styles from "./TripCard.module.css";
+import { TripData } from "@/feature/trip/types";
 
 type TripCardProps = {
-  company?: string;
-  service?: string;
-  departTime?: string;
-  departCity?: string;
-  arrivalTime?: string;
-  arrivalCity?: string;
-  duration?: string;
-  seats?: number;
-  price?: number;
+  tripDetail?: TripData;
+  handleSelectSeat: (tripId: number) => void;
 };
 
 export default function TripCard({
-  company = "Comfort Lines",
-  service = "Seated",
-  departTime = "08:30",
-  departCity = "Ho Chi Minh City",
-  arrivalTime = "14:30",
-  arrivalCity = "Da Lat",
-  duration = "6h",
-  seats = 8,
-  price = 220000,
+  tripDetail,
+  handleSelectSeat,
 }: TripCardProps) {
+  if (!tripDetail) {
+    return <div>Loading trip...</div>; // Or a proper skeleton loader
+  }
+
+  // Split routeName into departure and arrival cities
+  const [departureCity, arrivalCity] = tripDetail.routeName.split(" - ");
+
   return (
-    <div className="flex flex-row space-x-4 p-4 border border-gray-300 rounded-lg">
-      <div className="flex-1">
-        <div className="flex flex-row items-center gap-4 mb-4">
-          <div>logo</div>
-          <div className="flex flex-col">
-            <div>Tên</div>
-            <div>Loại dịch vụ</div>
+    <div className="bg-white rounded-xl shadow-md p-5 border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      {/* Left Section */}
+      <div className="flex-1 space-y-4">
+        {/* Header */}
+        <div className="flex items-center gap-3">
+          <div className="bg-[#FFF0EF] p-3 rounded-lg text-[#D83E3E] text-2xl">
+            🚌
+          </div>
+          <div>
+            <p className="font-bold text-gray-800">{departureCity}</p>
+            <span className="bg-gray-200 text-gray-600 text-xs font-semibold px-2 py-1 rounded-md">
+              {tripDetail.vehicleInfo}
+            </span>
           </div>
         </div>
-        <div className="flex flex-col md:flex-row w-full items-center justify-between gap-4">
-          {/* departure */}
-          <div className="flex flex-col">
-            <div>{departTime}</div>
-            <div>{departCity}</div>
+
+        {/* Details */}
+        <div className="flex items-end justify-between gap-4">
+          {/* Departure */}
+          <div className="space-y-1">
+            <p className="text-sm text-gray-500">Departure</p>
+            <p className="text-lg font-bold text-gray-800 flex items-center gap-1.5">
+              <span className="text-red-500">🕒</span>{" "}
+              {tripDetail.departureTime}
+            </p>
+            <p className="text-sm text-gray-600">{departureCity}</p>
           </div>
-          {/* duration */}
-          <div className="flex flex-col items-center mx-auto">
-            <div>Duration</div>
-            <div className="flex flex-row items-center gap-2 mx-auto max-w-xs">
-              <div className="bg-gray-400 rounded-b-sm w-xl h-0.5 justify-center items-center text-center px-2"></div>
-              <div>{duration}</div>
-              <div className="bg-gray-400 rounded-b-sm w-xl h-0.5 justify-center items-center text-center px-2"></div>
+
+          {/* Duration */}
+          <div className="text-center hidden md:block">
+            <p className="text-sm text-gray-500">Duration</p>
+            <div className="flex items-center gap-2">
+              <div className="flex-grow border-t border-gray-300"></div>
+              <p className="text-sm text-gray-600">6h</p>
+              <div className="flex-grow border-t border-gray-300"></div>
             </div>
           </div>
-          {/* arrive */}
-          <div className="flex flex-col">
-            <div>{arrivalTime}</div>
-            <div>{arrivalCity}</div>
+
+          {/* Arrival */}
+          <div className="space-y-1 text-left">
+            <p className="text-sm text-gray-500">Arrival</p>
+            <p className="text-lg font-bold text-gray-800 flex items-center gap-1.5">
+              {tripDetail.arrivalTime} <span className="text-red-500">📍</span>
+            </p>
+            <p className="text-sm text-gray-600">{arrivalCity}</p>
           </div>
         </div>
-        <div>👥 20 seats available</div>
+
+        <div className="text-sm text-gray-600 flex items-center gap-2">
+          <span>👥</span>
+          {tripDetail.totalSeats} seats available
+        </div>
       </div>
-      <div className="flex flex-col items-start gap-2">
-        <div>{price}</div>
-        <button>Select Seats</button>
+
+      {/* Right Section */}
+      <div className="w-full sm:w-auto flex flex-col items-stretch sm:items-end justify-center gap-2 pt-4 sm:pt-0 border-t sm:border-t-0 sm:border-l border-gray-200 sm:pl-6">
+        <div className="text-2xl font-bold text-[#D83E3E] text-right">
+          {tripDetail.price.toLocaleString("vi-VN")}đ
+        </div>
+        <button
+          onClick={() => handleSelectSeat(tripDetail.tripId)}
+          className="bg-[#D83E3E] text-white font-semibold py-2 px-5 rounded-lg hover:bg-[#B93434] transition-colors w-full"
+        >
+          Select Seats
+        </button>
       </div>
     </div>
-    // <div className={styles.card}>
-    //   <div className={styles.left}>
-    //     <div className={styles.header}>
-    //       <div className={styles.logo}>🚌</div>
-    //       <div>
-    //         <div>
-    //           <span className={styles.company}>{company}</span>
-    //           <span className={styles.badge}>{service}</span>
-    //         </div>
-    //       </div>
-    //     </div>
-
-    //     <div className={styles.section}>
-    //       <div className={styles.label}>Departure</div>
-    //       <div className={styles.time}>{departTime}</div>
-    //       <div className={styles.city}>{departCity}</div>
-    //       <div className={styles.seats}>👥 {seats} seats available</div>
-    //     </div>
-    //   </div>
-
-    //   <div className={styles.center}>
-    //     <div className={styles.durationLabel}>Duration</div>
-    //     <div className={styles.duration}>{duration}</div>
-    //   </div>
-
-    //   <div className={styles.right}>
-    //     <div className={styles.price}>{price?.toLocaleString()}đ</div>
-    //     <button className={styles.selectBtn}>Select Seats</button>
-    //     <div className={styles.arrivalLabel}>Arrival</div>
-    //     <div className={styles.time}>{arrivalTime}</div>
-    //     <div className={styles.city}>{arrivalCity}</div>
-    //   </div>
-    // </div>
   );
 }
