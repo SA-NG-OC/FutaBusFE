@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 export const useRoutes = () => {
     // ===== DATA STATE =====
     const [routes, setRoutes] = useState<RouteData[]>([]);
+    const [locations, setLocations] = useState<any[]>([]); // 🎯 NEW: Locations state
     const [loading, setLoading] = useState<boolean>(false);
     // Bỏ state 'error' text thuần túy vì giờ dùng Toast, 
     // nhưng nếu bạn muốn giữ để debug thì cứ giữ.
@@ -41,6 +42,17 @@ export const useRoutes = () => {
             setError(err.message || "Failed to load routes");
         } finally {
             setLoading(false);
+        }
+    }, []);
+
+    // 🎯 NEW: FETCH LOCATIONS
+    const fetchLocations = useCallback(async () => {
+        try {
+            const locationData = await routeApi.getLocations();
+            setLocations(locationData);
+        } catch (err: any) {
+            console.error("Fetch locations failed", err);
+            toast.error(err.message || "Failed to load locations");
         }
     }, []);
 
@@ -135,6 +147,7 @@ export const useRoutes = () => {
 
     return {
         routes,
+        locations, // 🎯 NEW: Export locations
         loading,
         error,
         currentPage,
@@ -152,5 +165,6 @@ export const useRoutes = () => {
         handleSaveRoute,
         handleDeleteConfirm,
         fetchRoutes,
+        fetchLocations, // 🎯 NEW: Export fetchLocations
     };
 };

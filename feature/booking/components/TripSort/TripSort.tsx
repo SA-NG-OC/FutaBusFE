@@ -1,26 +1,30 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { FaChevronDown } from "react-icons/fa";
 import styles from "./TripSort.module.css";
 
 interface TripSortProps {
-  value?: string;
-  onSortChange: (value: string) => void;
+  onSortChange: (sortBy: string, sortDir: string) => void;
 }
 
-export default function TripSort({
-  value = "recommended",
-  onSortChange,
-}: TripSortProps) {
-  const [selected, setSelected] = useState<string>(value);
+export default function TripSort({ onSortChange }: TripSortProps) {
+  const searchParams = useSearchParams();
+  const sortBy = searchParams?.get("sortBy") || "departureTime";
+  const sortDir = searchParams?.get("sortDir") || "asc";
+
+  const [selected, setSelected] = useState<string>(`${sortBy}_${sortDir}`);
 
   useEffect(() => {
-    setSelected(value);
-  }, [value]);
+    setSelected(`${sortBy}_${sortDir}`);
+  }, [sortBy, sortDir]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newValue = e.target.value as string;
-    setSelected(newValue);
-    onSortChange(newValue);
+    const value = e.target.value;
+    setSelected(value);
+
+    // Parse value to sortBy and sortDir
+    const [newSortBy, newSortDir] = value.split("_");
+    onSortChange(newSortBy, newSortDir);
   };
 
   return (
@@ -30,11 +34,11 @@ export default function TripSort({
         value={selected}
         onChange={handleChange}
       >
-        <option value="recommended">Sort by: Recommended</option>
+        <option value="departureTime_asc">Departure Time: Earliest</option>
+        <option value="departureTime_desc">Departure Time: Latest</option>
         <option value="price_asc">Price: Low to High</option>
         <option value="price_desc">Price: High to Low</option>
-        <option value="departure_time">Departure Time</option>
-        <option value="rating">Rating</option>
+        <option value="rating_desc">Rating: Highest</option>
       </select>
 
       <div className={styles["select-icon"]}>

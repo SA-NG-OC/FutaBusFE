@@ -15,7 +15,38 @@ export default function TripCard({
   }
 
   // Split routeName into departure and arrival cities
-  const [departureCity, arrivalCity] = tripDetail.routeName.split(" - ");
+  const [departureCity, arrivalCity] = tripDetail.routeName.split(" -> ");
+
+  // Calculate duration from departure and arrival times
+  const calculateDuration = (departure: string, arrival: string): string => {
+    try {
+      // Parse times in format "HH:mm"
+      const [depHour, depMin] = departure.split(":").map(Number);
+      const [arrHour, arrMin] = arrival.split(":").map(Number);
+
+      let totalMinutes = arrHour * 60 + arrMin - (depHour * 60 + depMin);
+
+      // Handle case where arrival is next day
+      if (totalMinutes < 0) {
+        totalMinutes += 24 * 60;
+      }
+
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+
+      if (minutes === 0) {
+        return `${hours} giờ`;
+      }
+      return `${hours} giờ ${minutes} phút`;
+    } catch {
+      return "0h";
+    }
+  };
+
+  const duration = calculateDuration(
+    tripDetail.departureTime,
+    tripDetail.arrivalTime
+  );
 
   return (
     <div className="bg-white rounded-xl shadow-md p-5 border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -27,7 +58,7 @@ export default function TripCard({
             🚌
           </div>
           <div>
-            <p className="font-bold text-gray-800">{departureCity}</p>
+            <p className="font-bold text-gray-800">{tripDetail.routeName}</p>
             <span className="bg-gray-200 text-gray-600 text-xs font-semibold px-2 py-1 rounded-md">
               {tripDetail.vehicleInfo}
             </span>
@@ -50,9 +81,9 @@ export default function TripCard({
           <div className="text-center hidden md:block">
             <p className="text-sm text-gray-500">Duration</p>
             <div className="flex items-center gap-2">
-              <div className="flex-grow border-t border-gray-300"></div>
-              <p className="text-sm text-gray-600">6h</p>
-              <div className="flex-grow border-t border-gray-300"></div>
+              <div className="grow border-t border-gray-300"></div>
+              <p className="text-sm text-gray-600">{duration}</p>
+              <div className="grow border-t border-gray-300"></div>
             </div>
           </div>
 

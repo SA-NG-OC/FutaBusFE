@@ -18,6 +18,13 @@
     padding: 16px;
     position: sticky;
     top: 16px;
+    display: none; /* Hidden by default on mobile */
+}
+
+@media (min-width: 640px) {
+    .filterbar {
+        display: block; /* Show on screens 640px and above */
+    }
 }
 
 /* Main content */

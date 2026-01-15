@@ -19,12 +19,35 @@ interface FetchTripsParams {
   date?: string | null;
 }
 
+// ============================================
+// 🎫 PARAMS FOR CLIENT BOOKING PAGE
+// ============================================
+interface FetchTripsForBookingParams {
+  page?: number;
+  size?: number;
+  
+  sortBy?: "price" | "departureTime" | "rating";
+  sortDir?: "asc" | "desc";
+  
+  search?: string;
+  originId?: number;
+  destId?: number;
+  date?: string;
+  
+  minPrice?: number;
+  maxPrice?: number;
+  
+  timeRanges?: Array<"Morning" | "Afternoon" | "Evening" | "Night">;
+  vehicleTypes?: string[];
+}
+
 export const useTrips = () => {
   // --- State cho Danh sách ---
   const [trips, setTrips] = useState<TripData[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
 
   // --- State cho Dropdown ---
   const [routes, setRoutes] = useState<RouteSelection[]>([]);
@@ -75,6 +98,9 @@ export const useTrips = () => {
     }
   }, []);
 
+  // ============================================
+  // 📋 FETCH TRIPS - FOR ADMIN/EMPLOYEE (Status & Date filter)
+  // ============================================
   const fetchTrips = useCallback(async (params: FetchTripsParams) => {
     setLoading(true);
     try {
@@ -89,6 +115,7 @@ export const useTrips = () => {
         setTrips(data.content);
         setTotalPages(data.totalPages);
         setCurrentPage(data.number);
+        setTotalElements(data.totalElements || 0);
       } else {
         setTrips([]);
       }
@@ -96,6 +123,49 @@ export const useTrips = () => {
       alert(getErrorMessage(error, "Failed to fetch trips."));
       console.error("Fetch Trips Error", error);
       setTrips([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // ============================================
+  // 🎫 FETCH TRIPS FOR BOOKING - FOR CLIENT (Full filters & sorting)
+  // ============================================
+  const fetchTripsForBooking = useCallback(async (params: FetchTripsForBookingParams) => {
+    setLoading(true);
+    try {
+      const data = await tripApi.getTripsForBooking({
+        page: params.page ?? 0,
+        size: params.size ?? 10,
+        sortBy: params.sortBy,
+        sortDir: params.sortDir,
+        search: params.search,
+        originId: params.originId,
+        destId: params.destId,
+        date: params.date,
+        minPrice: params.minPrice,
+        maxPrice: params.maxPrice,
+        timeRanges: params.timeRanges,
+        vehicleTypes: params.vehicleTypes,
+      });
+
+      if (data && Array.isArray(data.content)) {
+        setTrips(data.content);
+        setTotalPages(data.totalPages);
+        setCurrentPage(data.number);
+        setTotalElements(data.totalElements || 0);
+      } else {
+        setTrips([]);
+        setTotalPages(0);
+        setTotalElements(0);
+      }
+    } catch (error) {
+      const msg = getErrorMessage(error, "Failed to fetch trips for booking.");
+      alert(msg);
+      console.error("Fetch Trips For Booking Error", error);
+      setTrips([]);
+      setTotalPages(0);
+      setTotalElements(0);
     } finally {
       setLoading(false);
     }
@@ -174,18 +244,27 @@ export const useTrips = () => {
   };
 
   return {
+    // === STATE ===
     trips,
     loading,
     currentPage,
     totalPages,
+    totalElements,
     setPage: setCurrentPage,
-    fetchTrips,
+    
+    // === FETCH METHODS ===
+    fetchTrips,                  // 📋 For Admin/Employee (status, date filter)
+    fetchTripsForBooking,        // 🎫 For Client Booking (full filters & sorting)
+    
+    // === SELECTION DATA ===
     routes,
     vehicles,
     drivers,
     subDrivers,
     loadingSelection,
     fetchSelectionData,
+    
+    // === TRIP MANAGEMENT ===
     updateTripStatus,
     createTrip,
     isCreating,
