@@ -1,9 +1,9 @@
 .tableContainer {
   width: 100%;
   overflow-x: auto;
-  background: white;
+  background: var(--background-paper);
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--modal-shadow);
 }
 
 .ticketTable {
@@ -13,30 +13,30 @@
 }
 
 .ticketTable thead {
-  background-color: #f8f9fa;
+  background-color: var(--bg-secondary);
 }
 
 .ticketTable th {
   padding: 16px 12px;
   text-align: left;
   font-weight: 600;
-  color: #495057;
-  border-bottom: 2px solid #dee2e6;
+  color: var(--text-secondary);
+  border-bottom: 2px solid var(--border-gray);
   white-space: nowrap;
 }
 
 .ticketTable tbody tr {
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--border-gray);
   transition: background-color 0.2s;
 }
 
 .ticketTable tbody tr:hover {
-  background-color: #f8f9fa;
+  background-color: var(--bg-hover);
 }
 
 .ticketTable td {
   padding: 16px 12px;
-  color: #212529;
+  color: var(--text-primary);
 }
 
 .badge {
@@ -51,34 +51,34 @@
 
 /* Payment Status Styles */
 .statusPaid {
-  background-color: #d4edda;
-  color: #155724;
+  background-color: var(--stat-green-bg);
+  color: var(--stat-green-text);
 }
 
 .statusCash {
-  background-color: #fff3cd;
-  color: #856404;
+  background-color: var(--stat-orange-bg);
+  color: var(--stat-orange-text);
 }
 
 .statusPending {
-  background-color: #fff3cd;
-  color: #856404;
+  background-color: var(--stat-orange-bg);
+  color: var(--stat-orange-text);
 }
 
 /* Ticket Status Styles */
 .statusConfirmed {
-  background-color: #d4edda;
-  color: #155724;
+  background-color: var(--stat-green-bg);
+  color: var(--stat-green-text);
 }
 
 .statusCancelled {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: var(--badge-delayed-bg);
+  color: var(--badge-delayed-text);
 }
 
 .statusUsed {
-  background-color: #d1ecf1;
-  color: #0c5460;
+  background-color: var(--stat-blue-bg);
+  color: var(--stat-blue-text);
 }
 
 .actionButtons {
@@ -97,7 +97,7 @@
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
-  background-color: #f8f9fa;
+  background-color: var(--bg-secondary);
 }
 
 .actionButtons button:hover:not(:disabled) {
@@ -111,30 +111,30 @@
 }
 
 .viewButton {
-  color: #6c757d;
+  color: var(--text-secondary);
 }
 
 .viewButton:hover:not(:disabled) {
-  background-color: #e9ecef;
-  color: #495057;
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 .confirmButton {
-  color: #28a745;
+  color: var(--stat-green-text);
 }
 
 .confirmButton:hover:not(:disabled) {
-  background-color: #d4edda;
-  color: #155724;
+  background-color: var(--stat-green-bg);
+  color: var(--stat-green-text);
 }
 
 .cancelButton {
-  color: #dc3545;
+  color: var(--warning-text);
 }
 
 .cancelButton:hover:not(:disabled) {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: var(--badge-delayed-bg);
+  color: var(--badge-delayed-text);
 }
 
 /* Responsive */

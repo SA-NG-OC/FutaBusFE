@@ -1,0 +1,15 @@
+.page {
+  min-height: 100vh;
+  background: linear-gradient(
+    to bottom,
+    var(--bg-secondary) 0%,
+    var(--background) 100%
+  );
+  padding: 2rem 0;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 1rem 0;
+  }
+}
