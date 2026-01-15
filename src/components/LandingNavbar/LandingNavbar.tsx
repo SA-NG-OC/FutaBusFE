@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { useAuth } from '@/src/context/AuthContext';
-import { COLORS } from '@/shared/constants/colors';
-import { FaBus, FaUser } from 'react-icons/fa';
-import { BiLogIn } from 'react-icons/bi';
-import styles from './LandingNavbar.module.css';
+import React from "react";
+import Link from "next/link";
+import { useAuth } from "@/src/context/AuthContext";
+import { COLORS } from "@/shared/constants/colors";
+import { FaBus, FaUser } from "react-icons/fa";
+import { BiLogIn } from "react-icons/bi";
+import styles from "./LandingNavbar.module.css";
 
 /**
  * Simple Navigation Bar for Landing Page
@@ -17,11 +17,11 @@ export default function LandingNavbar() {
   const [showUserMenu, setShowUserMenu] = React.useState(false);
 
   const navItems = [
-    { name: 'Trang chủ', path: '/' },
-    { name: 'Lịch Trình', path: '/schedule' },
-    { name: 'Tra cứu vé', path: '/lookup' },
-    { name: 'Về chúng tôi', path: '/about' },
-    { name: 'Liên hệ', path: '/contact' },
+    { name: "Trang chủ", path: "/" },
+    { name: "Lịch Trình", path: "/schedule" },
+    { name: "Tra cứu vé", path: "/client/ticket-lookup-2" },
+    { name: "Về chúng tôi", path: "/about" },
+    { name: "Liên hệ", path: "/contact" },
   ];
 
   return (
@@ -41,11 +41,7 @@ export default function LandingNavbar() {
         {/* Navigation Links */}
         <div className={styles.navLinks}>
           {navItems.map((item) => (
-            <Link
-              key={item.path}
-              href={item.path}
-              className={styles.navLink}
-            >
+            <Link key={item.path} href={item.path} className={styles.navLink}>
               {item.name}
             </Link>
           ))}
@@ -62,7 +58,7 @@ export default function LandingNavbar() {
                 <FaUser size={16} />
                 <span>{user?.fullName}</span>
               </button>
-              
+
               {showUserMenu && (
                 <div className={styles.dropdown}>
                   <Link href="/profile" className={styles.dropdownItem}>

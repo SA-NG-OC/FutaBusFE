@@ -17,6 +17,8 @@ export interface TripInfo {
   arrivalTime: string;
   vehicleInfo: string;
   driverName: string;
+  pickupLocationName?: string;
+  dropoffLocationName?: string;
 }
 
 export interface BookingData {
