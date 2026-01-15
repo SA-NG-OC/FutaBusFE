@@ -19,7 +19,7 @@ export default function LandingNavbar() {
   const navItems = [
     { name: "Trang chủ", path: "/" },
     { name: "Lịch Trình", path: "/schedule" },
-    { name: "Tra cứu vé", path: "/client/ticket-lookup-2" },
+    { name: "Tra cứu vé", path: "/client/ticket-lookup" },
     { name: "Về chúng tôi", path: "/about" },
     { name: "Liên hệ", path: "/contact" },
   ];

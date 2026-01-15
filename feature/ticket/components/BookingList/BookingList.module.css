@@ -1,0 +1,322 @@
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2.5rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.backButton {
+  background: var(--background-paper);
+  color: var(--text-primary);
+  border: 1px solid var(--border-gray);
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 1rem;
+}
+
+.backButton:hover {
+  background: var(--bg-hover);
+  border-color: var(--primary);
+}
+
+.title {
+  color: var(--text-primary);
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+}
+
+.titleSection {
+  flex: 1;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.bookingList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.bookingCard {
+  background: var(--background-paper);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--modal-shadow);
+  border: 1px solid var(--border-gray);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.bookingCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.bookingHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-gray);
+}
+
+.bookingInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.bookingCode {
+  color: var(--primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.bookingMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.bookingDate {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.statusBadge {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.statusPaid {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.statusPending {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+}
+
+.statusCancelled,
+.statusExpired {
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+
+.statusCompleted {
+  background: var(--info-bg);
+  color: var(--info-text);
+}
+
+.tripInfo {
+  margin-bottom: 1.25rem;
+  padding: 1.25rem;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+}
+
+.routeInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.routeName {
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.tripTime {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+}
+
+.vehicleInfo {
+  display: flex;
+  gap: 1.5rem;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.customerInfo {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  flex-wrap: wrap;
+}
+
+.ticketsSection {
+  border-top: 1px solid var(--border-gray);
+  padding-top: 1.25rem;
+}
+
+.ticketsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.ticketsTitle {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.totalAmount {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 1.35rem;
+}
+
+.ticketsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ticketItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.125rem;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  border: 1px solid var(--border-gray);
+}
+
+.ticketInfo {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.ticketCode {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.seatInfo {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.ticketStatusBadge {
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.ticketConfirmed {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.ticketUnconfirmed {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+}
+
+.ticketCancelled {
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+
+.viewTicketButton {
+  background: var(--primary);
+  color: var(--text-white);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(255, 111, 15, 0.3);
+}
+
+.viewTicketButton:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 111, 15, 0.4);
+}
+
+.noTicketText {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .bookingCard {
+    padding: 1rem;
+  }
+
+  .bookingHeader {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .bookingInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .bookingMeta {
+    align-items: flex-start;
+  }
+
+  .routeInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .vehicleInfo,
+  .customerInfo {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .ticketItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .viewTicketButton {
+    width: 100%;
+  }
+}

@@ -15,7 +15,7 @@ const ClientHeader = () => {
   const navItems = [
     { name: "Trang chủ", path: "/home" },
     { name: "Lịch Trình", path: "/schedule" },
-    { name: "Tra cứu vé", path: "/client/ticket-lookup-2" },
+    { name: "Tra cứu vé", path: "/client/ticket-lookup" },
     { name: "Về chúng tôi", path: "/about-us" },
     { name: "Liên hệ", path: "/contact" },
   ];

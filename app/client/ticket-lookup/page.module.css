@@ -8,6 +8,15 @@
   padding: 2rem 0;
 }
 
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 768px) {
   .page {
     padding: 1rem 0;
