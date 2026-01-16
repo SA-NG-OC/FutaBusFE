@@ -1,5 +1,11 @@
+/* src/feature/booking/components/TripDetailsSummary/TripDetailsSummary.module.css */
+
 .container {
-  background: white;
+  /* [UPDATE] */
+  background: var(--background-paper);
+  color: var(--text-primary);
+  border: 1px solid var(--border-gray); /* Thêm border mỏng cho dark mode đỡ chìm */
+
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -11,7 +17,7 @@
 .title {
   font-size: 18px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary); /* [UPDATE] */
   margin-bottom: 16px;
 }
 
@@ -21,7 +27,8 @@
   gap: 12px;
   margin-bottom: 16px;
   padding: 12px;
-  background: #fef3f2;
+  background: var(--bg-hover);
+  border: 1px solid var(--border-gray);
   border-radius: 8px;
 }
 
@@ -31,15 +38,17 @@
 
 .busName {
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary); /* [UPDATE] */
   font-size: 14px;
 }
 
 .busType {
   font-size: 13px;
-  color: #6b7280;
-  background: #d4af7a;
-  color: #422006;
+
+  /* [UPDATE] Dùng màu vàng avatar làm nền badge */
+  background: var(--avatar-yellow);
+  color: #422006; /* Text nâu đậm giữ nguyên */
+
   padding: 2px 8px;
   border-radius: 4px;
   display: inline-block;
@@ -60,20 +69,20 @@
 
 .label {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--text-secondary); /* [UPDATE] */
   flex-shrink: 0;
 }
 
 .value {
   font-size: 14px;
-  color: #1f2937;
+  color: var(--text-primary); /* [UPDATE] */
   font-weight: 500;
   text-align: right;
 }
 
 .divider {
   height: 1px;
-  background: #e5e7eb;
+  background: var(--border-gray); /* [UPDATE] */
   margin: 16px 0;
 }
 
@@ -87,13 +96,13 @@
 .totalLabel {
   font-size: 16px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary); /* [UPDATE] */
 }
 
 .totalValue {
   font-size: 20px;
   font-weight: 700;
-  color: #ef4444;
+  color: var(--primary); /* [UPDATE] Đỏ chủ đạo */
 }
 
 @media (max-width: 768px) {

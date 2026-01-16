@@ -5,8 +5,14 @@ import { useTickets } from "@/feature/ticket/hooks/useTickets";
 import { TicketTable } from "@/feature/ticket/components/TicketTable/TicketTable";
 import { BookingData } from "@/feature/ticket/types";
 import styles from "./tickets.module.css";
+// [NEW] Import component đặt vé
+import AdminBookingView from "@/feature/ticket/components/AdminBookingView/AdminBookingView";
 
 export default function AdminTickets() {
+  // [NEW] State để chuyển đổi chế độ hiển thị
+  const [isBookingMode, setIsBookingMode] = useState(false);
+
+  // Các state cũ giữ nguyên
   const [page, setPage] = useState(0);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,9 +30,23 @@ export default function AdminTickets() {
     isLast,
     confirmBooking,
     cancelBooking,
+    refreshTickets, // Hàm này dùng để load lại danh sách vé sau khi đặt xong
   } = useTickets(page, 20, statusFilter, searchTerm);
 
-  // Filter handlers
+  // [NEW] Logic chuyển màn hình: Nếu đang ở chế độ Booking thì hiện AdminBookingView
+  if (isBookingMode) {
+    return (
+      <AdminBookingView
+        onBack={() => {
+          setIsBookingMode(false); // Quay lại màn hình danh sách
+          refreshTickets(); // Load lại dữ liệu vé mới nhất
+        }}
+      />
+    );
+  }
+
+  // --- CÁC HÀM XỬ LÝ SỰ KIỆN CŨ (GIỮ NGUYÊN) ---
+
   const handleFilterAll = () => {
     setStatusFilter(null);
     setPage(0);
@@ -47,7 +67,6 @@ export default function AdminTickets() {
     setPage(0);
   };
 
-  // Search handler
   const handleSearch = (text: string) => {
     setSearchTerm(text);
     setPage(0);
@@ -78,11 +97,59 @@ export default function AdminTickets() {
 
   return (
     <div className={styles.ticketsPage}>
+      {/* Header */}
       <div className={styles.header}>
-        <h1>All Tickets</h1>
-        <p>Quản lý tất cả vé đặt xe</p>
+        <div>
+          <h1>All Tickets</h1>
+          <p>Quản lý tất cả vé đặt xe</p>
+        </div>
+
+        {/* [NEW] Nút "Đặt vé tại quầy" */}
+        <button
+          onClick={() => setIsBookingMode(true)}
+          style={{
+            backgroundColor: "#D83E3E",
+            color: "white",
+            padding: "10px 20px",
+            borderRadius: "8px",
+            border: "none",
+            fontWeight: "bold",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            transition: "background-color 0.2s",
+          }}
+          onMouseOver={(e) =>
+            (e.currentTarget.style.backgroundColor = "#b93535")
+          }
+          onMouseOut={(e) =>
+            (e.currentTarget.style.backgroundColor = "#D83E3E")
+          }
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+            <line x1="12" y1="14" x2="12" y2="18"></line>
+            <line x1="10" y1="16" x2="14" y2="16"></line>
+          </svg>
+          Đặt vé tại quầy
+        </button>
       </div>
 
+      {/* Filter Section */}
       <div className={styles.filterSection}>
         <div className={styles.searchBox}>
           <input
@@ -152,6 +219,7 @@ export default function AdminTickets() {
         </div>
       </div>
 
+      {/* Loading & Error States */}
       {loading && (
         <div className={styles.loadingContainer}>
           <div className={styles.spinner}></div>
@@ -171,6 +239,7 @@ export default function AdminTickets() {
         </div>
       )}
 
+      {/* Ticket Table */}
       {!loading && !error && tickets.length > 0 && (
         <>
           <TicketTable
@@ -203,7 +272,7 @@ export default function AdminTickets() {
         </>
       )}
 
-      {/* Modal for ticket details */}
+      {/* Modal Details (Giữ nguyên) */}
       {selectedTicket && (
         <div className={styles.modal} onClick={handleCloseModal}>
           <div
