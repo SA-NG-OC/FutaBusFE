@@ -1,95 +1,144 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline, useMapEvents, CircleMarker } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import { FaLocationArrow } from "react-icons/fa"; // Icon cho nút recenter
+import { FaLocationArrow } from "react-icons/fa";
 
-// --- 1. CONFIG ICON XE BUÝT ---
-// Bạn có thể thay link ảnh này bằng link ảnh xe của Futa hoặc ảnh trong folder public của dự án
+// --- GOOGLE MAPS COLORS ---
+const GOOGLE_BLUE = '#4285F4';        // Google Maps primary blue
+const GOOGLE_BLUE_DARK = '#1a73e8';   // Darker blue for traveled path
+const ROUTE_OUTLINE = '#1557b0';       // Dark outline for route
+const WHITE = '#FFFFFF';
+
+// --- 1. CONFIG ICON ---
 const busIcon = L.icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/3448/3448339.png", // Icon xe buýt nhìn từ trên xuống hoặc ngang
-    iconSize: [45, 45],     // Kích thước to hơn chút cho dễ nhìn
-    iconAnchor: [22, 22],   // Tâm của icon nằm chính giữa
-    popupAnchor: [0, -25],  // Popup hiện phía trên icon
+    iconUrl: "https://cdn-icons-png.flaticon.com/512/3448/3448339.png",
+    iconSize: [45, 45],
+    iconAnchor: [22, 22],
+    popupAnchor: [0, -25],
 });
 
-const startIcon = L.icon({
-    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
-    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-});
+// Custom Google Maps style markers
+const createGoogleStyleIcon = (color: string, label: string) => {
+    return L.divIcon({
+        className: 'custom-google-marker',
+        html: `
+            <div style="
+                position: relative;
+                width: 28px;
+                height: 40px;
+            ">
+                <svg viewBox="0 0 28 40" width="28" height="40" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <filter id="shadow-${label}" x="-20%" y="-20%" width="140%" height="140%">
+                            <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.3)"/>
+                        </filter>
+                    </defs>
+                    <path 
+                        d="M14 0C6.268 0 0 6.268 0 14c0 10.5 14 26 14 26s14-15.5 14-26C28 6.268 21.732 0 14 0z" 
+                        fill="${color}" 
+                        filter="url(#shadow-${label})"
+                    />
+                    <circle cx="14" cy="14" r="6" fill="white"/>
+                </svg>
+                <div style="
+                    position: absolute;
+                    top: 8px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    font-size: 10px;
+                    font-weight: bold;
+                    color: ${color};
+                ">${label}</div>
+            </div>
+        `,
+        iconSize: [28, 40],
+        iconAnchor: [14, 40],
+        popupAnchor: [0, -40]
+    });
+};
 
-const endIcon = L.icon({
-    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
-    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-});
+const startIcon = createGoogleStyleIcon('#34A853', 'A');  // Google Green
+const endIcon = createGoogleStyleIcon('#EA4335', 'B');     // Google Red
 
-// --- 2. COMPONENT QUẢN LÝ SỰ KIỆN MAP ---
-// Xử lý logic: Khi người dùng chạm vào map -> Tắt Auto Follow
+// --- 2. HÀM GỌI API TÌM ĐƯỜNG (ROUTING) ---
+async function getRoutePolyline(startLat: number, startLng: number, endLat: number, endLng: number): Promise<L.LatLngTuple[]> {
+    try {
+        const url = `https://router.project-osrm.org/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?overview=full&geometries=geojson`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.routes && data.routes.length > 0) {
+            return data.routes[0].geometry.coordinates.map((coord: number[]) => [coord[1], coord[0]] as L.LatLngTuple);
+        }
+        return [];
+    } catch (error) {
+        console.error("Error fetching route:", error);
+        return [];
+    }
+}
+
+// --- 3. COMPONENT XỬ LÝ MAP ---
 function MapEventsHandler({ onUserInteraction }: { onUserInteraction: () => void }) {
     useMapEvents({
-        dragstart: () => {
-            onUserInteraction(); // Người dùng bắt đầu kéo map
-        },
-        zoomstart: () => {
-            onUserInteraction(); // Người dùng bắt đầu zoom
-        },
+        dragstart: onUserInteraction,
+        zoomstart: onUserInteraction,
     });
     return null;
 }
 
-// --- 3. COMPONENT ĐIỀU KHIỂN CAMERA THÔNG MINH ---
 interface SmartCameraProps {
     currentPos: L.LatLngExpression | null;
     origin: any;
     destination: any;
     isAutoFollow: boolean;
+    plannedPath: L.LatLngTuple[];
 }
 
-function SmartCamera({ currentPos, origin, destination, isAutoFollow }: SmartCameraProps) {
+function SmartCamera({ currentPos, origin, destination, isAutoFollow, plannedPath }: SmartCameraProps) {
     const map = useMap();
-    const hasInitialFit = useRef(false); // Ref để đảm bảo chỉ fitBounds lần đầu tiên
+    const hasInitialFit = useRef(false);
 
     useEffect(() => {
-        // 1. Lần đầu tiên khi có đủ dữ liệu -> FitBounds để thấy toàn cảnh
+        // 1. FitBounds lần đầu
         if (!hasInitialFit.current && origin && destination) {
-            const points = [
-                [origin.latitude, origin.longitude],
-                [destination.latitude, destination.longitude]
-            ];
-            if (currentPos) points.push(currentPos as any);
+            const points: L.LatLngExpression[] = [];
 
-            const bounds = L.latLngBounds(points as L.LatLngTuple[]);
-            map.fitBounds(bounds, { padding: [50, 50] });
-            hasInitialFit.current = true; // Đánh dấu đã fit xong
-            return;
+            if (plannedPath.length > 0) {
+                points.push(...plannedPath);
+            } else {
+                points.push([origin.latitude, origin.longitude]);
+                points.push([destination.latitude, destination.longitude]);
+            }
+
+            if (currentPos) {
+                points.push(currentPos);
+            }
+
+            if (points.length > 0) {
+                const bounds = L.latLngBounds(points);
+                if (bounds.isValid()) {
+                    map.fitBounds(bounds, { padding: [50, 50] });
+                    hasInitialFit.current = true;
+                }
+            }
         }
 
-        // 2. Các lần sau khi xe di chuyển
+        // 2. Auto Follow xe
         if (isAutoFollow && currentPos) {
-            // QUAN TRỌNG: map.getZoom() lấy zoom hiện tại của người dùng
-            // Chỉ di chuyển tâm map (pan) đến xe, KHÔNG đổi mức zoom
             map.flyTo(currentPos as L.LatLngExpression, map.getZoom(), {
                 animate: true,
-                duration: 1.5 // Thời gian bay mượt mà
+                duration: 1.5
             });
         }
-    }, [currentPos, origin, destination, isAutoFollow, map]);
+    }, [currentPos, origin, destination, isAutoFollow, map, plannedPath]);
 
     return null;
 }
-
 
 // --- MAIN COMPONENT ---
 interface MapContentProps {
@@ -100,34 +149,44 @@ interface MapContentProps {
 const MapContent = ({ tripId, onRouteInfoLoaded }: MapContentProps) => {
     const [currentPos, setCurrentPos] = useState<L.LatLngExpression | null>(null);
     const [routeHistory, setRouteHistory] = useState<L.LatLngExpression[]>([]);
+    const [plannedPath, setPlannedPath] = useState<L.LatLngTuple[]>([]);
+
     const [carDetails, setCarDetails] = useState<any>({});
     const [origin, setOrigin] = useState<any>(null);
     const [destination, setDestination] = useState<any>(null);
-
-    // State quản lý chế độ Auto Follow
     const [isAutoFollow, setIsAutoFollow] = useState(true);
 
     const stompClientRef = useRef<Client | null>(null);
 
-    // Fetch Route Info (Giữ nguyên)
+    // Fetch Route & Calculate Path
     useEffect(() => {
         const fetchRouteInfo = async () => {
             try {
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5230";
                 const res = await fetch(`${apiUrl}/gps/${tripId}/route-info`);
                 const json = await res.json();
+
                 if (json.success && json.data) {
-                    setOrigin(json.data.origin);
-                    setDestination(json.data.destination);
-                    if (!currentPos) setCurrentPos([json.data.origin.latitude, json.data.origin.longitude]);
+                    const org = json.data.origin;
+                    const dst = json.data.destination;
+
+                    setOrigin(org);
+                    setDestination(dst);
+
+                    if (!currentPos) setCurrentPos([org.latitude, org.longitude]);
                     if (onRouteInfoLoaded) onRouteInfoLoaded(json.data);
+
+                    if (org && dst) {
+                        const path = await getRoutePolyline(org.latitude, org.longitude, dst.latitude, dst.longitude);
+                        setPlannedPath(path);
+                    }
                 }
             } catch (error) { console.error(error); }
         };
         fetchRouteInfo();
     }, [tripId]);
 
-    // WebSocket (Giữ nguyên logic nhận data)
+    // WebSocket Logic
     useEffect(() => {
         const socketUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5230";
         const client = new Client({
@@ -149,30 +208,23 @@ const MapContent = ({ tripId, onRouteInfoLoaded }: MapContentProps) => {
         return () => { if (stompClientRef.current) stompClientRef.current.deactivate(); };
     }, [tripId]);
 
-    // Hàm xử lý khi bấm nút "Về vị trí xe"
     const handleRecenter = () => {
         setIsAutoFollow(true);
-        if (currentPos) {
-            // Có thể force zoom vào mức đẹp (vd: 15) khi bấm nút này
-            // map.flyTo(currentPos, 15); // Cần access map instance nếu muốn làm ở đây, 
-            // nhưng để đơn giản ta để SmartCamera lo việc flyTo, ta chỉ set state
-        }
     };
 
     return (
         <div className="w-full h-full bg-gray-50 relative">
             <MapContainer
                 center={[10.7769, 106.7009]}
-                zoom={10}
+                zoom={13}
                 zoomControl={false}
                 style={{ height: "100%", width: "100%" }}
             >
                 <TileLayer
-                    attribution='&copy; CARTO'
-                    url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+                    url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}"
+                    attribution='&copy; Google Maps'
                 />
 
-                {/* --- LOGIC CAMERA & EVENT --- */}
                 <MapEventsHandler onUserInteraction={() => setIsAutoFollow(false)} />
 
                 <SmartCamera
@@ -180,40 +232,113 @@ const MapContent = ({ tripId, onRouteInfoLoaded }: MapContentProps) => {
                     origin={origin}
                     destination={destination}
                     isAutoFollow={isAutoFollow}
+                    plannedPath={plannedPath}
                 />
 
-                <Polyline positions={routeHistory} pathOptions={{ color: '#3b82f6', weight: 4 }} />
+                {/* ========== GOOGLE MAPS STYLE ROUTE RENDERING ========== */}
+
+                {/* LAYER 1: VIỀN TỐI (Shadow/Outline) - Tạo chiều sâu */}
+                {plannedPath.length > 0 && (
+                    <Polyline
+                        positions={plannedPath}
+                        pathOptions={{
+                            color: ROUTE_OUTLINE,
+                            weight: 10,
+                            opacity: 0.4,
+                            lineCap: 'round',
+                            lineJoin: 'round'
+                        }}
+                    />
+                )}
+
+                {/* LAYER 2: VIỀN TRẮNG (White border) - Nhìn sắc nét hơn */}
+                {plannedPath.length > 0 && (
+                    <Polyline
+                        positions={plannedPath}
+                        pathOptions={{
+                            color: WHITE,
+                            weight: 8,
+                            opacity: 1,
+                            lineCap: 'round',
+                            lineJoin: 'round'
+                        }}
+                    />
+                )}
+
+                {/* LAYER 3: ĐƯỜNG CHÍNH MÀU XANH GOOGLE (Main route) */}
+                {plannedPath.length > 0 && (
+                    <Polyline
+                        positions={plannedPath}
+                        pathOptions={{
+                            color: GOOGLE_BLUE,
+                            weight: 5,
+                            opacity: 1,
+                            lineCap: 'round',
+                            lineJoin: 'round'
+                        }}
+                    />
+                )}
+
+                {/* ========== ĐƯỜNG XE ĐÃ ĐI (Traveled path) ========== */}
+
+                {/* LAYER 1: Viền tối cho đường đã đi */}
+                {routeHistory.length > 1 && (
+                    <Polyline
+                        positions={routeHistory}
+                        pathOptions={{
+                            color: '#0d47a1',
+                            weight: 8,
+                            opacity: 0.5,
+                            lineCap: 'round',
+                            lineJoin: 'round'
+                        }}
+                    />
+                )}
+
+                {/* LAYER 2: Đường đã đi màu xanh đậm */}
+                {routeHistory.length > 1 && (
+                    <Polyline
+                        positions={routeHistory}
+                        pathOptions={{
+                            color: GOOGLE_BLUE_DARK,
+                            weight: 5,
+                            opacity: 1,
+                            lineCap: 'round',
+                            lineJoin: 'round',
+                            dashArray: undefined
+                        }}
+                    />
+                )}
 
                 {origin && (
                     <Marker position={[origin.latitude, origin.longitude]} icon={startIcon}>
-                        <Popup>{origin.locationName}</Popup>
+                        <Popup><b>Bắt đầu:</b> {origin.locationName}</Popup>
                     </Marker>
                 )}
                 {destination && (
                     <Marker position={[destination.latitude, destination.longitude]} icon={endIcon}>
-                        <Popup>{destination.locationName}</Popup>
+                        <Popup><b>Đích đến:</b> {destination.locationName}</Popup>
                     </Marker>
                 )}
 
-                {/* --- XE BUÝT (Icon mới) --- */}
                 {currentPos && (
                     <Marker position={currentPos} icon={busIcon} zIndexOffset={1000}>
                         <Popup>
-                            <div className="p-1">
+                            <div className="p-1 min-w-[120px]">
                                 <p className="font-bold text-blue-600 mb-1">Futa Bus</p>
-                                <p className="text-xs">Speed: {carDetails.speed?.toFixed(1)} km/h</p>
-                                {/* Nếu muốn xoay icon theo hướng (Advanced): Cần custom DivIcon với CSS rotate */}
+                                <p className="text-xs text-gray-600">
+                                    Vận tốc: <span className="font-bold">{carDetails.speed?.toFixed(1) || 0} km/h</span>
+                                </p>
                             </div>
                         </Popup>
                     </Marker>
                 )}
             </MapContainer>
 
-            {/* --- NÚT RE-CENTER (Hiện khi người dùng đang không follow xe) --- */}
             {!isAutoFollow && currentPos && (
                 <button
                     onClick={handleRecenter}
-                    className="absolute bottom-24 right-4 z-[400] bg-white text-blue-600 p-3 rounded-full shadow-lg border border-gray-200 hover:bg-blue-50 transition-all animate-bounce-short"
+                    className="absolute bottom-24 right-4 z-[1000] bg-white text-blue-600 p-3 rounded-full shadow-xl border border-blue-100 hover:bg-blue-50 transition-all animate-bounce-short"
                     title="Về vị trí xe"
                 >
                     <FaLocationArrow className="text-xl" />

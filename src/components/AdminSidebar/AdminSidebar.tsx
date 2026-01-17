@@ -21,7 +21,7 @@ const ADMIN_MENU = [
     { name: 'Employees', path: '/admin/employees', icon: <FaUsers /> },
     { name: 'Customers', path: '/admin/customers', icon: <FaUsers /> },
     { name: 'Reports', path: '/admin/reports', icon: <FaChartBar /> },
-    { name: 'Notifications', path: '/admin/notifications', icon: <FaBell /> },
+    //{ name: 'Notifications', path: '/admin/notifications', icon: <FaBell /> },
 ];
 
 // 2. Định nghĩa danh sách menu cho EMPLOYEE (Ít quyền hơn - Theo HTML mới của bạn)
@@ -32,7 +32,7 @@ const EMPLOYEE_MENU = [
     { name: 'Trip Scheduling', path: '/employee/trip-scheduling', icon: <MdSchedule /> },
     { name: 'Tickets', path: '/employee/tickets', icon: <FaTicketAlt /> },
     { name: 'Drivers', path: '/employee/drivers', icon: <FaUserTie /> },
-    { name: 'Notifications', path: '/employee/notifications', icon: <FaBell /> },
+    //{ name: 'Notifications', path: '/employee/notifications', icon: <FaBell /> },
 ];
 
 // Định nghĩa kiểu dữ liệu cho Props (mặc định là admin nếu không truyền gì)
