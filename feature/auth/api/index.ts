@@ -57,6 +57,9 @@ export interface AuthResponse {
  * Login user
  */
 export async function login(request: LoginRequest): Promise<AuthResponse> {
+  console.log('[Auth API] Login request:', { emailOrPhone: request.emailOrPhone });
+  console.log('[Auth API] Calling:', `${API_BASE_URL}/auth/login`);
+  
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: 'POST',
     headers: {
@@ -65,12 +68,16 @@ export async function login(request: LoginRequest): Promise<AuthResponse> {
     body: JSON.stringify(request),
   });
 
+  console.log('[Auth API] Login response status:', response.status);
   const data: ApiResponse<AuthResponse> = await response.json();
+  console.log('[Auth API] Login response:', { success: data.success, message: data.message });
 
   if (!data.success) {
+    console.error('[Auth API] Login failed:', data.message);
     throw new Error(data.message || 'Đăng nhập thất bại');
   }
 
+  console.log('[Auth API] Login successful');
   return data.data!;
 }
 
@@ -78,6 +85,9 @@ export async function login(request: LoginRequest): Promise<AuthResponse> {
  * Register new user
  */
 export async function register(request: RegisterRequest): Promise<AuthResponse> {
+  console.log('[Auth API] Register request:', { email: request.email, fullName: request.fullName });
+  console.log('[Auth API] Calling:', `${API_BASE_URL}/auth/register`);
+  
   const response = await fetch(`${API_BASE_URL}/auth/register`, {
     method: 'POST',
     headers: {
@@ -86,12 +96,16 @@ export async function register(request: RegisterRequest): Promise<AuthResponse> 
     body: JSON.stringify(request),
   });
 
+  console.log('[Auth API] Register response status:', response.status);
   const data: ApiResponse<AuthResponse> = await response.json();
+  console.log('[Auth API] Register response:', { success: data.success, message: data.message });
 
   if (!data.success) {
+    console.error('[Auth API] Register failed:', data.message);
     throw new Error(data.message || 'Đăng ký thất bại');
   }
 
+  console.log('[Auth API] Register successful');
   return data.data!;
 }
 

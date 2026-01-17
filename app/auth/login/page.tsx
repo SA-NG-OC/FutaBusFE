@@ -75,9 +75,36 @@ export default function LoginPage() {
 
     try {
       const sanitizedInput = sanitizeInput(emailOrPhone);
+      console.log('[LoginPage] Attempting login with:', sanitizedInput);
+      
       await login({ emailOrPhone: sanitizedInput, password, rememberMe });
-      router.push('/');
+      
+      // Get user data after successful login
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        const user = JSON.parse(userData);
+        console.log('[LoginPage] Login successful, user role:', user.role.roleName);
+        
+        // Redirect based on role
+        if (user.role.roleName === 'ADMIN') {
+          console.log('[LoginPage] Redirecting to admin dashboard');
+          router.push('/admin/dashboard');
+        } else if (user.role.roleName === 'DRIVER') {
+          console.log('[LoginPage] Redirecting to driver dashboard');
+          router.push('/employee/dashboard');
+        } else if (user.role.roleName === 'STAFF') {
+          console.log('[LoginPage] Redirecting to staff dashboard');
+          router.push('/employee/dashboard');
+        } else {
+          console.log('[LoginPage] Redirecting to home page');
+          router.push('/');
+        }
+      } else {
+        console.log('[LoginPage] No user data found, redirecting to home');
+        router.push('/');
+      }
     } catch (err) {
+      console.error('[LoginPage] Login failed:', err);
       setError(err instanceof Error ? err.message : 'Đăng nhập thất bại');
     } finally {
       setIsLoading(false);
