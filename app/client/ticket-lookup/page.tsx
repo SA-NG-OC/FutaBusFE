@@ -1,11 +1,14 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import TicketLookup from "@/feature/ticket/components/TicketLookup";
 import TicketDetail from "@/feature/ticket/components/TicketDetail";
 import BookingList from "@/feature/ticket/components/BookingList";
 import { ticketApi } from "@/feature/ticket/api/ticketApi";
-import { BookingListItem } from "@/feature/ticket/types";
+import { BookingListItem, TicketInfo } from "@/feature/ticket/types";
 import styles from "./page.module.css";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 type SearchMethod = "email" | "phone" | "code";
 type ViewState = "search" | "bookingList" | "ticketDetail";
@@ -35,11 +38,22 @@ interface TicketDetailData {
 }
 
 export default function TicketLookupPage() {
+  const searchParams = useSearchParams();
+  const ticketRef = useRef<HTMLDivElement>(null);
   const [ticketData, setTicketData] = useState<TicketDetailData | null>(null);
   const [bookingList, setBookingList] = useState<BookingListItem[]>([]);
   const [viewState, setViewState] = useState<ViewState>("search");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  // Auto-load ticket when URL has bookingCode parameter
+  useEffect(() => {
+    const bookingCode = searchParams.get("code");
+    if (bookingCode) {
+      handleSearchByBookingCode(bookingCode);
+    }
+  }, [searchParams]);
 
   const handleSearch = async (searchData: {
     method: SearchMethod;
@@ -64,7 +78,7 @@ export default function TicketLookupPage() {
       setError(
         err instanceof Error
           ? err.message
-          : "Không thể tra cứu. Vui lòng thử lại sau."
+          : "Không thể tra cứu. Vui lòng thử lại sau.",
       );
       setViewState("search");
     } finally {
@@ -98,15 +112,15 @@ export default function TicketLookupPage() {
           booking.tripInfo.dropoffLocation ||
           "",
         departureDate: new Date(
-          booking.tripInfo.departureTime
+          booking.tripInfo.departureTime,
         ).toLocaleDateString("vi-VN"),
         departureTime: new Date(
-          booking.tripInfo.departureTime
+          booking.tripInfo.departureTime,
         ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
         duration: `${Math.round(
           (new Date(booking.tripInfo.arrivalTime).getTime() -
             new Date(booking.tripInfo.departureTime).getTime()) /
-            (1000 * 60 * 60)
+            (1000 * 60 * 60),
         )}h`,
         vehicleType: "Limousine",
         licensePlate: booking.tripInfo.vehiclePlate || "N/A",
@@ -119,11 +133,11 @@ export default function TicketLookupPage() {
         seatFloor: `Tầng ${ticket.floorNumber}`,
         pickupLocation: booking.tripInfo.pickupLocation || "",
         pickupTime: new Date(
-          booking.tripInfo.pickupTime || booking.tripInfo.departureTime
+          booking.tripInfo.pickupTime || booking.tripInfo.departureTime,
         ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
         dropoffLocation: booking.tripInfo.dropoffLocation || "",
         dropoffTime: new Date(
-          booking.tripInfo.dropoffTime || booking.tripInfo.arrivalTime
+          booking.tripInfo.dropoffTime || booking.tripInfo.arrivalTime,
         ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
       };
 
@@ -132,6 +146,90 @@ export default function TicketLookupPage() {
     } else {
       setError("Không tìm thấy thông tin vé. Vui lòng kiểm tra lại mã vé.");
       setViewState("search");
+    }
+  };
+
+  // New function to search by booking code (from my-ticket page)
+  const handleSearchByBookingCode = async (bookingCode: string) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await ticketApi.getBookingByCode(bookingCode);
+
+      if (response && response.success && response.data) {
+        const booking = response.data;
+
+        // Get the first ticket from the booking
+        const firstTicket = booking.tickets[0];
+
+        if (!firstTicket) {
+          throw new Error("Không tìm thấy vé trong booking");
+        }
+
+        const mappedData: TicketDetailData = {
+          bookingCode: booking.bookingCode,
+          status: booking.bookingStatus,
+          qrCode: firstTicket.ticketCode,
+          fromLocation:
+            booking.tripInfo.routeName.split("→")[0]?.trim() ||
+            booking.tripInfo.pickupLocation ||
+            "",
+          toLocation:
+            booking.tripInfo.routeName.split("→")[1]?.trim() ||
+            booking.tripInfo.dropoffLocation ||
+            "",
+          departureDate: new Date(
+            booking.tripInfo.departureTime,
+          ).toLocaleDateString("vi-VN"),
+          departureTime: new Date(
+            booking.tripInfo.departureTime,
+          ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+          duration: `${Math.round(
+            (new Date(booking.tripInfo.arrivalTime).getTime() -
+              new Date(booking.tripInfo.departureTime).getTime()) /
+              (1000 * 60 * 60),
+          )}h`,
+          vehicleType: "Limousine",
+          licensePlate: booking.tripInfo.vehiclePlate || "N/A",
+          driverName: booking.tripInfo.driverName,
+          customerName: firstTicket.passenger?.fullName || booking.customerName,
+          customerPhone:
+            firstTicket.passenger?.phoneNumber || booking.customerPhone,
+          customerEmail: firstTicket.passenger?.email || booking.customerEmail,
+          customerIdCard: "",
+          seatNumber: booking.tickets
+            .map((t: TicketInfo) => t.seatNumber)
+            .join(", "),
+          seatFloor: `Tầng ${firstTicket.floorNumber}`,
+          pickupLocation: booking.tripInfo.pickupLocation || "",
+          pickupTime: new Date(
+            booking.tripInfo.pickupTime || booking.tripInfo.departureTime,
+          ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+          dropoffLocation: booking.tripInfo.dropoffLocation || "",
+          dropoffTime: new Date(
+            booking.tripInfo.dropoffTime || booking.tripInfo.arrivalTime,
+          ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+        };
+
+        setTicketData(mappedData);
+        setViewState("ticketDetail");
+      } else {
+        setError(
+          "Không tìm thấy thông tin vé. Vui lòng kiểm tra lại mã đặt vé.",
+        );
+        setViewState("search");
+      }
+    } catch (err) {
+      console.error("Error fetching booking:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Không thể tra cứu. Vui lòng thử lại sau.",
+      );
+      setViewState("search");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -176,7 +274,7 @@ export default function TicketLookupPage() {
       await handleSearchByCode(ticketCode);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Không thể tải thông tin vé."
+        err instanceof Error ? err.message : "Không thể tải thông tin vé.",
       );
     } finally {
       setLoading(false);
@@ -190,9 +288,54 @@ export default function TicketLookupPage() {
     setError(null);
   };
 
-  const handleDownload = () => {
-    // TODO: Implement download functionality
-    alert("Tải xuống vé (chức năng đang phát triển)");
+  const handleDownload = async () => {
+    if (!ticketData || !ticketRef.current) {
+      alert("Không tìm thấy thông tin vé để tải xuống");
+      return;
+    }
+
+    setIsDownloading(true);
+
+    try {
+      // Find the ticket card element
+      const ticketElement = ticketRef.current.querySelector(
+        '[class*="ticketCard"]',
+      ) as HTMLElement;
+
+      if (!ticketElement) {
+        throw new Error("Không tìm thấy thông tin vé");
+      }
+
+      // Create canvas from the ticket element
+      const canvas = await html2canvas(ticketElement, {
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+      });
+
+      // Calculate dimensions for PDF (A4 size in mm)
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      // Create PDF
+      const pdf = new jsPDF({
+        orientation: imgHeight > imgWidth ? "portrait" : "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      // Convert canvas to image and add to PDF
+      const imgData = canvas.toDataURL("image/png");
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+
+      // Download PDF
+      pdf.save(`Ve-Xe-${ticketData.bookingCode}.pdf`);
+    } catch (error) {
+      console.error("Error downloading ticket:", error);
+      alert("Không thể tải xuống vé. Vui lòng thử lại sau.");
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -277,11 +420,53 @@ export default function TicketLookupPage() {
       )}
 
       {viewState === "ticketDetail" && !loading && ticketData && (
-        <TicketDetail
-          ticket={ticketData}
-          onBack={handleSearchAgain}
-          onDownload={handleDownload}
-        />
+        <div ref={ticketRef}>
+          <TicketDetail
+            ticket={ticketData}
+            onBack={handleSearchAgain}
+            onDownload={handleDownload}
+          />
+          {isDownloading && (
+            <div
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 9999,
+              }}
+            >
+              <div
+                style={{
+                  background: "white",
+                  padding: "2rem",
+                  borderRadius: "12px",
+                  textAlign: "center",
+                }}
+              >
+                <div
+                  style={{
+                    width: "48px",
+                    height: "48px",
+                    border: "4px solid #f3f4f6",
+                    borderTopColor: "#D83E3E",
+                    borderRadius: "50%",
+                    margin: "0 auto 1rem",
+                    animation: "spin 1s linear infinite",
+                  }}
+                ></div>
+                <p style={{ color: "#374151", fontWeight: 500 }}>
+                  Đang tạo file PDF...
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
