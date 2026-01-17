@@ -130,6 +130,76 @@
   color: #9ca3af;
 }
 
+/* Selected state */
+.selected {
+  border-color: #ef4444 !important;
+  background: #fef2f2 !important;
+}
+
+/* Disabled state */
+.methodOption:has(input:disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.methodOption:has(input:disabled):hover {
+  border-color: #e5e7eb;
+  background: white;
+}
+
+/* Badge styles */
+.recommended {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  color: #059669;
+  background: #d1fae5;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 8px;
+  text-transform: uppercase;
+}
+
+.comingSoon {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 8px;
+}
+
+/* MoMo Info section */
+.momoInfo {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.momoNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: #fef3c7;
+  border-radius: 8px;
+  border: 1px solid #fcd34d;
+}
+
+.momoNote p {
+  margin: 0;
+  font-size: 14px;
+  color: #92400e;
+  line-height: 1.5;
+}
+
+.infoIcon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 16px;
@@ -141,5 +211,17 @@
 
   .cardRow {
     grid-template-columns: 1fr;
+  }
+  
+  .methodName {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .recommended,
+  .comingSoon {
+    margin-left: 0;
   }
 }
