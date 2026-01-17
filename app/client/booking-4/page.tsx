@@ -6,24 +6,30 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSeatMap } from "@/feature/booking/hooks/useSeatMap";
 import { useWebSocket } from "@/src/context/WebSocketContext";
+import { useAuth } from "@/src/context/AuthContext";
 import { SelectedSeat, SeatMapResponse } from "@/feature/booking/types";
 import styles from "./page.module.css";
 
-// Generate a unique user ID (in production, get from auth)
-function getUserId(): string {
+// Generate a unique guest user ID for non-authenticated users
+function getGuestUserId(): string {
   if (typeof window === "undefined") return "";
-  let userId = sessionStorage.getItem("booking_user_id");
+  let userId = sessionStorage.getItem("booking_guest_id");
   if (!userId) {
-    userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    sessionStorage.setItem("booking_user_id", userId);
+    userId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    sessionStorage.setItem("booking_guest_id", userId);
   }
   return userId;
 }
 
 export default function ClientBookingDetailPage() {
+  const { user, isAuthenticated } = useAuth();
   const [selectedSeats, setSelectedSeats] = useState<SelectedSeat[]>([]);
   const [tripId, setTripId] = useState<number | null>(null);
-  const [userId] = useState<string>(getUserId);
+  
+  // Use real userId if authenticated, otherwise use guest ID
+  const userId = isAuthenticated && user ? String(user.userId) : getGuestUserId();
+  const isGuestBooking = !isAuthenticated || !user;
+  
   const [lockTimers, setLockTimers] = useState<Record<number, string>>({});
   const [notification, setNotification] = useState<{
     type: "success" | "error" | "warning";
