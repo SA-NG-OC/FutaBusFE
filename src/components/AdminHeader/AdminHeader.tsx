@@ -25,7 +25,7 @@ const AdminHeader = () => {
                 {/* Right Section: Search & Actions */}
                 <div className={styles['header-actions']}>
 
-                    {/* Search Bar */}
+                    {/* Search Bar
                     <div className={styles['search-container']}>
                         <div className={styles['search-icon']}>
                             <FiSearch size={18} />
@@ -35,7 +35,7 @@ const AdminHeader = () => {
                             className={styles['search-input']}
                             placeholder="Search"
                         />
-                    </div>
+                    </div> */}
 
                     {/* Action Buttons */}
                     <div className={styles['action-buttons']}>
@@ -50,10 +50,10 @@ const AdminHeader = () => {
                         </button>
 
                         {/* Notification Button */}
-                        <button className={`${styles['icon-button']} ${styles['notification-button']}`} aria-label="Notifications">
+                        {/* <button className={`${styles['icon-button']} ${styles['notification-button']}`} aria-label="Notifications">
                             <FiBell size={20} />
                             <span className={styles['notification-badge']}>3</span>
-                        </button>
+                        </button> */}
 
                         {/* User Avatar */}
                         <button className={styles['avatar-button']} aria-label="User Profile">

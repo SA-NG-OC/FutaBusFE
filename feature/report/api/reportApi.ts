@@ -1,6 +1,6 @@
 // /features/reports/api/reportApi.ts
 import axios from "axios";
-import { ApiResponse, PageResponse } from "@/shared/utils"; // Giả sử bạn có utils này
+import { ApiResponse, PageResponse } from "@/shared/utils";
 import {
     DashboardSummaryRes,
     ChartDataRes,
@@ -16,6 +16,24 @@ const axiosClient = axios.create({
         'Content-Type': 'application/json',
     }
 });
+
+axiosClient.interceptors.request.use(
+    (config) => {
+        // Kiểm tra xem có đang chạy ở trình duyệt không (tránh lỗi Next.js server-side)
+        if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('accessToken');
+
+            // Nếu có token thì gắn vào Header
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
 
 export const reportApi = {
     // 1. KPI Summary
@@ -57,7 +75,6 @@ export const reportApi = {
             return response.data.data;
         } catch (error) {
             console.error(error);
-            // Return empty page structure on error
             throw new Error("Failed to fetch top routes data");
         }
     },
@@ -66,19 +83,16 @@ export const reportApi = {
         try {
             const response = await axiosClient.get('/analytics/export', {
                 params,
-                responseType: 'blob', // QUAN TRỌNG: Để nhận dữ liệu binary
+                responseType: 'blob',
             });
 
-            // Tạo link ảo để download
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            // Đặt tên file
             link.setAttribute('download', `Bao_cao_thang_${params.month}_${params.year}.xlsx`);
             document.body.appendChild(link);
             link.click();
 
-            // Dọn dẹp
             link.remove();
             window.URL.revokeObjectURL(url);
         } catch (error) {
