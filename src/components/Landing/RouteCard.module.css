@@ -6,9 +6,18 @@
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
+:global(.dark) .card {
+  background: #1e293b;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
 .card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+:global(.dark) .card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 .imageWrapper {
@@ -35,6 +44,11 @@
   color: #999;
 }
 
+:global(.dark) .placeholder {
+  background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+  color: #64748b;
+}
+
 .badge {
   position: absolute;
   top: 12px;
@@ -57,6 +71,10 @@
   margin-bottom: 16px;
 }
 
+:global(.dark) .title {
+  color: #f8fafc;
+}
+
 .details {
   display: flex;
   flex-direction: column;
@@ -74,9 +92,17 @@
   color: #666;
 }
 
+:global(.dark) .label {
+  color: #94a3b8;
+}
+
 .value {
   font-weight: 600;
   color: #333;
+}
+
+:global(.dark) .value {
+  color: #f8fafc;
 }
 
 .footer {
@@ -87,9 +113,18 @@
   border-top: 1px solid #f0f0f0;
 }
 
+:global(.dark) .footer {
+  border-top-color: #334155;
+}
+
 .price {
   font-size: 24px;
   font-weight: 700;
+  color: #333;
+}
+
+:global(.dark) .price {
+  color: #f8fafc;
 }
 
 .bookButton {

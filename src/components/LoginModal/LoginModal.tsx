@@ -11,46 +11,84 @@ interface LoginModalProps {
   onClose: () => void;
 }
 
-type LoginMode = 'phone' | 'email';
-
 /**
  * Reusable Login Modal Component
  * 
  * Features:
- * - Email/Phone toggle
+ * - Single input for email/phone
  * - Remember me checkbox
+ * - Input validation & sanitization
  * - Forgot password link
  * - Sign up redirect
  * - Matches brand color palette
- * 
- * @example
- * // In any component
- * const { isLoginModalOpen, closeLoginModal, openLoginModal } = useAuth();
- * 
- * <button onClick={openLoginModal}>Login</button>
- * <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
  */
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const { login } = useAuth();
   const router = useRouter();
-  const [loginMode, setLoginMode] = useState<LoginMode>('phone');
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Input sanitization
+  const sanitizeInput = (input: string): string => {
+    return input
+      .replace(/[<>"'`]/g, '')
+      .replace(/[;\-\-]/g, '')
+      .replace(/(\/\*|\*\/)/g, '')
+      .trim();
+  };
+
+  const validateInput = (): boolean => {
+    const sanitized = sanitizeInput(emailOrPhone);
+    
+    const sqlPatterns = [
+      /('|(\-\-)|(;)|(\|\|)|(\*))/i,
+      /(\bOR\b|\bAND\b|\bUNION\b|\bSELECT\b|\bDROP\b|\bINSERT\b|\bUPDATE\b|\bDELETE\b)/i,
+      /(exec|execute|script|javascript|alert)/i
+    ];
+
+    for (const pattern of sqlPatterns) {
+      if (pattern.test(sanitized)) {
+        setError('Dữ liệu đầu vào không hợp lệ');
+        return false;
+      }
+    }
+
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sanitized);
+    const isPhone = /^[0-9]{10}$/.test(sanitized);
+
+    if (!isEmail && !isPhone) {
+      setError('Vui lòng nhập email hoặc số điện thoại hợp lệ');
+      return false;
+    }
+
+    if (password.length < 6) {
+      setError('Mật khẩu phải có ít nhất 6 ký tự');
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!validateInput()) {
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      await login({ emailOrPhone, password, rememberMe });
-      // Modal will close automatically via AuthContext
+      const sanitizedInput = sanitizeInput(emailOrPhone);
+      await login({ emailOrPhone: sanitizedInput, password, rememberMe });
       setEmailOrPhone('');
       setPassword('');
       setError('');
+      onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Đăng nhập thất bại');
     } finally {
@@ -77,69 +115,35 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           ×
         </button>
 
-        <h2 className={styles.title}>Sign In</h2>
-        <p className={styles.subtitle}>Choose your account type to continue</p>
-
-        {/* Login Mode Toggle */}
-        <div className={styles.toggleContainer}>
-          <button
-            className={`${styles.toggleButton} ${loginMode === 'phone' ? styles.toggleActive : ''}`}
-            onClick={() => setLoginMode('phone')}
-            style={{
-              backgroundColor: loginMode === 'phone' ? COLORS.secondary : 'transparent',
-              borderColor: loginMode === 'phone' ? COLORS.secondaryDark : COLORS.border,
-            }}
-          >
-            <span className={styles.toggleIcon}>📱</span>
-            Số điện thoại
-          </button>
-          <button
-            className={`${styles.toggleButton} ${loginMode === 'email' ? styles.toggleActive : ''}`}
-            onClick={() => setLoginMode('email')}
-            style={{
-              backgroundColor: loginMode === 'email' ? COLORS.secondary : 'transparent',
-              borderColor: loginMode === 'email' ? COLORS.secondaryDark : COLORS.border,
-            }}
-          >
-            <span className={styles.toggleIcon}>✉️</span>
-            Email
-          </button>
-        </div>
+        <h2 className={styles.title}>Đăng nhập</h2>
+        <p className={styles.subtitle}>Nhập thông tin đăng nhập để tiếp tục</p>
 
         {/* Login Form */}
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.inputGroup}>
             <label className={styles.label}>
-              {loginMode === 'phone' ? 'Số điện thoại' : 'Email'}
+              SĐT/Email
             </label>
-            <div className={styles.inputWrapper}>
-              <span className={styles.inputIcon}>
-                {loginMode === 'phone' ? '📧' : '✉️'}
-              </span>
-              <input
-                type={loginMode === 'phone' ? 'tel' : 'email'}
-                value={emailOrPhone}
-                onChange={(e) => setEmailOrPhone(e.target.value)}
-                placeholder={loginMode === 'phone' ? '0989999934' : 'example@email.com'}
-                className={styles.input}
-                required
-              />
-            </div>
+            <input
+              type="text"
+              value={emailOrPhone}
+              onChange={(e) => setEmailOrPhone(e.target.value)}
+              placeholder="0989999934 hoặc example@email.com"
+              className={styles.input}
+              required
+            />
           </div>
 
           <div className={styles.inputGroup}>
             <label className={styles.label}>Mật khẩu</label>
-            <div className={styles.inputWrapper}>
-              <span className={styles.inputIcon}>🔒</span>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className={styles.input}
-                required
-              />
-            </div>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className={styles.input}
+              required
+            />
           </div>
 
           {error && (
@@ -156,7 +160,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 onChange={(e) => setRememberMe(e.target.checked)}
                 className={styles.checkbox}
               />
-              Remember me
+              Ghi nhớ đăng nhập
             </label>
             <button
               type="button"
@@ -164,7 +168,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               className={styles.forgotPassword}
               style={{ color: COLORS.primary }}
             >
-              Forgot password?
+              Quên mật khẩu?
             </button>
           </div>
 
@@ -177,19 +181,19 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               cursor: isLoading ? 'not-allowed' : 'pointer',
             }}
           >
-            {isLoading ? 'Đang đăng nhập...' : 'Sign In'}
+            {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
           </button>
         </form>
 
         <div className={styles.footer}>
-          Don't have an account?{' '}
+          Chưa có tài khoản?{' '}
           <button
             type="button"
             onClick={handleSignUp}
             className={styles.signUpLink}
             style={{ color: COLORS.primary }}
           >
-            Sign up
+            Đăng ký ngay
           </button>
         </div>
       </div>

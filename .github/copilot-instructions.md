@@ -6,6 +6,7 @@ FutaBusFE is a **Next.js 16 + React 19 + TypeScript** web application with:
 - **App Router** (file-based routing in `app/` directory)
 - **Tailwind CSS 4** for styling
 - **Three user interfaces**: Admin, Employee, Client (each with separate layouts)
+- **All customers pages in client folder must have responsive design
 - **Feature-based organization** for business logic
 - **Component-driven** architecture with reusable UI components
 - **Dark mode support** with theme persistence

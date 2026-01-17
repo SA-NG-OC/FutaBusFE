@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 
 /**
  * User interface matching backend User entity
@@ -10,6 +11,7 @@ export interface User {
   fullName: string;
   email: string;
   phoneNumber: string;
+  avt?: string; // Avatar URL from backend
   role: {
     roleId: number;
     roleName: 'ADMIN' | 'USER' | 'DRIVER' | 'STAFF';
@@ -29,6 +31,7 @@ export interface AuthResponse {
     userId: number;
     email: string;
     fullName: string;
+    avt?: string;
     role: string;
     expiresIn: number;
   };
@@ -83,6 +86,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5230';
  * - Role-based access control
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -125,7 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(result.message || 'Đăng nhập thất bại');
       }
 
-      const { accessToken, refreshToken, userId, email, fullName, role } = result.data;
+      const { accessToken, refreshToken, userId, email, fullName, avt, role } = result.data;
 
       // Store tokens
       localStorage.setItem('accessToken', accessToken);
@@ -141,6 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         fullName,
         email,
         phoneNumber: '', // Will be filled from user profile endpoint if needed
+        avt, // Avatar URL from backend
         role: {
           roleId: role === 'ADMIN' ? 1 : role === 'DRIVER' ? 3 : role === 'STAFF' ? 4 : 2,
           roleName: role as 'ADMIN' | 'USER' | 'DRIVER' | 'STAFF',
@@ -152,6 +157,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(accessToken);
       setUser(userData);
       setIsLoginModalOpen(false);
+      
+      // Navigate to home page after successful login
+      router.push('/');
     } catch (error) {
       console.error('Login error:', error);
       throw error;

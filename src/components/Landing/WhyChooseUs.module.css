@@ -3,6 +3,10 @@
   background: white;
 }
 
+:global(.dark) .section {
+  background: #020617;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -25,6 +29,11 @@
   margin-bottom: 16px;
 }
 
+:global(.dark) .badge {
+  background: rgba(123, 31, 162, 0.2);
+  color: #c084fc;
+}
+
 .title {
   font-size: 36px;
   font-weight: 700;
@@ -32,11 +41,19 @@
   margin-bottom: 12px;
 }
 
+:global(.dark) .title {
+  color: #f8fafc;
+}
+
 .subtitle {
   font-size: 16px;
   color: #666;
   max-width: 600px;
   margin: 0 auto;
+}
+
+:global(.dark) .subtitle {
+  color: #94a3b8;
 }
 
 .grid {

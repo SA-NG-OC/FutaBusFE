@@ -92,74 +92,75 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#EAEAEA] items-center justify-center p-8">
-      {/* Sign Up Card - Single Block */}
-      <div className="flex bg-white rounded-3xl shadow-2xl max-w-[1100px] w-full overflow-hidden">
-        {/* Left Side - Branding */}
-        <div className="flex-1 flex items-center justify-center p-16 bg-gradient-to-br from-gray-50 to-gray-100">
-          <div className="max-w-[500px]">
-          <div className="flex items-center gap-4 mb-10">
+    <div className="min-h-screen bg-[#EAEAEA] flex items-center justify-center p-4 lg:p-8" style={{ colorScheme: 'light' }}>
+      <div className="w-full max-w-7xl flex flex-col lg:flex-row items-center justify-center gap-0 lg:gap-20 xl:gap-32">
+        {/* Left Side - Branding (No Block) - Hidden on mobile */}
+        <div className="hidden lg:flex flex-1 items-center justify-center p-4 md:p-8 w-full">
+          <div className="max-w-[600px] w-full">
+          <div className="flex items-center gap-3 md:gap-4 mb-8 md:mb-10">
             <div 
-              className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl shadow-lg"
+              className="w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center text-3xl md:text-4xl shadow-lg"
               style={{ backgroundColor: COLORS.primary, boxShadow: `0 4px 12px ${COLORS.primary}33` }}
             >
               🚌
             </div>
-            <h1 className="text-5xl font-bold text-gray-800">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800">
               FUBA<span style={{ color: COLORS.primary }}>Bus</span>
             </h1>
           </div>
 
-          <h2 className="text-4xl font-semibold text-gray-800 mb-4">Join FUBABus Today!</h2>
-          <p className="text-base text-gray-600 leading-relaxed mb-12">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-gray-800 mb-3 md:mb-4">Join FUBABus Today!</h2>
+          <p className="text-sm md:text-base text-gray-600 leading-relaxed mb-8 md:mb-12">
             Create your account to start booking tickets and enjoy seamless travel experiences.
           </p>
 
-          <div className="flex flex-col gap-6">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-4 md:gap-6">
+            <div className="flex items-center gap-3 md:gap-4">
               <div 
-                className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl"
+                className="w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center text-xl md:text-2xl shrink-0"
                 style={{ backgroundColor: COLORS.secondary }}
               >
                 ⚡
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-1">Quick Registration</h3>
-                <p className="text-sm text-gray-600">Get started in under 2 minutes</p>
+                <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-0.5 md:mb-1">Quick Registration</h3>
+                <p className="text-xs md:text-sm text-gray-600">Get started in under 2 minutes</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 md:gap-4">
               <div 
-                className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl"
+                className="w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center text-xl md:text-2xl shrink-0"
                 style={{ backgroundColor: COLORS.secondary }}
               >
                 🎁
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-1">Special Offers</h3>
-                <p className="text-sm text-gray-600">Exclusive deals for members</p>
+                <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-0.5 md:mb-1">Special Offers</h3>
+                <p className="text-xs md:text-sm text-gray-600">Exclusive deals for members</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 md:gap-4">
               <div 
-                className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl"
+                className="w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center text-xl md:text-2xl shrink-0"
                 style={{ backgroundColor: COLORS.secondary }}
               >
                 📱
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-1">Easy Management</h3>
-                <p className="text-sm text-gray-600">Track bookings anytime, anywhere</p>
+                <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-0.5 md:mb-1">Easy Management</h3>
+                <p className="text-xs md:text-sm text-gray-600">Track bookings anytime, anywhere</p>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Right Side - Sign Up Form */}
-        <div className="flex-1 flex items-center justify-center p-12 bg-white overflow-y-auto max-h-[calc(100vh-4rem)]">
-          <div className="w-full max-w-[420px] my-auto">
-            <h2 className="text-4xl font-semibold text-center mb-2 text-gray-800">Create Account</h2>
-            <p className="text-center text-gray-600 text-sm mb-8">Fill in your information to get started</p>
+        {/* Right Side - Sign Up Form (White Block) */}
+        <div className="w-full lg:flex-1 lg:max-w-[650px]">
+          <div className="bg-white rounded-2xl lg:rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-12 max-h-[calc(100vh-2rem)] overflow-y-auto">
+          <div className="w-full max-w-[500px] mx-auto">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-center mb-2 text-gray-800">Create Account</h2>
+            <p className="text-center text-gray-600 text-sm mb-6 lg:mb-8">Fill in your information to get started</p>
 
             {/* Sign Up Form */}
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -173,7 +174,7 @@ export default function SignUpPage() {
                   value={formData.fullName}
                   onChange={handleChange}
                   placeholder="Nguyễn Văn A"
-                  className="w-full py-3.5 pl-12 pr-4 border-2 border-gray-200 rounded-lg text-[15px] transition-all outline-none focus:border-[#D83E3E] focus:shadow-[0_0_0_3px_rgba(216,62,62,0.1)] placeholder:text-gray-500"
+                  className="text-gray-800 w-full py-3.5 pl-12 pr-4 border-2 border-gray-200 rounded-lg text-[15px] transition-all outline-none focus:border-[#D83E3E] focus:shadow-[0_0_0_3px_rgba(216,62,62,0.1)] placeholder:text-gray-500"
                   required
                 />
                 </div>
@@ -189,7 +190,7 @@ export default function SignUpPage() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="example@email.com"
-                  className="w-full py-3.5 pl-12 pr-4 border-2 border-gray-200 rounded-lg text-[15px] transition-all outline-none focus:border-[#D83E3E] focus:shadow-[0_0_0_3px_rgba(216,62,62,0.1)] placeholder:text-gray-500"
+                  className="text-gray-800 w-full py-3.5 pl-12 pr-4 border-2 border-gray-200 rounded-lg text-[15px] transition-all outline-none focus:border-[#D83E3E] focus:shadow-[0_0_0_3px_rgba(216,62,62,0.1)] placeholder:text-gray-500"
                   required
                 />
               </div>
@@ -205,7 +206,7 @@ export default function SignUpPage() {
                   value={formData.phoneNumber}
                   onChange={handleChange}
                   placeholder="0989999934"
-                  className="w-full py-3.5 pl-12 pr-4 border-2 border-gray-200 rounded-lg text-[15px] transition-all outline-none focus:border-[#D83E3E] focus:shadow-[0_0_0_3px_rgba(216,62,62,0.1)] placeholder:text-gray-500"
+                  className="text-gray-800 w-full py-3.5 pl-12 pr-4 border-2 border-gray-200 rounded-lg text-[15px] transition-all outline-none focus:border-[#D83E3E] focus:shadow-[0_0_0_3px_rgba(216,62,62,0.1)] placeholder:text-gray-500"
                   required
                 />
               </div>
@@ -221,7 +222,7 @@ export default function SignUpPage() {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full py-3.5 pl-12 pr-4 border-2 border-gray-200 rounded-lg text-[15px] transition-all outline-none focus:border-[#D83E3E] focus:shadow-[0_0_0_3px_rgba(216,62,62,0.1)] placeholder:text-gray-500"
+                  className="text-gray-800 w-full py-3.5 pl-12 pr-4 border-2 border-gray-200 rounded-lg text-[15px] transition-all outline-none focus:border-[#D83E3E] focus:shadow-[0_0_0_3px_rgba(216,62,62,0.1)] placeholder:text-gray-500"
                   required
                 />
               </div>
@@ -237,7 +238,7 @@ export default function SignUpPage() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full py-3.5 pl-12 pr-4 border-2 border-gray-200 rounded-lg text-[15px] transition-all outline-none focus:border-[#D83E3E] focus:shadow-[0_0_0_3px_rgba(216,62,62,0.1)] placeholder:text-gray-500"
+                  className="text-gray-800 w-full py-3.5 pl-12 pr-4 border-2 border-gray-200 rounded-lg text-[15px] transition-all outline-none focus:border-[#D83E3E] focus:shadow-[0_0_0_3px_rgba(216,62,62,0.1)] placeholder:text-gray-500"
                   required
                 />
                 </div>
@@ -254,7 +255,7 @@ export default function SignUpPage() {
                 type="checkbox"
                 checked={acceptTerms}
                 onChange={(e) => setAcceptTerms(e.target.checked)}
-                className="w-4 h-4 mt-0.5 flex-shrink-0 cursor-pointer"
+                className="w-4 h-4 mt-0.5 shrink-0 cursor-pointer"
               />
               <span>
                 I agree to the{' '}
@@ -299,11 +300,11 @@ export default function SignUpPage() {
             >
                 Sign in
               </button>
-            </div>
+          </div>
+        </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
   );
 }

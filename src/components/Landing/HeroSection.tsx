@@ -34,7 +34,9 @@ export default function HeroSection() {
             </p>
 
             {/* Search Form */}
-            <TripSearch />
+            <TripSearch onSearch={(params) => {
+              console.log('Search params:', params);
+            }} />
             {/* <div className={styles.searchForm}>
               <div className={styles.inputGroup}>
                 <label>Điểm đi</label>

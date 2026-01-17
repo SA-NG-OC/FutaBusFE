@@ -3,6 +3,10 @@
   background: #f9f9f9;
 }
 
+:global(.dark) .section {
+  background: #0f172a;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -25,6 +29,11 @@
   margin-bottom: 16px;
 }
 
+:global(.dark) .badge {
+  background: rgba(245, 124, 0, 0.2);
+  color: #fb923c;
+}
+
 .title {
   font-size: 36px;
   font-weight: 700;
@@ -32,11 +41,19 @@
   margin-bottom: 12px;
 }
 
+:global(.dark) .title {
+  color: #f8fafc;
+}
+
 .subtitle {
   font-size: 16px;
   color: #666;
   max-width: 600px;
   margin: 0 auto;
+}
+
+:global(.dark) .subtitle {
+  color: #94a3b8;
 }
 
 .grid {
@@ -53,7 +70,7 @@
 .viewMoreButton {
   padding: 14px 32px;
   border: 2px solid #D83E3E;
-  background: white;
+  background: transparent;
   color: #D83E3E;
   border-radius: 8px;
   font-size: 16px;
@@ -62,8 +79,18 @@
   transition: all 0.2s;
 }
 
+:global(.dark) .viewMoreButton {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
 .viewMoreButton:hover {
   background: #D83E3E;
+  color: white;
+}
+
+:global(.dark) .viewMoreButton:hover {
+  background: #ef4444;
   color: white;
 }
 
