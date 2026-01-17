@@ -1,0 +1,140 @@
+/* src/feature/ticket/components/AdminSeatSelection/AdminSeatSelection.module.css */
+
+.container {
+  padding: 0;
+  animation: fadeIn 0.3s ease-out;
+  color: var(--text-primary);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  margin-bottom: 20px;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  color: var(--text-secondary); /* Text phụ */
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s;
+  font-weight: 500;
+}
+
+.backButton:hover {
+  color: var(--primary); /* Hover đỏ */
+}
+
+.mainContent {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 24px;
+  margin-bottom: 80px;
+}
+
+/* Khung bao ngoài Sơ đồ ghế (Cần class này trong file .tsx) */
+.seatMapWrapper {
+  background: var(--background-paper);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border-gray);
+  position: relative;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+/* Loading overlay */
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  /* Nền overlay bán trong suốt phù hợp dark mode */
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  color: var(--text-white);
+  backdrop-filter: blur(2px);
+}
+
+/* --- BOTTOM BAR --- */
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 260px; /* Né Sidebar Admin */
+  right: 0;
+
+  /* Nền bottom bar theo theme */
+  background: var(--background-paper);
+  border-top: 1px solid var(--border-gray);
+
+  padding: 16px 32px;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 50;
+}
+
+.totalInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.totalLabel {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.totalAmount {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary); /* Màu đỏ thương hiệu */
+}
+
+.continueButton {
+  background: var(--primary);
+  color: var(--text-white);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.continueButton:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.continueButton:disabled {
+  background: var(--bg-hover); /* Màu xám disabled */
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 1280px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+  .bottomBar {
+    left: 0;
+  }
+}
