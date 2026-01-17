@@ -1,112 +1,319 @@
-/* TripCard.module.css */
+/* TripCard.module.css - Responsive & Dark Mode Support */
+
 .card {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 1.25rem;
+  border: 1px solid #f3f4f6;
   display: flex;
-  gap: 24px;
-  align-items: center;
-  justify-content: space-between;
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 20px 22px;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.06) inset, 0 4px 18px rgba(15,23,42,0.06);
-  border: 1px solid rgba(0,0,0,0.04);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
 }
-.left, .center, .right {
+
+/* Dark mode for card */
+:global(.dark) .card {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+/* Responsive - tablet and desktop */
+@media (min-width: 640px) {
+  .card {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+/* Left section */
+.leftSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Header section */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.busIcon {
+  background-color: #fff0ef;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  color: #d83e3e;
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+:global(.dark) .busIcon {
+  background-color: #3d1a1a;
+}
+
+.headerInfo {
   display: flex;
   flex-direction: column;
 }
-.left { flex: 1 1 55%; }
-.center { flex: 0 0 18%; align-items: center; }
-.right { flex: 0 0 25%; align-items: flex-end; }
 
-.header {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 10px;
+.routeName {
+  font-weight: 700;
+  color: #1f2937;
 }
-.logo {
-  width: 48px;
-  height: 48px;
-  background: #fff0ef;
-  color: #d94a43;
+
+:global(.dark) .routeName {
+  color: #e5e7eb;
+}
+
+.badges {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.vehicleBadge {
+  background-color: #e5e7eb;
+  color: #4b5563;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+}
+
+:global(.dark) .vehicleBadge {
+  background-color: #4b5563;
+  color: #d1d5db;
+}
+
+.dateBadge {
+  background-color: #dbeafe;
+  color: #2563eb;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+:global(.dark) .dateBadge {
+  background-color: #1e3a8a;
+  color: #93c5fd;
+}
+
+/* Details section */
+.details {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.locationInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.locationLabel {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #6b7280;
+}
+
+:global(.dark) .locationLabel {
+  color: #9ca3af;
+}
+
+.timeInfo {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+:global(.dark) .timeInfo {
+  color: #e5e7eb;
+}
+
+.timeIcon {
+  color: #ef4444;
+}
+
+.cityName {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #4b5563;
+}
+
+:global(.dark) .cityName {
+  color: #d1d5db;
+}
+
+/* Duration section - hidden on mobile */
+.duration {
+  text-align: center;
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .duration {
+    display: block;
+  }
+}
+
+.durationLabel {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #6b7280;
+}
+
+:global(.dark) .durationLabel {
+  color: #9ca3af;
+}
+
+.durationLine {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.durationBorder {
+  flex-grow: 1;
+  border-top: 1px solid #d1d5db;
+}
+
+:global(.dark) .durationBorder {
+  border-color: #4b5563;
+}
+
+.durationText {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #4b5563;
+}
+
+:global(.dark) .durationText {
+  color: #d1d5db;
+}
+
+/* Seats available */
+.seatsInfo {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+:global(.dark) .seatsInfo {
+  color: #d1d5db;
+}
+
+/* Right section */
+.rightSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   justify-content: center;
-  border-radius: 10px;
-  font-size: 20px;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
 }
-.company {
-  font-weight: 600;
-  font-size: 16px;
-  color: #2b2b2b;
+
+:global(.dark) .rightSection {
+  border-color: #4b5563;
 }
-.badge {
-  display: inline-block;
-  margin-left: 8px;
-  background: #eadfd6;
-  color: #8a5f4b;
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-size: 12px;
+
+@media (min-width: 640px) {
+  .rightSection {
+    width: auto;
+    align-items: flex-end;
+    padding-top: 0;
+    border-top: none;
+    border-left: 1px solid #e5e7eb;
+    padding-left: 1.5rem;
+  }
+
+  :global(.dark) .rightSection {
+    border-color: #4b5563;
+  }
 }
-.section {
-  color: #6b7280;
-  font-size: 13px;
-}
-.label {
-  font-size: 12px;
-  color: #9aa0a6;
-  margin-bottom: 6px;
-}
-.time {
-  font-size: 20px;
+
+.price {
+  font-size: 1.5rem;
+  line-height: 2rem;
   font-weight: 700;
-  color: #2b2b2b;
+  color: #d83e3e;
+  text-align: right;
 }
-.city {
-  font-size: 13px;
-  color: #6b7280;
-  margin-top: 6px;
-}
-.seats {
-  margin-top: 10px;
-  color: #6b7280;
-  font-size: 13px;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.center .durationLabel {
-  font-size: 12px;
-  color: #9aa0a6;
-  margin-bottom: 6px;
-}
-.center .duration {
-  background: transparent;
-  color: #9aa0a6;
+
+.selectButton {
+  background-color: #d83e3e;
+  color: #ffffff;
   font-weight: 600;
-}
-.right .price {
-  color: #d94a43;
-  font-weight: 700;
-  font-size: 20px;
-}
-.selectBtn {
-  margin-top: 10px;
-  background: #e14b45;
-  color: white;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
   border: none;
-  padding: 8px 14px;
-  border-radius: 8px;
   cursor: pointer;
-  font-weight: 600;
+  transition: background-color 0.2s ease-in-out;
+  width: 100%;
 }
-.selectBtn:hover { opacity: 0.95; }
 
-.arrivalLabel { font-size: 12px; color: #9aa0a6; margin-top: 14px; }
+.selectButton:hover {
+  background-color: #b93434;
+}
 
-@media (max-width: 900px) {
-  .card { flex-direction: column; gap: 12px; }
-  .left, .center, .right { align-items: flex-start; }
-  .right { align-items: flex-start; }
+:global(.dark) .selectButton:hover {
+  background-color: #a62929;
+}
+
+.selectButton:focus {
+  outline: 2px solid #d83e3e;
+  outline-offset: 2px;
+}
+
+/* Loading state */
+.loading {
+  color: #6b7280;
+}
+
+:global(.dark) .loading {
+  color: #9ca3af;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 639px) {
+  .card {
+    padding: 1rem;
+  }
+  
+  .header {
+    gap: 0.5rem;
+  }
+  
+  .busIcon {
+    padding: 0.5rem;
+    font-size: 1.25rem;
+  }
+  
+  .details {
+    gap: 0.75rem;
+  }
+  
+  .badges {
+    flex-wrap: wrap;
+  }
 }

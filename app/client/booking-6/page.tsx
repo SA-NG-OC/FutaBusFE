@@ -9,6 +9,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { paymentApi } from "@/feature/booking/api/paymentApi";
 import { useWebSocket } from "@/src/context/WebSocketContext";
+import { useAuth } from "@/src/context/AuthContext";
 import styles from "./page.module.css";
 import type { PassengerData } from "@/feature/booking/components/PassengerForm/PassengerForm";
 
@@ -26,12 +27,14 @@ interface BookingInfoState {
     seatNumber: string;
   }>;
   userId: string;
+  isGuest?: boolean;
 }
 
 export default function ClientBookingCheckoutPage() {
+  const { user, isAuthenticated } = useAuth();
   const [isFormValid, setIsFormValid] = useState(false);
   const [passengerData, setPassengerData] = useState<PassengerData | null>(
-    null
+    null,
   );
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>("momo");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -53,32 +56,43 @@ export default function ClientBookingCheckoutPage() {
       const storedSeats = sessionStorage.getItem("selectedSeats");
       const storedTripId = sessionStorage.getItem("selectedTripId");
       const storedUserId = sessionStorage.getItem("booking_user_id");
+      const storedIsGuest = sessionStorage.getItem("booking_is_guest");
 
       if (stored) {
         try {
           const parsedInfo = JSON.parse(stored);
           const parsedSeats = storedSeats ? JSON.parse(storedSeats) : [];
 
+          // Use real userId from auth if authenticated, otherwise use stored guest ID
+          const effectiveUserId =
+            isAuthenticated && user ? String(user.userId) : storedUserId || "";
+
           setBookingInfo({
             ...parsedInfo,
             tripId: storedTripId ? parseInt(storedTripId, 10) : null,
             selectedSeats: parsedSeats,
-            userId: storedUserId || "",
+            userId: effectiveUserId,
+            isGuest: storedIsGuest === "true",
           });
         } catch (e) {
           console.error("Failed to parse booking info:", e);
         }
       }
     };
-    
+
     loadBookingInfo();
-  }, []);
+  }, [isAuthenticated, user]);
 
   // Keep seats locked using WebSocket context
   useEffect(() => {
-    if (bookingInfo && bookingInfo.tripId && bookingInfo.selectedSeats.length > 0 && bookingInfo.userId) {
+    if (
+      bookingInfo &&
+      bookingInfo.tripId &&
+      bookingInfo.selectedSeats.length > 0 &&
+      bookingInfo.userId
+    ) {
       const tripId = bookingInfo.tripId;
-      const seatIds = bookingInfo.selectedSeats.map(s => s.seatId);
+      const seatIds = bookingInfo.selectedSeats.map((s) => s.seatId);
       const userId = bookingInfo.userId;
 
       // Enable keep-alive to re-lock seats every 2 minutes
@@ -128,7 +142,7 @@ export default function ClientBookingCheckoutPage() {
       setIsFormValid(isValid);
       setPassengerData(data);
     },
-    []
+    [],
   );
 
   const handlePaymentMethodChange = useCallback((method: PaymentMethodType) => {
@@ -155,6 +169,8 @@ export default function ClientBookingCheckoutPage() {
     console.log("tripId:", bookingInfo.tripId);
     console.log("selectedSeats:", bookingInfo.selectedSeats);
     console.log("userId:", bookingInfo.userId);
+    console.log("isAuthenticated:", isAuthenticated);
+    console.log("isGuest:", bookingInfo.isGuest);
     console.log("passengerData:", passengerData);
 
     setIsProcessing(true);
@@ -164,6 +180,8 @@ export default function ClientBookingCheckoutPage() {
       // Step 1: Create booking
       setProcessingStep("Đang tạo đơn đặt vé...");
 
+      const isGuest = bookingInfo.isGuest ?? !isAuthenticated;
+
       const requestData = {
         tripId: bookingInfo.tripId,
         seatIds: bookingInfo.selectedSeats.map((s) => s.seatId),
@@ -171,12 +189,28 @@ export default function ClientBookingCheckoutPage() {
         customerName: passengerData.name,
         customerPhone: passengerData.phone,
         customerEmail: passengerData.email || undefined,
-        isGuestBooking: true,
-        guestSessionId: bookingInfo.userId,
+        isGuestBooking: isGuest,
+        guestSessionId: isGuest ? bookingInfo.userId : undefined,
       };
 
       console.log("=== DEBUG: Request Data ===");
       console.log(JSON.stringify(requestData, null, 2));
+
+      // const isGuest = bookingInfo.isGuest ?? !isAuthenticated;
+
+      // const requestData = {
+      //   tripId: bookingInfo.tripId,
+      //   seatIds: bookingInfo.selectedSeats.map((s) => s.seatId),
+      //   userId: bookingInfo.userId,
+      //   customerName: passengerData.name,
+      //   customerPhone: passengerData.phone,
+      //   customerEmail: passengerData.email || undefined,
+      //   isGuestBooking: isGuest,
+      //   guestSessionId: isGuest ? bookingInfo.userId : undefined,
+      // };
+
+      // console.log("=== DEBUG: Final Request Data ===");
+      // console.log(JSON.stringify(requestData, null, 2));
 
       const bookingResponse = await paymentApi.createBooking(requestData);
 
@@ -187,7 +221,7 @@ export default function ClientBookingCheckoutPage() {
         setProcessingStep("Đang kết nối với MoMo...");
 
         const paymentResponse = await paymentApi.createMomoPayment(
-          bookingResponse.bookingId
+          bookingResponse.bookingId,
         );
 
         console.log("MoMo payment created:", paymentResponse);
@@ -200,7 +234,7 @@ export default function ClientBookingCheckoutPage() {
             requestId: paymentResponse.requestId,
             bookingId: bookingResponse.bookingId,
             bookingCode: bookingResponse.bookingCode,
-          })
+          }),
         );
 
         // Redirect to MoMo payment page
@@ -219,26 +253,37 @@ export default function ClientBookingCheckoutPage() {
     } catch (err) {
       console.error("=== Payment error ===");
       console.error("Error object:", err);
-      
+
       let errorMessage = "Có lỗi xảy ra. Vui lòng thử lại sau.";
-      
+
       // Type guard for axios error
-      if (err && typeof err === 'object' && 'response' in err) {
-        const axiosErr = err as { response?: { data?: { message?: string; errors?: Record<string, string>; errorCode?: string } } };
+      if (err && typeof err === "object" && "response" in err) {
+        const axiosErr = err as {
+          response?: {
+            data?: {
+              message?: string;
+              errors?: Record<string, string>;
+              errorCode?: string;
+            };
+          };
+        };
         console.error("Error response:", axiosErr.response);
         console.error("Error data:", axiosErr.response?.data);
-        
+
         if (axiosErr.response?.data?.message) {
           errorMessage = axiosErr.response.data.message;
-          
+
           // Nếu lỗi do ghế không được lock
-          if (axiosErr.response.data.errorCode === 'BAD_REQUEST' || 
-              axiosErr.response.data.message.includes('chưa được khóa')) {
-            errorMessage = "Ghế đã hết thời gian giữ chỗ. Vui lòng quay lại trang chọn ghế và chọn lại.";
-            
+          if (
+            axiosErr.response.data.errorCode === "BAD_REQUEST" ||
+            axiosErr.response.data.message.includes("chưa được khóa")
+          ) {
+            errorMessage =
+              "Ghế đã hết thời gian giữ chỗ. Vui lòng quay lại trang chọn ghế và chọn lại.";
+
             // Redirect về trang chọn ghế sau 3 giây
             setTimeout(() => {
-              router.push('/client/booking-4');
+              router.push("/client/booking-4");
             }, 3000);
           }
         } else if (axiosErr.response?.data?.errors) {
@@ -249,7 +294,7 @@ export default function ClientBookingCheckoutPage() {
       } else if (err instanceof Error) {
         errorMessage = err.message;
       }
-      
+
       setError(errorMessage);
       setIsProcessing(false);
     }
@@ -315,10 +360,7 @@ export default function ClientBookingCheckoutPage() {
         <div className={styles.errorBanner}>
           <span className={styles.errorIcon}>⚠️</span>
           <span>{error}</span>
-          <button
-            className={styles.errorClose}
-            onClick={() => setError(null)}
-          >
+          <button className={styles.errorClose} onClick={() => setError(null)}>
             ×
           </button>
         </div>

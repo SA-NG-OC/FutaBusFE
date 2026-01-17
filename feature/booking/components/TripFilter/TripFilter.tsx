@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { FaFilter } from "react-icons/fa";
+import styles from "./TripFilter.module.css";
 
 interface TripFilterProps {
   onFilterChange: (filters: {
@@ -34,7 +35,7 @@ export default function TripFilter({ onFilterChange }: TripFilterProps) {
   const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
   const [selectedTimeRanges, setSelectedTimeRanges] = useState<string[]>([]);
   const [selectedVehicleTypes, setSelectedVehicleTypes] = useState<string[]>(
-    []
+    [],
   );
 
   // Initialize from URL params
@@ -46,19 +47,19 @@ export default function TripFilter({ onFilterChange }: TripFilterProps) {
     setMaxPrice(maxPriceParam ? parseInt(maxPriceParam) : undefined);
     setSelectedTimeRanges(searchParams?.get("timeRanges")?.split(",") || []);
     setSelectedVehicleTypes(
-      searchParams?.get("vehicleTypes")?.split(",") || []
+      searchParams?.get("vehicleTypes")?.split(",") || [],
     );
   }, [searchParams]);
 
   const handleTimeRangeChange = (value: string) => {
     setSelectedTimeRanges((prev) =>
-      prev.includes(value) ? prev.filter((t) => t !== value) : [...prev, value]
+      prev.includes(value) ? prev.filter((t) => t !== value) : [...prev, value],
     );
   };
 
   const handleVehicleTypeChange = (value: string) => {
     setSelectedVehicleTypes((prev) =>
-      prev.includes(value) ? prev.filter((t) => t !== value) : [...prev, value]
+      prev.includes(value) ? prev.filter((t) => t !== value) : [...prev, value],
     );
   };
 
@@ -82,16 +83,16 @@ export default function TripFilter({ onFilterChange }: TripFilterProps) {
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-xs">
-      <div className="flex items-center mb-6">
-        <FaFilter className="text-red-500 text-xl" />
-        <h2 className="ml-3 text-xl font-bold text-gray-800">Filters</h2>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <FaFilter className={styles.filterIcon} />
+        <h2 className={styles.title}>Filters</h2>
       </div>
 
       {/* Price Range */}
-      <div className="mb-6">
-        <h3 className="font-semibold text-gray-700 mb-4">Price Range</h3>
-        <div className="space-y-3">
+      <div className={styles.section}>
+        <h3 className={styles.sectionTitle}>Price Range</h3>
+        <div className={styles.inputContainer}>
           <input
             type="number"
             placeholder="Min Price"
@@ -99,7 +100,7 @@ export default function TripFilter({ onFilterChange }: TripFilterProps) {
             onChange={(e) =>
               setMinPrice(e.target.value ? parseInt(e.target.value) : undefined)
             }
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
+            className={styles.input}
           />
           <input
             type="number"
@@ -108,65 +109,53 @@ export default function TripFilter({ onFilterChange }: TripFilterProps) {
             onChange={(e) =>
               setMaxPrice(e.target.value ? parseInt(e.target.value) : undefined)
             }
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
+            className={styles.input}
           />
         </div>
       </div>
 
       {/* Departure Time */}
-      <div className="mb-6">
-        <h3 className="font-semibold text-gray-700 mb-4">Departure Time</h3>
-        <div className="space-y-3">
+      <div className={styles.section}>
+        <h3 className={styles.sectionTitle}>Departure Time</h3>
+        <div className={styles.checkboxContainer}>
           {timeRangeOptions.map((option) => (
-            <label
-              key={option.value}
-              className="flex items-center text-gray-600 cursor-pointer"
-            >
+            <label key={option.value} className={styles.checkboxLabel}>
               <input
                 type="checkbox"
                 checked={selectedTimeRanges.includes(option.value)}
                 onChange={() => handleTimeRangeChange(option.value)}
-                className="h-5 w-5 rounded border-gray-300 text-red-500 focus:ring-red-400"
+                className={styles.checkbox}
               />
-              <span className="ml-3">{option.label}</span>
+              <span className={styles.checkboxText}>{option.label}</span>
             </label>
           ))}
         </div>
       </div>
 
       {/* Vehicle Type */}
-      <div className="mb-8">
-        <h3 className="font-semibold text-gray-700 mb-4">Vehicle Type</h3>
-        <div className="space-y-3">
+      <div className={styles.sectionLarge}>
+        <h3 className={styles.sectionTitle}>Vehicle Type</h3>
+        <div className={styles.checkboxContainer}>
           {vehicleTypeOptions.map((option) => (
-            <label
-              key={option.value}
-              className="flex items-center text-gray-600 cursor-pointer"
-            >
+            <label key={option.value} className={styles.checkboxLabel}>
               <input
                 type="checkbox"
                 checked={selectedVehicleTypes.includes(option.value)}
                 onChange={() => handleVehicleTypeChange(option.value)}
-                className="h-5 w-5 rounded border-gray-300 text-red-500 focus:ring-red-400"
+                className={styles.checkbox}
               />
-              <span className="ml-3">{option.label}</span>
+              <span className={styles.checkboxText}>{option.label}</span>
             </label>
           ))}
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="space-y-2">
-        <button
-          onClick={handleApplyFilters}
-          className="w-full py-3 px-4 bg-red-500 text-white font-bold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 transition-colors"
-        >
+      <div className={styles.buttonContainer}>
+        <button onClick={handleApplyFilters} className={styles.applyButton}>
           Apply Filters
         </button>
-        <button
-          onClick={handleClearFilters}
-          className="w-full py-3 px-4 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 focus:outline-none transition-colors"
-        >
+        <button onClick={handleClearFilters} className={styles.clearButton}>
           Clear All
         </button>
       </div>

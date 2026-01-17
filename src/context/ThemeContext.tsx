@@ -1,56 +1,51 @@
-/* src/context/ThemeContext.tsx */
-'use client';
+"use client";
 
-import { createContext, useContext, useEffect, useState, useRef } from 'react';
+import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = 'light' | 'dark';
+type Theme = "light" | "dark";
 
 const ThemeContext = createContext<{
-    theme: Theme;
-    toggleTheme: () => void;
+  theme: Theme;
+  toggleTheme: () => void;
 } | null>(null);
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-    const [theme, setTheme] = useState<Theme>('light');
-    // Dùng ref để check xem đây có phải lần render đầu tiên không
-    const isFirstRender = useRef(true);
+  const [theme, setTheme] = useState<Theme>("light");
 
-    useEffect(() => {
-        // Lần chạy đầu tiên: Chỉ đồng bộ State với Storage, KHÔNG can thiệp vào DOM (để Script ở layout tự lo)
-        if (isFirstRender.current) {
-            const savedTheme = localStorage.getItem('theme') as Theme;
-            if (savedTheme) {
-                setTheme(savedTheme);
-            }
-            isFirstRender.current = false;
-            return;
-        }
+  // 🔑 Chạy 1 lần: đọc localStorage
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") as Theme;
+    if (savedTheme) {
+      setTheme(savedTheme);
+    }
+  }, []);
 
-        // Các lần chạy sau (khi user bấm nút): Mới can thiệp vào DOM
-        if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        }
-    }, [theme]);
+  // 🔑 Luôn sync DOM theo theme
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [theme]);
 
-    const toggleTheme = () => {
-        setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
-    };
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
 
-    return (
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
-            {children}
-        </ThemeContext.Provider>
-    );
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 };
 
 export const useTheme = () => {
-    const ctx = useContext(ThemeContext);
-    if (!ctx) {
-        throw new Error('useTheme must be used inside ThemeProvider');
-    }
-    return ctx;
+  const ctx = useContext(ThemeContext);
+  if (!ctx) {
+    throw new Error("useTheme must be used inside ThemeProvider");
+  }
+  return ctx;
 };
