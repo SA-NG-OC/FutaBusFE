@@ -5,6 +5,7 @@ import styles from "./page.module.css";
 import TicketCard from "@/feature/ticket/components/TicketCard";
 import { useMyTickets } from "@/feature/ticket/hooks/useMyTickets";
 import { useAuth } from "@/src/context/AuthContext";
+import { ticketApi } from "@/feature/ticket/api/ticketApi";
 
 export default function MyTicketsPage() {
   const router = useRouter();
@@ -13,7 +14,12 @@ export default function MyTicketsPage() {
     isAuthenticated,
     isLoading: authLoading,
     openLoginModal,
+    user,
   } = useAuth();
+
+  const [cancellationLoading, setCancellationLoading] = React.useState<
+    number | null
+  >(null);
 
   // Redirect or show login modal if not authenticated
   React.useEffect(() => {
@@ -37,12 +43,42 @@ export default function MyTicketsPage() {
     activeTab,
     setActiveTab,
     setPage,
+    refetch,
   } = useMyTickets(token);
 
   const handleViewDetails = (bookingCode: string) => {
     console.log("View details for booking:", bookingCode);
     // Navigate to ticket lookup with booking code
     router.push(`/client/ticket-lookup?code=${bookingCode}`);
+  };
+
+  const handleCancelBooking = async (bookingId: number) => {
+    if (!user || !token) {
+      alert("Please login to cancel booking");
+      return;
+    }
+
+    // Ask for confirmation
+    if (!window.confirm("Are you sure you want to cancel this booking?")) {
+      return;
+    }
+
+    setCancellationLoading(bookingId);
+    try {
+      const response = await ticketApi.cancelBooking(bookingId, user.userId);
+      if (response.success) {
+        alert("Booking cancelled successfully!");
+        // Refetch tickets to update the list
+        refetch();
+      } else {
+        alert(response.message || "Failed to cancel booking");
+      }
+    } catch (err) {
+      console.error("Error cancelling booking:", err);
+      alert(err instanceof Error ? err.message : "Failed to cancel booking");
+    } finally {
+      setCancellationLoading(null);
+    }
   };
 
   const handlePreviousPage = () => {
@@ -123,13 +159,14 @@ export default function MyTicketsPage() {
           tickets.map((booking) => (
             <TicketCard
               key={booking.bookingId}
+              bookingId={booking.bookingId}
               bookingReference={booking.bookingCode}
               status={
                 activeTab === "Upcoming"
                   ? "Upcoming"
                   : activeTab === "Completed"
-                  ? "Completed"
-                  : "Cancelled"
+                    ? "Completed"
+                    : "Cancelled"
               }
               from={
                 booking.tripInfo.pickupLocationName ||
@@ -140,10 +177,10 @@ export default function MyTicketsPage() {
                 booking.tripInfo.routeName.split(" - ")[1]
               }
               date={new Date(booking.tripInfo.departureTime).toLocaleDateString(
-                "vi-VN"
+                "vi-VN",
               )}
               departureTime={new Date(
-                booking.tripInfo.departureTime
+                booking.tripInfo.departureTime,
               ).toLocaleTimeString("vi-VN", {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -151,6 +188,7 @@ export default function MyTicketsPage() {
               seats={booking.tickets.map((t) => t.seatNumber).join(", ")}
               price={booking.totalAmount}
               onViewDetails={() => handleViewDetails(booking.bookingCode)}
+              onCancel={handleCancelBooking}
             />
           ))
         ) : (
