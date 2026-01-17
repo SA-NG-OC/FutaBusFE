@@ -19,6 +19,56 @@
   color: #1f2937;
 }
 
+/* Timer Banner */
+.timerBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  color: #92400e;
+  font-size: 14px;
+}
+
+.timerIcon {
+  font-size: 18px;
+}
+
+/* Error Banner */
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  color: #991b1b;
+  font-size: 14px;
+}
+
+.errorIcon {
+  font-size: 18px;
+}
+
+.errorClose {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #991b1b;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.errorClose:hover {
+  color: #7f1d1d;
+}
+
 .container {
   display: grid;
   grid-template-columns: 1fr 380px;
@@ -50,6 +100,9 @@
   cursor: pointer;
   transition: all 0.2s;
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .confirmButton:hover:not(:disabled) {
@@ -62,6 +115,49 @@
   background: #d1d5db;
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.securityNote {
+  font-size: 12px;
+  color: #6b7280;
+  text-align: center;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Processing Container */
+.processingContainer {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.processingCard {
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.spinner {
+  margin-bottom: 24px;
+}
+
+.processingText {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 8px;
+}
+
+.processingNote {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
 }
 
 @media (max-width: 1024px) {

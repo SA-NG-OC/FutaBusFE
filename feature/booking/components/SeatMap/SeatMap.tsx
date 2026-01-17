@@ -1,157 +1,252 @@
 "use client";
-import React, { useState } from "react";
+import React, { useMemo, useCallback } from "react";
 import styles from "./SeatMap.module.css";
+import {
+  SeatMapResponse,
+  TripSeatDto,
+  SelectedSeat,
+} from "@/feature/booking/types";
 
-type SeatStatus = "available" | "selected" | "booked";
+type SeatStatus = "available" | "selected" | "booked" | "held" | "held-by-me";
 
 interface Seat {
   id: string;
+  seatId: number;
   status: SeatStatus;
+  seatType: string;
+  lockExpiry: string | null;
+  lockedBy: string | null;
+}
+
+interface Floor {
+  floorNumber: number;
+  floorLabel: string;
+  seats: Seat[];
 }
 
 interface SeatMapProps {
-  onSeatsChange?: (seats: string[]) => void;
+  seatMapData?: SeatMapResponse | null;
+  loading?: boolean;
+  selectedSeats: SelectedSeat[];
+  currentUserId: string;
+  wsConnected?: boolean;
+  onSeatClick?: (
+    seatId: number,
+    seatNumber: string,
+    isSelected: boolean
+  ) => void;
   maxSeats?: number;
-  busType?: "single" | "double"; // single floor or double floor
-  seatsPerFloor?: number;
-  lowerFloorSeats?: number;
-  upperFloorSeats?: number;
-  bookedSeats?: string[];
+  lockTimers?: Record<number, string>; // seatId -> remaining time string
+}
+
+// Convert API status to local status
+function mapApiStatus(
+  apiStatus: string,
+  lockedBy: string | null,
+  currentUserId: string
+): SeatStatus {
+  switch (apiStatus) {
+    case "Available":
+      return "available";
+    case "Booked":
+      return "booked";
+    case "Held":
+      // Check if held by current user
+      if (lockedBy === currentUserId) {
+        return "held-by-me";
+      }
+      return "held";
+    default:
+      return "available";
+  }
+}
+
+// Convert API seats to local seat format
+function convertApiSeats(
+  apiSeats: TripSeatDto[],
+  currentUserId: string,
+  selectedSeats: SelectedSeat[]
+): Seat[] {
+  const selectedSeatIds = new Set(selectedSeats.map((s) => s.seatId));
+
+  return apiSeats.map((seat) => {
+    let status = mapApiStatus(seat.status, seat.lockedBy, currentUserId);
+
+    // Override with selected if it's in our selected list
+    if (selectedSeatIds.has(seat.seatId)) {
+      status = "selected";
+    }
+
+    return {
+      id: seat.seatNumber,
+      seatId: seat.seatId,
+      status,
+      seatType: seat.seatType,
+      lockExpiry: seat.holdExpiry,
+      lockedBy: seat.lockedBy,
+    };
+  });
+}
+
+// Convert API data to floors
+function convertSeatMapData(
+  seatMapData: SeatMapResponse | null | undefined,
+  currentUserId: string,
+  selectedSeats: SelectedSeat[]
+): Floor[] {
+  if (!seatMapData?.floors) return [];
+  return seatMapData.floors.map((floor) => ({
+    floorNumber: floor.floorNumber,
+    floorLabel: floor.floorLabel,
+    seats: convertApiSeats(floor.seats, currentUserId, selectedSeats),
+  }));
 }
 
 export default function SeatMap({
-  onSeatsChange,
+  seatMapData,
+  loading = false,
+  selectedSeats,
+  currentUserId,
+  wsConnected = false,
+  onSeatClick,
   maxSeats = 5,
-  busType = "double",
-  lowerFloorSeats = 20,
-  upperFloorSeats = 20,
-  bookedSeats = ["A3", "A6", "A8", "A12", "B2", "B4", "B8", "B12"],
+  lockTimers = {},
 }: SeatMapProps) {
-  const [lowerFloor, setLowerFloor] = useState<Seat[]>(
-    generateSeats(
-      "A",
-      lowerFloorSeats,
-      bookedSeats.filter((s) => s.startsWith("A"))
-    )
-  );
-  const [upperFloor, setUpperFloor] = useState<Seat[]>(
-    busType === "double"
-      ? generateSeats(
-          "B",
-          upperFloorSeats,
-          bookedSeats.filter((s) => s.startsWith("B"))
-        )
-      : []
+  // Convert API data to floors with memoization
+  const floors = useMemo(
+    () => convertSeatMapData(seatMapData, currentUserId, selectedSeats),
+    [seatMapData, currentUserId, selectedSeats]
   );
 
-  function generateSeats(
-    prefix: string,
-    count: number,
-    bookedSeats: string[]
-  ): Seat[] {
-    return Array.from({ length: count }, (_, i) => {
-      const seatId = `${prefix}${i + 1}`;
-      return {
-        id: seatId,
-        status: bookedSeats.includes(seatId) ? "booked" : "available",
-      };
-    });
+  const handleSeatClick = useCallback(
+    (seat: Seat) => {
+      // Can't click on booked or held (by others) seats
+      if (seat.status === "booked" || seat.status === "held") {
+        return;
+      }
+
+      const isCurrentlySelected =
+        seat.status === "selected" || seat.status === "held-by-me";
+
+      // Check max seats limit
+      if (!isCurrentlySelected && selectedSeats.length >= maxSeats) {
+        alert(`Bạn chỉ có thể chọn tối đa ${maxSeats} ghế`);
+        return;
+      }
+
+      // Notify parent
+      onSeatClick?.(seat.seatId, seat.id, isCurrentlySelected);
+    },
+    [selectedSeats.length, maxSeats, onSeatClick]
+  );
+
+  const renderSeat = useCallback(
+    (seat: Seat) => {
+      const isDisabled = seat.status === "booked" || seat.status === "held";
+      const isSelected =
+        seat.status === "selected" || seat.status === "held-by-me";
+      const timer = lockTimers[seat.seatId];
+
+      // Map status to CSS class
+      const statusClass =
+        seat.status === "held-by-me" ? styles.selected : styles[seat.status];
+
+      return (
+        <button
+          key={seat.seatId}
+          className={`${styles.seat} ${statusClass}`}
+          onClick={() => handleSeatClick(seat)}
+          disabled={isDisabled}
+          title={
+            isDisabled
+              ? "Ghế đang được người khác chọn"
+              : isSelected
+              ? `Ghế ${seat.id} - Đang chọn`
+              : `Ghế ${seat.id} - Còn trống`
+          }
+        >
+          <span className={styles.seatNumber}>{seat.id}</span>
+          {isSelected && timer && (
+            <span className={styles.seatTimer}>{timer}</span>
+          )}
+        </button>
+      );
+    },
+    [handleSeatClick, lockTimers]
+  );
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loadingContainer}>
+          <div className={styles.spinner}></div>
+          <p>Đang tải sơ đồ ghế...</p>
+        </div>
+      </div>
+    );
   }
 
-  const handleSeatClick = (floor: "lower" | "upper", seatId: string) => {
-    const seats = floor === "lower" ? lowerFloor : upperFloor;
-    const setSeat = floor === "lower" ? setLowerFloor : setUpperFloor;
-
-    const seat = seats.find((s) => s.id === seatId);
-    if (!seat || seat.status === "booked") return;
-
-    const selectedCount = [...lowerFloor, ...upperFloor].filter(
-      (s) => s.status === "selected"
-    ).length;
-
-    if (seat.status === "available" && selectedCount >= maxSeats) {
-      return;
-    }
-
-    const newSeats = seats.map((s) =>
-      s.id === seatId
-        ? {
-            ...s,
-            status: s.status === "selected" ? "available" : "selected",
-          }
-        : s
+  // No data state
+  if (!seatMapData || floors.length === 0) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.errorContainer}>
+          <p>Không thể tải sơ đồ ghế. Vui lòng thử lại.</p>
+        </div>
+      </div>
     );
-
-    setSeat(newSeats as Seat[]);
-
-    // Notify parent of selected seats
-    if (onSeatsChange) {
-      const allSeats =
-        floor === "lower"
-          ? [...newSeats, ...upperFloor]
-          : [...lowerFloor, ...newSeats];
-      const selected = allSeats
-        .filter((s) => s.status === "selected")
-        .map((s) => s.id);
-      onSeatsChange(selected);
-    }
-  };
-
-  const renderSeat = (seat: Seat, floor: "lower" | "upper") => (
-    <button
-      key={seat.id}
-      className={`${styles.seat} ${styles[seat.status]}`}
-      onClick={() => handleSeatClick(floor, seat.id)}
-      disabled={seat.status === "booked"}
-    >
-      {seat.id}
-    </button>
-  );
+  }
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2 className={styles.title}>Select Your Seats</h2>
+        <h2 className={styles.title}>Chọn ghế</h2>
+        <div className={styles.vehicleInfo}>
+          <span className={styles.vehicleType}>
+            {seatMapData.vehicleTypeName}
+          </span>
+          {wsConnected && (
+            <span className={styles.wsStatus} title="Real-time connected">
+              🟢 Live
+            </span>
+          )}
+        </div>
         <div className={styles.legend}>
           <div className={styles.legendItem}>
             <div className={`${styles.legendBox} ${styles.available}`}></div>
-            <span>Available</span>
+            <span>Còn trống</span>
           </div>
           <div className={styles.legendItem}>
             <div className={`${styles.legendBox} ${styles.selected}`}></div>
-            <span>Selected</span>
+            <span>Đang chọn</span>
+          </div>
+          <div className={styles.legendItem}>
+            <div className={`${styles.legendBox} ${styles.held}`}></div>
+            <span>Đang giữ</span>
           </div>
           <div className={styles.legendItem}>
             <div className={`${styles.legendBox} ${styles.booked}`}></div>
-            <span>Booked</span>
+            <span>Đã đặt</span>
           </div>
         </div>
       </div>
 
       <div className={styles.busLayout}>
-        <div className={styles.driverArea}>Driver</div>
+        <div className={styles.driverArea}>Tài xế</div>
 
         <div className={styles.floorsContainer}>
-          <div className={styles.floorSection}>
-            <div className={styles.floorLabel}>
-              {busType === "single" ? "Seats" : "Lower Floor"}
-            </div>
-            <div className={styles.seatsGrid}>
-              {lowerFloor.map((seat) => renderSeat(seat, "lower"))}
-            </div>
-          </div>
-
-          {busType === "double" && upperFloor.length > 0 && (
-            <>
-              <div className={styles.floorDivider}></div>
+          {floors.map((floor, index) => (
+            <React.Fragment key={floor.floorNumber}>
+              {index > 0 && <div className={styles.floorDivider}></div>}
               <div className={styles.floorSection}>
-                <div className={styles.floorLabel}>Upper Floor</div>
+                <div className={styles.floorLabel}>{floor.floorLabel}</div>
                 <div className={styles.seatsGrid}>
-                  {upperFloor.map((seat) => renderSeat(seat, "upper"))}
+                  {floor.seats.map((seat) => renderSeat(seat))}
                 </div>
               </div>
-            </>
-          )}
+            </React.Fragment>
+          ))}
         </div>
       </div>
     </div>
