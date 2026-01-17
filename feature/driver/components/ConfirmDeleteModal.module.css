@@ -1,0 +1,134 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  background-color: var(--background-paper);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-gray);
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.content {
+  padding: 24px;
+  text-align: center;
+}
+
+.warning {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.message {
+  font-size: 16px;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+}
+
+.message strong {
+  color: var(--primary);
+}
+
+.detail {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 8px 0;
+}
+
+.notice {
+  font-size: 13px;
+  color: #dc3545;
+  margin-top: 16px;
+  font-weight: 500;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-gray);
+}
+
+.btnCancel,
+.btnDelete {
+  flex: 1;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnCancel {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.btnCancel:hover {
+  background-color: var(--bg-hover);
+}
+
+.btnDelete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btnDelete:hover {
+  background-color: #c82333;
+}
+
+/* Dark mode */
+.dark .modal {
+  background-color: var(--background-paper);
+}
+
+.dark .header,
+.dark .actions {
+  border-color: var(--border-gray);
+}

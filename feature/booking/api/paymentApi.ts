@@ -1,13 +1,4 @@
-import axios from "axios";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5230";
-
-const axiosClient = axios.create({
-  baseURL: API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+import { api } from '@/shared/utils/apiClient';
 
 // ===== TYPES =====
 export interface BookingData {
@@ -65,13 +56,6 @@ export interface BookingResponse {
   createdAt: string;
 }
 
-interface ApiResponse<T> {
-  success: boolean;
-  message: string;
-  data: T;
-  timestamp?: string;
-}
-
 // ===== PAYMENT API =====
 export const paymentApi = {
   // =====================================================
@@ -79,16 +63,7 @@ export const paymentApi = {
   // URL: POST /bookings/confirm
   // =====================================================
   createBooking: async (data: CreateBookingRequest): Promise<BookingResponse> => {
-    const response = await axiosClient.post<ApiResponse<BookingResponse>>(
-      "/bookings/confirm",
-      data
-    );
-
-    if (!response.data.success) {
-      throw new Error(response.data.message || "Failed to create booking");
-    }
-
-    return response.data.data;
+    return api.post<BookingResponse>("/bookings/confirm", data);
   },
 
   // =====================================================
@@ -96,15 +71,7 @@ export const paymentApi = {
   // URL: POST /payments/momo/create/{bookingId}
   // =====================================================
   createMomoPayment: async (bookingId: number): Promise<MomoPaymentResponse> => {
-    const response = await axiosClient.post<ApiResponse<MomoPaymentResponse>>(
-      `/payments/momo/create/${bookingId}`
-    );
-
-    if (!response.data.success) {
-      throw new Error(response.data.message || "Failed to create MoMo payment");
-    }
-
-    return response.data.data;
+    return api.post<MomoPaymentResponse>(`/payments/momo/create/${bookingId}`);
   },
 
   // =====================================================
@@ -115,14 +82,9 @@ export const paymentApi = {
     orderId: string,
     requestId: string
   ): Promise<MomoStatusResponse> => {
-    const response = await axiosClient.get<ApiResponse<MomoStatusResponse>>(
-      "/payments/momo/status",
-      {
-        params: { orderId, requestId },
-      }
-    );
-
-    return response.data.data;
+    return api.get<MomoStatusResponse>("/payments/momo/status", {
+      params: { orderId, requestId },
+    });
   },
 
   // =====================================================
@@ -130,15 +92,7 @@ export const paymentApi = {
   // URL: GET /bookings/{bookingId}
   // =====================================================
   getBooking: async (bookingId: number): Promise<BookingResponse> => {
-    const response = await axiosClient.get<ApiResponse<BookingResponse>>(
-      `/bookings/${bookingId}`
-    );
-
-    if (!response.data.success) {
-      throw new Error(response.data.message || "Failed to fetch booking");
-    }
-
-    return response.data.data;
+    return api.get<BookingResponse>(`/bookings/${bookingId}`);
   },
 
   // =====================================================
@@ -146,14 +100,6 @@ export const paymentApi = {
   // URL: GET /bookings/code/{bookingCode}
   // =====================================================
   getBookingByCode: async (bookingCode: string): Promise<BookingResponse> => {
-    const response = await axiosClient.get<ApiResponse<BookingResponse>>(
-      `/bookings/code/${bookingCode}`
-    );
-
-    if (!response.data.success) {
-      throw new Error(response.data.message || "Failed to fetch booking");
-    }
-
-    return response.data.data;
+    return api.get<BookingResponse>(`/bookings/code/${bookingCode}`);
   },
 };

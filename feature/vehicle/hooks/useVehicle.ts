@@ -15,9 +15,10 @@ export const useVehicles = () => {
     try {
       setLoading(true);
       const res = await vehicleApi.getAll(0, 20);
-      setVehicles(res.data.content);
-    } catch (err: any) {
-      setError(err.message || "Failed to load vehicles");
+      setVehicles(res.content);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to load vehicles";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

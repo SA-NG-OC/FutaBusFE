@@ -228,3 +228,42 @@ hr {
     transform: scale(1);
   }
 }
+/* =========================
+   React Toastify Custom Styles
+   ========================= */
+/* Light mode toasts */
+:root .Toastify__toast-container {
+  z-index: 9999;
+}
+
+:root .Toastify__toast {
+  font-family: var(--font-geist-sans), Arial, sans-serif;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode toasts */
+.dark .Toastify__toast {
+  background-color: #1e293b;
+  color: #f1f5f9;
+}
+
+.dark .Toastify__toast--error {
+  background-color: #7f1d1d;
+}
+
+.dark .Toastify__toast--success {
+  background-color: #14532d;
+}
+
+.dark .Toastify__toast--warning {
+  background-color: #78350f;
+}
+
+.dark .Toastify__toast--info {
+  background-color: #1e3a8a;
+}
+
+.dark .Toastify__progress-bar {
+  background: linear-gradient(to right, #f1f5f9, #cbd5e1);
+}
