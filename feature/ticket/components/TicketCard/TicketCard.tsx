@@ -13,6 +13,8 @@ export interface TicketCardProps {
   seats: string;
   price: number;
   onViewDetails: () => void;
+  bookingId: number;
+  onCancel?: (bookingId: number) => void;
 }
 
 export default function TicketCard({
@@ -25,6 +27,8 @@ export default function TicketCard({
   seats,
   price,
   onViewDetails,
+  bookingId,
+  onCancel,
 }: TicketCardProps) {
   const formatCurrency = (amount: number) => {
     return amount.toLocaleString("vi-VN");
@@ -142,9 +146,19 @@ export default function TicketCard({
               <div className={styles.seats}>Seats: {seats}</div>
               <div className={styles.price}>{formatCurrency(price)}₫</div>
             </div>
-            <button className={styles.detailsButton} onClick={onViewDetails}>
-              View Details
-            </button>
+            <div className={styles.buttonGroup}>
+              {status === "Upcoming" && onCancel && (
+                <button
+                  className={styles.cancelButton}
+                  onClick={() => onCancel(bookingId)}
+                >
+                  Cancel Booking
+                </button>
+              )}
+              <button className={styles.detailsButton} onClick={onViewDetails}>
+                View Details
+              </button>
+            </div>
           </div>
         </div>
 
