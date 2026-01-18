@@ -2,10 +2,12 @@
 
 import DriverCard from "@/feature/driver/components/DriverCard";
 import DriverModal from "@/feature/driver/components/DriverModal";
+import CreateDriverModal from "@/feature/driver/components/CreateDriverModal";
 import ConfirmDeleteModal from "@/feature/driver/components/ConfirmDeleteModal";
 import { useDrivers } from "@/feature/driver/hooks/useDrivers";
 import PageHeader from "@/src/components/PageHeader/PageHeader";
 import Pagination from "@/src/components/Pagination/Pagination";
+import { useState } from "react";
 
 export default function AdminDriversPage() {
   const {
@@ -26,7 +28,10 @@ export default function AdminDriversPage() {
     closeModal,
     handleSaveDriver,
     handleDeleteConfirm,
+    handleCreateWithAccount,
   } = useDrivers();
+
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   return (
     <div className="p-4 min-h-screen bg-(--background) text-(--foreground)">
@@ -34,7 +39,7 @@ export default function AdminDriversPage() {
         title="Driver Management"
         subtitle="Manage your drivers and route assignments"
         actionLabel="Add Driver"
-        onAction={openAddModal}
+        onAction={() => setShowCreateModal(true)}
       />
 
       {/* Search Bar */}
@@ -85,6 +90,14 @@ export default function AdminDriversPage() {
       )}
 
       {/* Modals */}
+      {/* Create Driver with Account Modal */}
+      <CreateDriverModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSubmit={handleCreateWithAccount}
+      />
+
+      {/* Edit Driver Modal (for existing drivers) */}
       <DriverModal
         isOpen={isModalOpen}
         onClose={closeModal}

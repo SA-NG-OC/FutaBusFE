@@ -39,6 +39,18 @@ export interface DriverRequest {
   salary?: number;
 }
 
+export interface CreateDriverWithAccountRequest {
+  fullName: string;
+  email: string;
+  password: string;
+  phoneNumber: string;
+  driverLicense: string;
+  licenseExpiry: string;
+  dateOfBirth: string;
+  salary?: number;
+  avatarUrl?: string;
+}
+
 export interface DriverSelection {
   value: number;
   label: string;
@@ -72,10 +84,41 @@ export const driverApi = {
   },
 
   /**
-   * Create new driver
+   * Create new driver (old method - requires existing user)
    */
   create: async (data: DriverRequest): Promise<Driver> => {
     return api.post<Driver>('/drivers', data);
+  },
+
+  /**
+   * Create new driver with account (user + driver in one transaction)
+   * Now accepts FormData with avatar file
+   */
+  createWithAccount: async (data: CreateDriverWithAccountRequest, avatarFile?: File): Promise<Driver> => {
+    const formData = new FormData();
+    
+    // Append all form fields
+    formData.append('fullName', data.fullName);
+    formData.append('email', data.email);
+    formData.append('password', data.password);
+    formData.append('phoneNumber', data.phoneNumber);
+    formData.append('driverLicense', data.driverLicense);
+    formData.append('licenseExpiry', data.licenseExpiry);
+    formData.append('dateOfBirth', data.dateOfBirth);
+    if (data.salary !== undefined) {
+      formData.append('salary', data.salary.toString());
+    }
+    
+    // Append avatar file if provided
+    if (avatarFile) {
+      formData.append('avatar', avatarFile);
+    }
+    
+    return api.post<Driver>('/drivers/with-account', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   },
 
   /**
