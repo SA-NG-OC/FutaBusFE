@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState } from "react";
 import DriverCard from "@/feature/driver/components/DriverCard";
 import DriverModal from "@/feature/driver/components/DriverModal";
 import CreateDriverModal from "@/feature/driver/components/CreateDriverModal";
@@ -7,7 +8,7 @@ import ConfirmDeleteModal from "@/feature/driver/components/ConfirmDeleteModal";
 import { useDrivers } from "@/feature/driver/hooks/useDrivers";
 import PageHeader from "@/src/components/PageHeader/PageHeader";
 import Pagination from "@/src/components/Pagination/Pagination";
-import { useState } from "react";
+import styles from "./AdminDriversPage.module.css";
 
 export default function AdminDriversPage() {
   const {
@@ -34,32 +35,32 @@ export default function AdminDriversPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   return (
-    <div className="p-4 min-h-screen bg-(--background) text-(--foreground)">
+    <div className={styles.pageContainer}>
       <PageHeader
-        title="Driver Management"
-        subtitle="Manage your drivers and route assignments"
-        actionLabel="Add Driver"
+        title="Quản lý tài xế"
+        subtitle="Quản lý thông tin tài xế và phân công tuyến"
+        actionLabel="Thêm tài xế"
         onAction={() => setShowCreateModal(true)}
       />
 
       {/* Search Bar */}
-      <div className="mb-6 max-w-md">
+      <div className={styles.searchContainer}>
         <input
           type="text"
-          placeholder="Search by name, license, email, or phone..."
+          placeholder="Tìm kiếm theo tên, bằng lái, email hoặc SĐT..."
           value={keyword}
           onChange={(e) => handleSearch(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          className={styles.searchInput}
         />
       </div>
 
-      {loading && <p className="text-center py-8">Loading drivers...</p>}
-      {error && <p className="text-red-500 text-center py-4">{error}</p>}
+      {loading && <p className={styles.loadingText}>Đang tải danh sách...</p>}
+      {error && <p className={styles.errorText}>{error}</p>}
 
       {/* Driver Cards Grid */}
       {!loading && !error && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          <div className={styles.grid}>
             {drivers.map((driver) => (
               <DriverCard
                 key={driver.driverId}
@@ -71,10 +72,12 @@ export default function AdminDriversPage() {
           </div>
 
           {drivers.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No drivers found</p>
-              <p className="text-gray-400 text-sm mt-2">
-                {keyword ? 'Try adjusting your search terms' : 'Click "Add Driver" to create one'}
+            <div className={styles.emptyState}>
+              <p className={styles.emptyTitle}>Không tìm thấy tài xế nào</p>
+              <p className={styles.emptySubtitle}>
+                {keyword
+                  ? "Thử thay đổi từ khóa tìm kiếm"
+                  : 'Nhấn "Thêm tài xế" để tạo mới'}
               </p>
             </div>
           )}
@@ -90,20 +93,18 @@ export default function AdminDriversPage() {
       )}
 
       {/* Modals */}
-      {/* Create Driver with Account Modal */}
       <CreateDriverModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onSubmit={handleCreateWithAccount}
       />
 
-      {/* Edit Driver Modal (for existing drivers) */}
       <DriverModal
         isOpen={isModalOpen}
         onClose={closeModal}
         onSubmit={handleSaveDriver}
         initialData={selectedDriver}
-        title={selectedDriver ? "Edit Driver" : "Add New Driver"}
+        title={selectedDriver ? "Chỉnh sửa thông tin" : "Thêm tài xế mới"}
       />
 
       <ConfirmDeleteModal

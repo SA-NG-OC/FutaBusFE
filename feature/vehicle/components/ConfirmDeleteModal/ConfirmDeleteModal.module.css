@@ -1,40 +1,25 @@
-/* ConfirmDeleteModal.module.css */
-
 /* Overlay */
 .overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background-color: var(--overlay-bg);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 16px;
-}
-
-:global(.dark) .overlay {
-  background-color: rgba(0, 0, 0, 0.7);
+  padding: 1rem;
 }
 
 /* Modal */
 .modal {
-  background: white;
+  background: var(--modal-bg);
   border-radius: 12px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--modal-shadow);
   width: 100%;
   max-width: 480px;
-  max-height: 90vh;
-  overflow-y: auto;
   animation: slideIn 0.2s ease-out;
-}
-
-:global(.dark) .modal {
-  background: #1f2937;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-gray);
 }
 
 @keyframes slideIn {
@@ -62,53 +47,26 @@
   justify-content: center;
   width: 48px;
   height: 48px;
-  background: #fef2f2;
+  background: var(--warning-bg);
   border-radius: 50%;
 }
 
-:global(.dark) .iconContainer {
-  background: #7f1d1d;
-}
-
 .warningIcon {
-  color: #dc2626;
-}
-
-:global(.dark) .warningIcon {
-  color: #f87171;
+  color: var(--warning-text);
 }
 
 .closeButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
   background: transparent;
   border: none;
   border-radius: 6px;
-  color: #6b7280;
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s;
+  padding: 8px;
 }
 
 .closeButton:hover {
-  background: #f3f4f6;
-  color: #374151;
-}
-
-.closeButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-:global(.dark) .closeButton {
-  color: #9ca3af;
-}
-
-:global(.dark) .closeButton:hover {
-  background: #374151;
-  color: #d1d5db;
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 /* Body */
@@ -119,119 +77,70 @@
 .title {
   font-size: 20px;
   font-weight: 600;
-  color: #111827;
-  margin: 0 0 16px 0;
-  line-height: 1.3;
-}
-
-:global(.dark) .title {
-  color: #f9fafb;
-}
-
-.message {
-  margin-bottom: 20px;
+  color: var(--text-primary);
+  margin-bottom: 16px;
 }
 
 .warningText {
   font-size: 16px;
-  color: #374151;
-  margin: 0;
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 
-:global(.dark) .warningText {
-  color: #d1d5db;
-}
-
-/* Vehicle Info */
+/* Vehicle Info Box */
 .vehicleInfo {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-gray);
   border-radius: 8px;
   padding: 16px;
-  margin-bottom: 20px;
-}
-
-:global(.dark) .vehicleInfo {
-  background: #374151;
-  border-color: #4b5563;
+  margin: 20px 0;
 }
 
 .infoRow {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   padding: 6px 0;
+  border-bottom: 1px solid var(--border-gray);
 }
 
-.infoRow:not(:last-child) {
-  border-bottom: 1px solid #e5e7eb;
-}
-
-:global(.dark) .infoRow:not(:last-child) {
-  border-bottom-color: #4b5563;
+.infoRow:last-child {
+  border-bottom: none;
 }
 
 .infoLabel {
+  color: var(--text-secondary);
   font-size: 14px;
-  font-weight: 500;
-  color: #6b7280;
-}
-
-:global(.dark) .infoLabel {
-  color: #9ca3af;
 }
 
 .infoValue {
-  font-size: 14px;
+  color: var(--text-primary);
   font-weight: 600;
-  color: #111827;
-}
-
-:global(.dark) .infoValue {
-  color: #f9fafb;
+  font-size: 14px;
 }
 
 /* Warning Note */
 .warningNote {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
   border-radius: 8px;
   padding: 16px;
-  margin-bottom: 20px;
-}
-
-:global(.dark) .warningNote {
-  background: #7f1d1d;
-  border-color: #991b1b;
 }
 
 .warningNoteText {
   font-size: 14px;
   font-weight: 600;
-  color: #dc2626;
-  margin: 0 0 12px 0;
-}
-
-:global(.dark) .warningNoteText {
-  color: #f87171;
+  color: var(--warning-text);
+  margin-bottom: 8px;
 }
 
 .warningList {
-  margin: 0;
   padding-left: 20px;
-  list-style-type: disc;
+  color: var(--warning-text);
 }
 
 .warningList li {
   font-size: 14px;
-  color: #7f1d1d;
   margin-bottom: 4px;
-  line-height: 1.4;
-}
-
-:global(.dark) .warningList li {
-  color: #fca5a5;
 }
 
 /* Footer */
@@ -239,187 +148,48 @@
   display: flex;
   gap: 12px;
   justify-content: flex-end;
-  padding: 0 24px 24px;
-  border-top: 1px solid #e5e7eb;
-  margin-top: 20px;
-  padding-top: 20px;
+  padding: 20px 24px 24px;
+  border-top: 1px solid var(--border-gray);
+  background-color: var(--bg-secondary); /* Làm nền footer tối hơn chút */
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
 }
 
-:global(.dark) .footer {
-  border-top-color: #374151;
-}
-
-/* Buttons */
 .button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
   padding: 10px 16px;
   border-radius: 6px;
-  font-size: 14px;
   font-weight: 500;
-  border: 1px solid transparent;
+  font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
-  min-width: 80px;
-  height: 40px;
+  border: 1px solid transparent;
 }
 
-.button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Secondary Button (Cancel) */
 .buttonSecondary {
-  background: white;
-  color: #374151;
-  border-color: #d1d5db;
+  background: var(--btn-cancel-bg);
+  color: var(--text-primary);
+  border-color: var(--border-gray);
 }
 
-.buttonSecondary:hover:not(:disabled) {
-  background: #f9fafb;
-  border-color: #9ca3af;
+.buttonSecondary:hover {
+  background: var(--btn-cancel-hover);
 }
 
-:global(.dark) .buttonSecondary {
-  background: #374151;
-  color: #d1d5db;
-  border-color: #4b5563;
-}
-
-:global(.dark) .buttonSecondary:hover:not(:disabled) {
-  background: #4b5563;
-  border-color: #6b7280;
-}
-
-/* Danger Button (Delete) */
 .buttonDanger {
-  background: #dc2626;
+  background: var(--btn-delete-bg);
   color: white;
-  border-color: #dc2626;
 }
 
-.buttonDanger:hover:not(:disabled) {
-  background: #b91c1c;
-  border-color: #b91c1c;
+.buttonDanger:hover {
+  background: var(--btn-delete-hover);
 }
 
-:global(.dark) .buttonDanger {
-  background: #dc2626;
-  border-color: #dc2626;
-}
-
-:global(.dark) .buttonDanger:hover:not(:disabled) {
-  background: #b91c1c;
-  border-color: #b91c1c;
-}
-
-/* Loading Spinner */
 .loadingSpinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid transparent;
-  border-top: 2px solid currentColor;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Mobile Responsiveness */
-@media (max-width: 639px) {
-  .overlay {
-    padding: 8px;
-  }
-  
-  .modal {
-    max-height: 95vh;
-  }
-  
-  .header {
-    padding: 16px 20px 12px;
-  }
-  
-  .body {
-    padding: 0 20px 16px;
-  }
-  
-  .footer {
-    padding: 0 20px 20px;
-    flex-direction: column-reverse;
-    gap: 8px;
-  }
-  
-  .button {
-    width: 100%;
-    justify-content: center;
-  }
-  
-  .title {
-    font-size: 18px;
-  }
-  
-  .warningText {
-    font-size: 15px;
-  }
-  
-  .vehicleInfo {
-    padding: 12px;
-  }
-  
-  .warningNote {
-    padding: 12px;
-  }
-}
-
-/* Tablet Responsiveness */
-@media (min-width: 640px) and (max-width: 1023px) {
-  .modal {
-    max-width: 520px;
-  }
-  
-  .footer {
-    gap: 16px;
-  }
-  
-  .button {
-    min-width: 100px;
-  }
-}
-
-/* Desktop */
-@media (min-width: 1024px) {
-  .overlay {
-    padding: 20px;
-  }
-  
-  .modal {
-    max-width: 500px;
-  }
-  
-  .header {
-    padding: 24px 28px 20px;
-  }
-  
-  .body {
-    padding: 0 28px 24px;
-  }
-  
-  .footer {
-    padding: 0 28px 28px;
-    padding-top: 24px;
-  }
-  
-  .button {
-    min-width: 120px;
-  }
+  display: inline-block;
+  margin-right: 6px;
 }

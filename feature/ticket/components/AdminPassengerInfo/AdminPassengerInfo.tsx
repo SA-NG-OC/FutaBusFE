@@ -88,7 +88,7 @@ export default function AdminPassengerInfo({
       const requestData: CounterBookingRequest = {
         tripId: trip.tripId,
         seatIds: selectedSeats.map((s) => s.seatId),
-        userId: String(user.userId), // Admin ID
+        staffUserId: String(user.userId), // Admin ID
 
         customerName: formData.name,
         customerPhone: formData.phone,

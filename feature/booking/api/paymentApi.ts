@@ -59,7 +59,7 @@ export interface BookingResponse {
 export interface CounterBookingRequest {
   tripId: number;
   seatIds: number[];
-  userId: string;
+  staffUserId: string;
   customerName: string;
   customerPhone: string;
   customerEmail?: string;

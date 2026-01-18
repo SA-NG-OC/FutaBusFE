@@ -1,0 +1,89 @@
+/* Container chính của trang */
+.pageContainer {
+  padding: 24px;
+  min-height: 100vh;
+  background-color: var(--background);
+  color: var(--text-primary);
+  transition: background-color 0.2s ease;
+}
+
+/* Thanh tìm kiếm */
+.searchContainer {
+  margin-bottom: 24px;
+  max-width: 480px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  transition: all 0.2s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--input-focus);
+}
+
+.searchInput::placeholder {
+  color: var(--input-placeholder);
+}
+
+/* Lưới hiển thị Card */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Trạng thái Loading / Lỗi / Trống */
+.loadingText,
+.errorText {
+  text-align: center;
+  padding: 32px 0;
+  color: var(--text-secondary);
+}
+
+.errorText {
+  color: #dc2626;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 48px 0;
+  color: var(--text-secondary);
+  background-color: var(--background-paper);
+  border-radius: 12px;
+  border: 1px dashed var(--border-gray);
+}
+
+.emptyTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.emptySubtitle {
+  font-size: 14px;
+  opacity: 0.8;
+}

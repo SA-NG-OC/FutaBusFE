@@ -1,12 +1,15 @@
-import { useState } from 'react';
-import { CreateDriverWithAccountRequest } from '../api/driverApi';
-import { validateImageFile } from '@/shared/utils/imageUpload';
-import styles from './DriverModal.module.css';
+import { useState } from "react";
+import { CreateDriverWithAccountRequest } from "../api/driverApi";
+import { validateImageFile } from "@/shared/utils/imageUpload";
+import styles from "./CreateDriverModal.module.css";
 
 interface CreateDriverModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: CreateDriverWithAccountRequest, avatarFile?: File) => Promise<void>;
+  onSubmit: (
+    data: CreateDriverWithAccountRequest,
+    avatarFile?: File,
+  ) => Promise<void>;
 }
 
 export default function CreateDriverModal({
@@ -15,15 +18,15 @@ export default function CreateDriverModal({
   onSubmit,
 }: CreateDriverModalProps) {
   const [formData, setFormData] = useState<CreateDriverWithAccountRequest>({
-    fullName: '',
-    email: '',
-    password: '',
-    phoneNumber: '',
-    driverLicense: '',
-    licenseExpiry: '',
-    dateOfBirth: '',
+    fullName: "",
+    email: "",
+    password: "",
+    phoneNumber: "",
+    driverLicense: "",
+    licenseExpiry: "",
+    dateOfBirth: "",
     salary: 0,
-    avatarUrl: '',
+    avatarUrl: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -32,18 +35,16 @@ export default function CreateDriverModal({
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'salary' ? Number(value) : value,
+      [name]: name === "salary" ? Number(value) : value,
     }));
-  };
-
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const url = e.target.value;
-    setFormData((prev) => ({ ...prev, avatarUrl: url }));
-    setAvatarPreview(url);
   };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,20 +52,17 @@ export default function CreateDriverModal({
     if (!file) return;
 
     try {
-      // Validate file
       validateImageFile(file);
-      
-      // Show preview immediately
       const reader = new FileReader();
       reader.onloadend = () => {
         setAvatarPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
-      
+
       setSelectedFile(file);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Invalid file');
+      setError(err instanceof Error ? err.message : "Invalid file");
       setSelectedFile(null);
       setAvatarPreview(null);
     }
@@ -76,26 +74,25 @@ export default function CreateDriverModal({
     setError(null);
 
     try {
-      // Submit form with file directly (no separate upload)
       await onSubmit(formData, selectedFile || undefined);
-      
+
       // Reset form
       setFormData({
-        fullName: '',
-        email: '',
-        password: '',
-        phoneNumber: '',
-        driverLicense: '',
-        licenseExpiry: '',
-        dateOfBirth: '',
+        fullName: "",
+        email: "",
+        password: "",
+        phoneNumber: "",
+        driverLicense: "",
+        licenseExpiry: "",
+        dateOfBirth: "",
         salary: 0,
-        avatarUrl: '',
+        avatarUrl: "",
       });
       setAvatarPreview(null);
       setSelectedFile(null);
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create driver');
+      setError(err instanceof Error ? err.message : "Failed to create driver");
     } finally {
       setLoading(false);
     }
@@ -105,31 +102,25 @@ export default function CreateDriverModal({
 
   return (
     <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()} style={{ maxWidth: '700px' }}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Create Driver with Account</h2>
+          <h2 className={styles.title}>Tạo tài xế mới (kèm tài khoản)</h2>
           <button className={styles.closeBtn} onClick={onClose}>
             ✕
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className={styles.form}>
-          {error && (
-            <div className={styles.error}>
-              {error}
-            </div>
-          )}
+          {error && <div className={styles.error}>{error}</div>}
 
           {/* Account Information */}
-          <div style={{ marginBottom: '20px', paddingBottom: '15px', borderBottom: '2px solid #e5e7eb' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px', color: '#D83E3E' }}>
-              👤 Account Information
-            </h3>
+          <div className={styles.sectionHeader}>
+            <h3 className={styles.sectionTitle}>👤 Thông tin tài khoản</h3>
 
             <div className={styles.row}>
               <div className={styles.field}>
                 <label className={styles.label}>
-                  Full Name <span className={styles.required}>*</span>
+                  Họ và tên <span className={styles.required}>*</span>
                 </label>
                 <input
                   type="text"
@@ -162,42 +153,33 @@ export default function CreateDriverModal({
             <div className={styles.row}>
               <div className={styles.field}>
                 <label className={styles.label}>
-                  Password <span className={styles.required}>*</span>
+                  Mật khẩu <span className={styles.required}>*</span>
                 </label>
-                <div style={{ position: 'relative' }}>
+                <div className={styles.passwordWrapper}>
                   <input
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
                     className={styles.input}
-                    placeholder="Min 8 characters"
+                    placeholder="Tối thiểu 8 ký tự"
                     required
                     minLength={8}
-                    style={{ paddingRight: '40px' }}
+                    style={{ paddingRight: "40px" }}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    style={{
-                      position: 'absolute',
-                      right: '10px',
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontSize: '18px',
-                    }}
+                    className={styles.passwordToggle}
                   >
-                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                    {showPassword ? "👁️" : "👁️‍🗨️"}
                   </button>
                 </div>
               </div>
 
               <div className={styles.field}>
                 <label className={styles.label}>
-                  Phone Number <span className={styles.required}>*</span>
+                  Số điện thoại <span className={styles.required}>*</span>
                 </label>
                 <input
                   type="tel"
@@ -209,39 +191,32 @@ export default function CreateDriverModal({
                   required
                   pattern="[0-9]{10,11}"
                 />
-                <small className={styles.hint}>10-11 digits</small>
               </div>
             </div>
           </div>
 
           {/* Avatar Upload */}
-          <div style={{ marginBottom: '20px', paddingBottom: '15px', borderBottom: '2px solid #e5e7eb' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px', color: '#D83E3E' }}>
-              🖼️ Avatar Image
-            </h3>
-
+          <div className={styles.sectionHeader}>
+            <h3 className={styles.sectionTitle}>🖼️ Ảnh đại diện</h3>
             <div className={styles.field}>
-              <label className={styles.label}>Upload Avatar Image</label>
+              <label className={styles.label}>Tải ảnh lên</label>
               <input
                 type="file"
-                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                accept="image/*"
                 onChange={handleFileSelect}
                 className={styles.input}
               />
-              <small className={styles.hint}>Max 5MB - JPG, PNG, GIF, WEBP</small>
+              <small className={styles.hint}>
+                Tối đa 5MB - JPG, PNG, GIF, WEBP
+              </small>
+
               {avatarPreview && (
-                <div style={{ marginTop: '8px', textAlign: 'center' }}>
+                <div className={styles.avatarPreviewContainer}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img 
-                    src={avatarPreview} 
-                    alt="Avatar preview" 
-                    style={{ 
-                      width: '100px', 
-                      height: '100px', 
-                      borderRadius: '50%', 
-                      objectFit: 'cover',
-                      border: '3px solid #D83E3E' 
-                    }}
+                  <img
+                    src={avatarPreview}
+                    alt="Avatar preview"
+                    className={styles.avatarImage}
                     onError={() => setAvatarPreview(null)}
                   />
                   <button
@@ -249,21 +224,11 @@ export default function CreateDriverModal({
                     onClick={() => {
                       setAvatarPreview(null);
                       setSelectedFile(null);
-                      setFormData((prev) => ({ ...prev, avatarUrl: '' }));
+                      setFormData((prev) => ({ ...prev, avatarUrl: "" }));
                     }}
-                    style={{
-                      display: 'block',
-                      margin: '8px auto 0',
-                      padding: '4px 12px',
-                      fontSize: '12px',
-                      color: '#991b1b',
-                      background: '#fee2e2',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                    }}
+                    className={styles.btnRemoveAvatar}
                   >
-                    Remove
+                    Xóa ảnh
                   </button>
                 </div>
               )}
@@ -271,15 +236,15 @@ export default function CreateDriverModal({
           </div>
 
           {/* Driver Information */}
-          <div style={{ marginBottom: '20px' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '12px', color: '#D83E3E' }}>
-              🚗 Driver Information
+          <div style={{ marginBottom: "20px" }}>
+            <h3 className={styles.sectionTitle}>
+              🚗 Thông tin bằng lái & Hợp đồng
             </h3>
 
             <div className={styles.row}>
               <div className={styles.field}>
                 <label className={styles.label}>
-                  Driver License <span className={styles.required}>*</span>
+                  Số bằng lái <span className={styles.required}>*</span>
                 </label>
                 <input
                   type="text"
@@ -295,7 +260,7 @@ export default function CreateDriverModal({
 
               <div className={styles.field}>
                 <label className={styles.label}>
-                  License Expiry <span className={styles.required}>*</span>
+                  Ngày hết hạn bằng <span className={styles.required}>*</span>
                 </label>
                 <input
                   type="date"
@@ -304,7 +269,7 @@ export default function CreateDriverModal({
                   onChange={handleChange}
                   className={styles.input}
                   required
-                  min={new Date().toISOString().split('T')[0]}
+                  min={new Date().toISOString().split("T")[0]}
                 />
               </div>
             </div>
@@ -312,7 +277,7 @@ export default function CreateDriverModal({
             <div className={styles.row}>
               <div className={styles.field}>
                 <label className={styles.label}>
-                  Date of Birth <span className={styles.required}>*</span>
+                  Ngày sinh <span className={styles.required}>*</span>
                 </label>
                 <input
                   type="date"
@@ -321,20 +286,24 @@ export default function CreateDriverModal({
                   onChange={handleChange}
                   className={styles.input}
                   required
-                  max={new Date(Date.now() - 18 * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
+                  max={
+                    new Date(Date.now() - 18 * 365 * 24 * 60 * 60 * 1000)
+                      .toISOString()
+                      .split("T")[0]
+                  }
                 />
-                <small className={styles.hint}>Must be at least 18 years old</small>
+                <small className={styles.hint}>Phải từ 18 tuổi trở lên</small>
               </div>
 
               <div className={styles.field}>
-                <label className={styles.label}>Salary (VND)</label>
+                <label className={styles.label}>Lương cơ bản (VND)</label>
                 <input
                   type="number"
                   name="salary"
                   value={formData.salary}
                   onChange={handleChange}
                   className={styles.input}
-                  placeholder="10,000,000"
+                  placeholder="10000000"
                   min="0"
                   step="100000"
                 />
@@ -349,14 +318,14 @@ export default function CreateDriverModal({
               className={styles.btnCancel}
               disabled={loading}
             >
-              Cancel
+              Hủy
             </button>
             <button
               type="submit"
               className={styles.btnSubmit}
               disabled={loading}
             >
-              {loading ? 'Creating...' : 'Create Driver & Account'}
+              {loading ? "Đang tạo..." : "Tạo tài khoản & Tài xế"}
             </button>
           </div>
         </form>

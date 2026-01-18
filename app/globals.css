@@ -53,8 +53,8 @@
   /* --- Modal & Overlay --- */
   --overlay-bg: rgba(0, 0, 0, 0.5);
   --modal-bg: #ffffff; /* Modal nền trắng cho sạch */
-  --modal-shadow: 0px 10px 25px -5px rgba(0, 0, 0, 0.1),
-    0px 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --modal-shadow:
+    0px 10px 25px -5px rgba(0, 0, 0, 0.1), 0px 8px 10px -6px rgba(0, 0, 0, 0.1);
 
   /* --- Buttons --- */
   --btn-bg-hover: #ecddc0;
@@ -199,7 +199,9 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 hr {
@@ -266,4 +268,28 @@ hr {
 
 .dark .Toastify__progress-bar {
   background: linear-gradient(to right, #f1f5f9, #cbd5e1);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  /* Sử dụng box-shadow để che màu nền mặc định của trình duyệt */
+  -webkit-box-shadow: 0 0 0 30px var(--input-bg) inset !important;
+
+  /* Đổi màu chữ cho khớp với theme */
+  -webkit-text-fill-color: var(--input-text) !important;
+
+  /* Giữ nguyên bo góc nếu có */
+  border-radius: 8px !important;
+
+  /* Đảm bảo border đúng màu */
+  border: 1px solid var(--input-border) !important;
+
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Đảm bảo khi focus vào ô autofill vẫn giữ style border của mình */
+input:-webkit-autofill:focus {
+  border-color: var(--primary) !important;
 }

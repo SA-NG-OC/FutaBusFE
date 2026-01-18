@@ -1,6 +1,85 @@
 .map {
   width: 100%;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-gray);
   overflow: hidden;
+  z-index: 1; /* Ensure map stays below modals */
+}
+
+/* Custom Marker Styles */
+.customDivIcon {
+  background: none;
+  border: none;
+}
+
+.customMarker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 16px;
+  width: 30px;
+  height: 30px;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.customMarker:hover {
+  transform: scale(1.1);
+}
+
+.pickupMarker {
+  background: var(--stat-green-text); /* Green */
+}
+
+.dropoffMarker {
+  background: var(--primary); /* Red/Brand */
+}
+
+.bothMarker {
+  background: var(--stat-blue-text); /* Blue */
+}
+
+/* Popup Styles - Note: Leaflet renders these outside React tree, 
+   so sometimes :global is needed if CSS Modules hash classes too aggressively. 
+   However, for simplicity here, assume typical usage. */
+
+:global(.leaflet-popup-content-wrapper) {
+  border-radius: 0.5rem;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--background-paper);
+  color: var(--text-primary);
+}
+
+:global(.leaflet-popup-content) {
+  margin: 12px;
+  line-height: 1.4;
+}
+
+:global(.leaflet-popup-tip) {
+  background-color: var(--background-paper);
+}
+
+.popupContent {
+  text-align: center;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.popupTitle {
+  color: var(--primary);
+  font-size: 14px;
+}
+
+.popupType {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.popupCoords {
+  font-size: 11px;
+  color: var(--text-secondary);
+  opacity: 0.8;
 }

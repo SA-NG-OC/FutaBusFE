@@ -1,0 +1,186 @@
+.pageContainer {
+  min-height: 100vh;
+  background-color: var(--background);
+  transition: background-color 0.2s ease;
+  padding-bottom: 40px;
+}
+
+/* --- ERROR BOX --- */
+.errorBox {
+  background-color: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.errorIcon {
+  color: var(--warning-text);
+  width: 20px;
+  height: 20px;
+}
+
+.errorTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--warning-text);
+  margin: 0;
+}
+
+.errorText {
+  font-size: 14px;
+  color: var(--warning-text);
+  margin: 4px 0 0 0;
+  opacity: 0.9;
+}
+
+/* --- LAYOUT --- */
+.contentWrapper {
+  padding: 0 24px;
+}
+
+.statsSection {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--border-gray);
+  margin-bottom: 24px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+/* Responsive Grid */
+@media (min-width: 768px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .statsGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* --- STAT CARDS --- */
+.statCard {
+  border-radius: 8px;
+  padding: 16px;
+  transition: transform 0.2s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+}
+
+.statContent {
+  display: flex;
+  align-items: center;
+}
+
+.statIconWrapper {
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.statIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.statInfo {
+  margin-left: 12px;
+}
+
+.statLabel {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.statValue {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 4px 0 0 0;
+}
+
+/* --- COLOR VARIANTS (Using Global Vars) --- */
+/* Blue - Total */
+.cardBlue {
+  background-color: var(--stat-blue-bg);
+}
+.iconWrapperBlue {
+  background-color: rgba(37, 99, 235, 0.1);
+} /* Fallback or specific opacity */
+.iconBlue {
+  color: var(--stat-blue-text);
+}
+.labelBlue {
+  color: var(--stat-blue-text);
+  opacity: 0.8;
+}
+.valueBlue {
+  color: var(--stat-blue-text);
+}
+
+/* Green - Active */
+.cardGreen {
+  background-color: var(--stat-green-bg);
+}
+.iconWrapperGreen {
+  background-color: rgba(22, 163, 74, 0.1);
+}
+.iconGreen {
+  color: var(--stat-green-text);
+}
+.labelGreen {
+  color: var(--stat-green-text);
+  opacity: 0.8;
+}
+.valueGreen {
+  color: var(--stat-green-text);
+}
+
+/* Yellow - Maintenance */
+.cardYellow {
+  background-color: var(--stat-orange-bg);
+} /* Using Orange vars for better contrast in dark */
+.iconWrapperYellow {
+  background-color: rgba(234, 88, 12, 0.1);
+}
+.iconYellow {
+  color: var(--stat-orange-text);
+}
+.labelYellow {
+  color: var(--stat-orange-text);
+  opacity: 0.8;
+}
+.valueYellow {
+  color: var(--stat-orange-text);
+}
+
+/* Red - Inactive */
+.cardRed {
+  background-color: var(--badge-delayed-bg);
+}
+.iconWrapperRed {
+  background-color: rgba(220, 38, 38, 0.1);
+}
+.iconRed {
+  color: var(--badge-delayed-text);
+}
+.labelRed {
+  color: var(--badge-delayed-text);
+  opacity: 0.8;
+}
+.valueRed {
+  color: var(--badge-delayed-text);
+}

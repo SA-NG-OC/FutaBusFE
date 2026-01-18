@@ -165,7 +165,7 @@ export default function VehicleTable({
               vehicles.map((vehicle) => (
                 <tr key={vehicle.vehicleId} className={styles.tableRow}>
                   <td className={styles.tableCell}>
-                    <div style={{ fontWeight: 600, color: "#1f2937" }}>
+                    <div className={styles.licensePlate}>
                       {vehicle.licensePlate}
                     </div>
                   </td>
