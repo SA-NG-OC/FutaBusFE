@@ -294,6 +294,7 @@ export default function ClientBookingDetailPage() {
           selectedSeats={selectedSeats}
           currentUserId={userId}
           wsConnected={connected}
+          wsLockedSeats={wsContext.lockedSeats}
           onSeatClick={handleSeatClick}
           maxSeats={5}
           lockTimers={lockTimers}

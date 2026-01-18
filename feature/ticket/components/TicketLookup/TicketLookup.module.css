@@ -99,6 +99,17 @@
   color: var(--input-placeholder);
 }
 
+.inputError {
+  border-color: #ef4444 !important;
+}
+
+.errorText {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin: 0;
+  margin-top: -0.25rem;
+}
+
 .note {
   font-size: 0.875rem;
   color: var(--text-secondary);
