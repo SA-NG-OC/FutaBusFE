@@ -68,19 +68,22 @@ export default function MyTicketsPage() {
           return;
         }
 
+        // Parse route name - support both " - " and " → " separators
+        const routeParts = booking.tripInfo?.routeName?.split(/\s*[-→]\s*/) || [];
+        const fromLocation = booking.tripInfo?.pickupLocation ||
+            booking.tripInfo?.pickupLocationName ||
+            routeParts[0] || "N/A";
+        const toLocation = booking.tripInfo?.dropoffLocation ||
+            booking.tripInfo?.dropoffLocationName ||
+            routeParts[1] || "N/A";
+
         // Map data to modal format
         const ticketData = {
           bookingCode: booking.bookingCode,
           status: booking.bookingStatus,
           qrCode: firstTicket.ticketCode,
-          fromLocation:
-            booking.tripInfo.routeName.split("→")[0]?.trim() ||
-            booking.tripInfo.pickupLocation ||
-            "",
-          toLocation:
-            booking.tripInfo.routeName.split("→")[1]?.trim() ||
-            booking.tripInfo.dropoffLocation ||
-            "",
+          fromLocation: fromLocation,
+          toLocation: toLocation,
           departureDate: new Date(
             booking.tripInfo.departureTime,
           ).toLocaleDateString("vi-VN"),
@@ -94,19 +97,19 @@ export default function MyTicketsPage() {
           )}h`,
           vehicleType: "Limousine",
           licensePlate: booking.tripInfo.vehiclePlate || "N/A",
-          driverName: booking.tripInfo.driverName,
+          driverName: booking.tripInfo.driverName || "N/A",
           customerName: firstTicket.passenger?.fullName || booking.customerName,
           customerPhone:
             firstTicket.passenger?.phoneNumber || booking.customerPhone,
           customerEmail: firstTicket.passenger?.email || booking.customerEmail,
           customerIdCard: "",
           seatNumber: booking.tickets.map((t: any) => t.seatNumber).join(", "),
-          seatFloor: `Tầng ${firstTicket.floorNumber}`,
-          pickupLocation: booking.tripInfo.pickupLocation || "",
+          seatFloor: firstTicket.floorNumber ? `Tầng ${firstTicket.floorNumber}` : "N/A",
+          pickupLocation: booking.tripInfo.pickupLocation || fromLocation,
           pickupTime: new Date(
             booking.tripInfo.pickupTime || booking.tripInfo.departureTime,
           ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
-          dropoffLocation: booking.tripInfo.dropoffLocation || "",
+          dropoffLocation: booking.tripInfo.dropoffLocation || toLocation,
           dropoffTime: new Date(
             booking.tripInfo.dropoffTime || booking.tripInfo.arrivalTime,
           ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
@@ -233,7 +236,17 @@ export default function MyTicketsPage() {
             <p>Loading tickets...</p>
           </div>
         ) : tickets.length > 0 ? (
-          tickets.map((booking) => (
+          tickets.map((booking) => {
+            // Parse route name - support both " - " and " → " separators
+            const routeParts = booking.tripInfo.routeName?.split(/\s*[-→]\s*/) || [];
+            const fromLocation = booking.tripInfo.pickupLocation || 
+                                booking.tripInfo.pickupLocationName || 
+                                routeParts[0] || "N/A";
+            const toLocation = booking.tripInfo.dropoffLocation || 
+                              booking.tripInfo.dropoffLocationName || 
+                              routeParts[1] || "N/A";
+            
+            return (
             <TicketCard
               key={booking.bookingId}
               bookingId={booking.bookingId}
@@ -245,14 +258,8 @@ export default function MyTicketsPage() {
                     ? "Completed"
                     : "Cancelled"
               }
-              from={
-                booking.tripInfo.pickupLocationName ||
-                booking.tripInfo.routeName.split(" - ")[0]
-              }
-              to={
-                booking.tripInfo.dropoffLocationName ||
-                booking.tripInfo.routeName.split(" - ")[1]
-              }
+              from={fromLocation}
+              to={toLocation}
               date={new Date(booking.tripInfo.departureTime).toLocaleDateString(
                 "vi-VN",
               )}
@@ -267,7 +274,8 @@ export default function MyTicketsPage() {
               onViewDetails={() => handleViewDetails(booking.bookingCode)}
               onCancel={handleCancelBooking}
             />
-          ))
+            );
+          })
         ) : (
           <div className={styles.emptyState}>
             <svg

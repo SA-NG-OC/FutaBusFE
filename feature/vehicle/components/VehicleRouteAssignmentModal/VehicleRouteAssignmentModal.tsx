@@ -66,31 +66,24 @@ export default function VehicleRouteAssignmentModal({
       return;
     }
 
-    // Remove empty optional fields to avoid backend validation errors
-    const payload: any = {
-      vehicleId: formData.vehicleId,
-      routeId: formData.routeId,
-      priority: formData.priority,
-      startDate: formData.startDate
-    };
-
-    // Only add optional fields if they have values
-    if (formData.maintenanceSchedule && formData.maintenanceSchedule.trim()) {
-      payload.maintenanceSchedule = formData.maintenanceSchedule.trim();
-    }
-    if (formData.notes && formData.notes.trim()) {
-      payload.notes = formData.notes.trim();
-    }
-    if (formData.endDate) {
-      payload.endDate = formData.endDate;
-    }
-
-    console.log('Submitting vehicle-route assignment:', payload);
+    // Build payload ensuring required fields are present and non-undefined
+        const payload: CreateVehicleRouteAssignmentRequest = {
+          vehicleId: vehicleId,
+          routeId: formData.routeId,
+          priority: formData.priority,
+          startDate: formData.startDate,
+          // optional fields: set explicitly or undefined
+          endDate: formData.endDate ?? undefined,
+          maintenanceSchedule: formData.maintenanceSchedule?.trim() || undefined,
+          notes: formData.notes?.trim() || undefined
+        };
     
-    setLoading(true);
-    try {
-      const result = await vehicleRouteAssignmentApi.create(payload);
-      console.log('Assignment created successfully:', result);
+        console.log('Submitting vehicle-route assignment:', payload);
+        
+        setLoading(true);
+        try {
+          const result = await vehicleRouteAssignmentApi.create(payload);
+          console.log('Assignment created successfully:', result);
       toast.success('Gắn tuyến thành công!');
       onSuccess?.();
       onClose();

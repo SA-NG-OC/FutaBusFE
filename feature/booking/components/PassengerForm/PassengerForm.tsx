@@ -1,5 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useAuth } from "@/src/context/AuthContext";
+import RegisterModal from "@/src/components/RegisterModal/RegisterModal";
 import styles from "./PassengerForm.module.css";
 
 interface PassengerFormProps {
@@ -13,6 +15,9 @@ export interface PassengerData {
 }
 
 export default function PassengerForm({ onFormChange }: PassengerFormProps) {
+  const { user, isAuthenticated } = useAuth();
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  
   const [formData, setFormData] = useState<PassengerData>({
     name: "",
     phone: "",
@@ -25,6 +30,19 @@ export default function PassengerForm({ onFormChange }: PassengerFormProps) {
     email: "",
   });
 
+  // Auto-fill user info if logged in
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const autoFilledData = {
+        name: user.fullName || "",
+        phone: user.phoneNumber || "",
+        email: user.email || "",
+      };
+      setFormData(autoFilledData);
+      validateForm(autoFilledData);
+    }
+  }, [isAuthenticated, user]);
+
   const validateForm = (data: PassengerData) => {
     const newErrors = {
       name: "",
@@ -33,19 +51,19 @@ export default function PassengerForm({ onFormChange }: PassengerFormProps) {
     };
 
     if (!data.name.trim()) {
-      newErrors.name = "Name is required";
+      newErrors.name = "Vui lòng nhập họ tên";
     }
 
     if (!data.phone.trim()) {
-      newErrors.phone = "Phone number is required";
+      newErrors.phone = "Vui lòng nhập số điện thoại";
     } else if (!/^[+\d\s()-]+$/.test(data.phone)) {
-      newErrors.phone = "Invalid phone number";
+      newErrors.phone = "Số điện thoại không hợp lệ";
     }
 
     if (!data.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = "Vui lòng nhập email";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-      newErrors.email = "Invalid email address";
+      newErrors.email = "Email không hợp lệ";
     }
 
     setErrors(newErrors);
@@ -65,16 +83,30 @@ export default function PassengerForm({ onFormChange }: PassengerFormProps) {
     validateForm(newData);
   };
 
+  const handleOpenRegisterModal = () => {
+    setIsRegisterModalOpen(true);
+  };
+
+  const handleCloseRegisterModal = () => {
+    setIsRegisterModalOpen(false);
+  };
+
   return (
     <div className={styles.container}>
-      <h3 className={styles.title}>Passenger Information</h3>
+      <h3 className={styles.title}>Thông tin hành khách</h3>
+
+      {isAuthenticated && (
+        <div className={styles.autoFillNote}>
+          ✅ Thông tin đã được tự động điền từ tài khoản của bạn
+        </div>
+      )}
 
       <div className={styles.formGroup}>
-        <label className={styles.label}>Name</label>
+        <label className={styles.label}>Họ và tên</label>
         <input
           type="text"
           className={`${styles.input} ${errors.name ? styles.inputError : ""}`}
-          placeholder="John"
+          placeholder="Nguyễn Văn A"
           value={formData.name}
           onChange={(e) => handleChange("name", e.target.value)}
         />
@@ -82,11 +114,11 @@ export default function PassengerForm({ onFormChange }: PassengerFormProps) {
       </div>
 
       <div className={styles.formGroup}>
-        <label className={styles.label}>Phone Number</label>
+        <label className={styles.label}>Số điện thoại</label>
         <input
           type="tel"
           className={`${styles.input} ${errors.phone ? styles.inputError : ""}`}
-          placeholder="+84 123 456 789"
+          placeholder="0901 234 567"
           value={formData.phone}
           onChange={(e) => handleChange("phone", e.target.value)}
         />
@@ -98,12 +130,37 @@ export default function PassengerForm({ onFormChange }: PassengerFormProps) {
         <input
           type="email"
           className={`${styles.input} ${errors.email ? styles.inputError : ""}`}
-          placeholder="john@example.com"
+          placeholder="email@example.com"
           value={formData.email}
           onChange={(e) => handleChange("email", e.target.value)}
         />
         {errors.email && <span className={styles.error}>{errors.email}</span>}
       </div>
+
+      {/* Register prompt for guests */}
+      {!isAuthenticated && (
+        <div className={styles.registerPrompt}>
+          <span className={styles.giftIcon}>🎁</span>
+          <button
+            type="button"
+            className={styles.registerLink}
+            onClick={handleOpenRegisterModal}
+          >
+            Nhấp vào đây để đăng ký tài khoản và nhận nhiều ưu đãi!
+          </button>
+        </div>
+      )}
+
+      {/* Register Modal */}
+      <RegisterModal
+        isOpen={isRegisterModalOpen}
+        onClose={handleCloseRegisterModal}
+        prefillData={{
+          fullName: formData.name,
+          email: formData.email,
+          phoneNumber: formData.phone,
+        }}
+      />
     </div>
   );
 }

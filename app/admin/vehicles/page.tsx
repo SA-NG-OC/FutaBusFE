@@ -122,10 +122,17 @@ const mapApiStatusToComponentStatus = (
   switch (apiStatus.toLowerCase()) {
     case "operational":
       return "ACTIVE";
-    case "inactive":
-      return "INACTIVE";
     case "maintenance":
       return "MAINTENANCE";
+    case "inactive":
+      return "INACTIVE";
+    // Fallback for Vietnamese values
+    case "hoàn thiện":
+      return "ACTIVE";
+    case "hư hại":
+      return "MAINTENANCE";
+    case "phế liệu":
+      return "INACTIVE";
     default:
       return "ACTIVE";
   }
@@ -137,10 +144,10 @@ const mapComponentStatusToApiStatus = (
   switch (componentStatus) {
     case "ACTIVE":
       return "Operational";
-    case "INACTIVE":
-      return "Inactive";
     case "MAINTENANCE":
       return "Maintenance";
+    case "INACTIVE":
+      return "Inactive";
     default:
       return "Operational";
   }
