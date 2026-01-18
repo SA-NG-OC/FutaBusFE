@@ -124,4 +124,12 @@ export const paymentApi = {
   ): Promise<BookingResponse> => {
     return api.post<BookingResponse>("/bookings/counter", data);
   },
+
+  // =====================================================
+  // 🔓 BYPASS PAYMENT - Thanh toán ngay không qua MoMo (Demo/Test)
+  // URL: POST /payments/bypass/{bookingId}
+  // =====================================================
+  bypassPayment: async (bookingId: number): Promise<BookingResponse> => {
+    return api.post<BookingResponse>(`/payments/bypass/${bookingId}`);
+  },
 };

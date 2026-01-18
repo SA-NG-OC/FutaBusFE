@@ -7,21 +7,40 @@
   transition: background-color 0.2s ease;
 }
 
-/* Thanh tìm kiếm */
-.searchContainer {
+/* --- FILTER SECTION (Mới) --- */
+/* Thay thế searchContainer cũ bằng layout Grid để chứa cả Search và Filter */
+.filterContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
   margin-bottom: 24px;
-  max-width: 480px;
+}
+
+/* Trên màn hình tablet trở lên, Search chiếm 2 phần, Filter chiếm 1 phần */
+@media (min-width: 768px) {
+  .filterContainer {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.searchBox {
+  width: 100%;
+}
+
+.routeFilterBox {
+  width: 100%;
 }
 
 .searchInput {
   width: 100%;
-  padding: 12px 16px;
+  padding: 10px 16px;
   border: 1px solid var(--input-border);
   border-radius: 8px;
   font-size: 14px;
   background-color: var(--input-bg);
   color: var(--input-text);
   transition: all 0.2s ease;
+  height: 42px; /* Chiều cao cố định để khớp với RouteFilter */
 }
 
 .searchInput:focus {
@@ -34,7 +53,29 @@
   color: var(--input-placeholder);
 }
 
-/* Lưới hiển thị Card */
+/* --- STATISTICS BOX (Mới) --- */
+.statsBox {
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background-color: var(--stat-blue-bg);
+  border: 1px solid var(--border-gray); /* Hoặc border nhẹ của stat */
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.statsText {
+  font-size: 14px;
+  color: var(--stat-blue-text);
+  margin: 0;
+}
+
+.statsHighlight {
+  font-weight: 700;
+  margin: 0 4px;
+}
+
+/* --- GRID LAYOUT --- */
 .grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -42,7 +83,6 @@
   margin-bottom: 24px;
 }
 
-/* Responsive */
 @media (min-width: 768px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
@@ -55,7 +95,38 @@
   }
 }
 
-/* Trạng thái Loading / Lỗi / Trống */
+/* --- CARD WRAPPER & ASSIGN BUTTON (Mới) --- */
+/* Wrapper để định vị nút Gán tuyến đè lên Card */
+.cardWrapper {
+  position: relative;
+  height: 100%;
+}
+
+/* Nút Gán tuyến (+ Gán tuyến) */
+.assignButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  background-color: var(--primary);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  z-index: 10; /* Đảm bảo nút nằm trên Card */
+}
+
+.assignButton:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* --- STATES (Loading, Error, Empty) --- */
 .loadingText,
 .errorText {
   text-align: center;

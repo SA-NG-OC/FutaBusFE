@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import styles from "./PaymentMethod.module.css";
 
-export type PaymentMethodType = "credit" | "momo" | "zalopay" | "vnpay" | "bank";
+export type PaymentMethodType = "credit" | "momo" | "zalopay" | "vnpay" | "bank" | "bypass";
 
 interface PaymentMethodProps {
   onMethodChange?: (method: PaymentMethodType) => void;
@@ -34,6 +34,27 @@ export default function PaymentMethod({
       <h3 className={styles.title}>Phương thức thanh toán</h3>
 
       <div className={styles.methods}>
+        {/* Bypass Payment - For Testing/Demo */}
+        <label className={`${styles.methodOption} ${selectedMethod === "bypass" ? styles.selected : ""}`}>
+          <input
+            type="radio"
+            name="payment"
+            value="bypass"
+            checked={selectedMethod === "bypass"}
+            onChange={() => handleMethodChange("bypass")}
+          />
+          <div className={styles.methodContent}>
+            <div className={styles.methodIcon}>⚡</div>
+            <div className={styles.methodInfo}>
+              <div className={styles.methodName}>
+                Thanh toán nhanh (Demo)
+                <span className={styles.recommended}>Thử nghiệm</span>
+              </div>
+              <div className={styles.methodDesc}>Bỏ qua thanh toán, xác nhận vé ngay</div>
+            </div>
+          </div>
+        </label>
+
         {/* MoMo - Highlighted as recommended */}
         <label className={`${styles.methodOption} ${selectedMethod === "momo" ? styles.selected : ""}`}>
           <input

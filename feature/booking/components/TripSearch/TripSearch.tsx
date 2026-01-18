@@ -1,6 +1,7 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import Select from "react-select";
 import {
   FaMapMarkerAlt,
   FaCalendarAlt,
@@ -18,6 +19,17 @@ interface TripSearchProps {
   }) => void;
 }
 
+interface SelectOption {
+  value: string;
+  label: string;
+}
+
+// Get today's date in YYYY-MM-DD format
+const getTodayDate = () => {
+  const today = new Date();
+  return today.toISOString().split("T")[0];
+};
+
 export default function TripSearch({ onSearch }: TripSearchProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -30,8 +42,17 @@ export default function TripSearch({ onSearch }: TripSearchProps) {
   const [destId, setDestId] = useState<string>(
     searchParams?.get("destId") || ""
   );
-  const [date, setDate] = useState(searchParams?.get("date") || "");
+  // Default date to today if not specified
+  const [date, setDate] = useState(searchParams?.get("date") || getTodayDate());
   const [passengers, setPassengers] = useState(1);
+
+  // Convert locations to react-select options
+  const locationOptions: SelectOption[] = useMemo(() => {
+    return locations.map((location) => ({
+      value: String(location.locationId),
+      label: location.locationName,
+    }));
+  }, [locations]);
 
   // Fetch locations on mount
   useEffect(() => {
@@ -42,7 +63,7 @@ export default function TripSearch({ onSearch }: TripSearchProps) {
   useEffect(() => {
     setOriginId(searchParams?.get("originId") || "");
     setDestId(searchParams?.get("destId") || "");
-    setDate(searchParams?.get("date") || "");
+    setDate(searchParams?.get("date") || getTodayDate());
   }, [searchParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -73,52 +94,90 @@ export default function TripSearch({ onSearch }: TripSearchProps) {
     }
   };
 
+  // Custom styles for react-select to match the design
+  const customSelectStyles = {
+    control: (base: any, state: any) => ({
+      ...base,
+      borderRadius: "8px",
+      borderColor: state.isFocused ? "#D83E3E" : "#d1d5db",
+      boxShadow: state.isFocused ? "0 0 0 2px rgba(216, 62, 62, 0.2)" : "none",
+      padding: "4px 0",
+      minHeight: "44px",
+      "&:hover": {
+        borderColor: "#D83E3E",
+      },
+    }),
+    option: (base: any, state: any) => ({
+      ...base,
+      backgroundColor: state.isSelected
+        ? "#D83E3E"
+        : state.isFocused
+        ? "#fef2f2"
+        : "white",
+      color: state.isSelected ? "white" : "#1f2937",
+      cursor: "pointer",
+      "&:active": {
+        backgroundColor: "#fee2e2",
+      },
+    }),
+    placeholder: (base: any) => ({
+      ...base,
+      color: "#9ca3af",
+    }),
+    singleValue: (base: any) => ({
+      ...base,
+      color: "#1f2937",
+    }),
+    menu: (base: any) => ({
+      ...base,
+      zIndex: 100,
+    }),
+  };
+
   return (
     <form onSubmit={handleSubmit} className={styles.searchForm}>
       <div className={styles.gridContainer}>
-        {/* Origin City Dropdown */}
+        {/* Origin City Dropdown - Searchable */}
         <div className={styles.inputGroup}>
           <label className={styles.label}>
             <FaMapMarkerAlt className={styles.icon} />
             Điểm đi
           </label>
-          <select
-            value={originId}
-            onChange={(e) => setOriginId(e.target.value)}
-            className={styles.select}
-            required
-          >
-            <option value="">Select Origin</option>
-            {locations.map((location) => (
-              <option key={location.locationId} value={location.locationId}>
-                {location.locationName}
-              </option>
-            ))}
-          </select>
+          <Select
+            instanceId="origin-select"
+            options={locationOptions}
+            value={locationOptions.find((opt) => opt.value === originId) || null}
+            onChange={(option) => setOriginId(option?.value || "")}
+            placeholder="Nhập hoặc chọn điểm đi..."
+            isClearable
+            isSearchable
+            styles={customSelectStyles}
+            noOptionsMessage={() => "Không tìm thấy địa điểm"}
+            classNamePrefix="react-select"
+          />
         </div>
 
-        {/* Destination City Dropdown */}
+        {/* Destination City Dropdown - Searchable */}
         <div className={styles.inputGroup}>
           <label className={styles.label}>
             <FaMapMarkerAlt className={styles.icon} />
             Điểm đến
           </label>
-          <select
-            value={destId}
-            onChange={(e) => setDestId(e.target.value)}
-            className={styles.select}
-            required
-          >
-            <option value="">Select Destination</option>
-            {locations.map((location) => (
-              <option key={location.locationId} value={location.locationId}>
-                {location.locationName}
-              </option>
-            ))}
-          </select>
+          <Select
+            instanceId="dest-select"
+            options={locationOptions}
+            value={locationOptions.find((opt) => opt.value === destId) || null}
+            onChange={(option) => setDestId(option?.value || "")}
+            placeholder="Nhập hoặc chọn điểm đến..."
+            isClearable
+            isSearchable
+            styles={customSelectStyles}
+            noOptionsMessage={() => "Không tìm thấy địa điểm"}
+            classNamePrefix="react-select"
+          />
         </div>
 
-        {/* Date Input */}
+        {/* Date Input - Default to today */}
         <div className={styles.inputGroup}>
           <label className={styles.label}>
             <FaCalendarAlt className={styles.icon} />
@@ -129,6 +188,7 @@ export default function TripSearch({ onSearch }: TripSearchProps) {
             value={date}
             onChange={(e) => setDate(e.target.value)}
             className={styles.input}
+            min={getTodayDate()}
             required
           />
         </div>

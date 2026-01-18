@@ -28,6 +28,10 @@
   gap: 12px;
 }
 
+:global(.dark) .headerContent h1 {
+  color: #f9fafb; /* gray-50 */
+}
+
 .titleIcon {
   color: var(--primary);
   font-size: 24px;
@@ -38,6 +42,10 @@
   color: var(--text-secondary);
   font-size: 16px;
   line-height: 1.5;
+}
+
+:global(.dark) .subtitle {
+  color: #9ca3af; /* gray-400 */
 }
 
 .headerActions {
@@ -509,5 +517,9 @@
   .table {
     display: block;
     overflow-x: auto;
+  }
+
+  .formActions {
+    flex-direction: column;
   }
 }

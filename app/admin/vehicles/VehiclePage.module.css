@@ -37,6 +37,31 @@
   opacity: 0.9;
 }
 
+/* --- FILTER SECTION (Mới) --- */
+.filterSection {
+  padding: 0 24px 16px 24px;
+}
+
+/* --- STATS BOX (Mới) --- */
+.statsBox {
+  margin: 0 24px 24px 24px;
+  padding: 12px 16px;
+  background-color: var(--stat-blue-bg);
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+}
+
+.statsText {
+  font-size: 14px;
+  color: var(--stat-blue-text);
+  margin: 0;
+}
+
+.statsHighlight {
+  font-weight: 700;
+  margin: 0 4px;
+}
+
 /* --- LAYOUT --- */
 .contentWrapper {
   padding: 0 24px;
@@ -113,13 +138,12 @@
 }
 
 /* --- COLOR VARIANTS (Using Global Vars) --- */
-/* Blue - Total */
 .cardBlue {
   background-color: var(--stat-blue-bg);
 }
 .iconWrapperBlue {
   background-color: rgba(37, 99, 235, 0.1);
-} /* Fallback or specific opacity */
+}
 .iconBlue {
   color: var(--stat-blue-text);
 }
@@ -131,7 +155,6 @@
   color: var(--stat-blue-text);
 }
 
-/* Green - Active */
 .cardGreen {
   background-color: var(--stat-green-bg);
 }
@@ -149,10 +172,9 @@
   color: var(--stat-green-text);
 }
 
-/* Yellow - Maintenance */
 .cardYellow {
   background-color: var(--stat-orange-bg);
-} /* Using Orange vars for better contrast in dark */
+}
 .iconWrapperYellow {
   background-color: rgba(234, 88, 12, 0.1);
 }
@@ -167,7 +189,6 @@
   color: var(--stat-orange-text);
 }
 
-/* Red - Inactive */
 .cardRed {
   background-color: var(--badge-delayed-bg);
 }

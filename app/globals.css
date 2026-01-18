@@ -6,7 +6,7 @@
    ========================= */
 :root {
   /* Nền & Chữ chính */
-  --background: #ffffff;
+  --background: #ffffff; /* White cho các component cần nền trắng */
   --foreground: #171717;
 
   /* Semantic Mapping (Thêm mới để dùng chung) */
@@ -99,13 +99,13 @@
    ========================= */
 .dark {
   /* Nền & Chữ chính */
-  --background: #020617;
-  --foreground: #e2e8f0;
+  --background: #1f2937; /* gray-800 cho các component cần nền tối */
+  --foreground: #f9fafb; /* gray-50 */
 
   /* Semantic Mapping */
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
-  --bg-secondary: #0f172a; /* Nền tối hơn nền card */
+  --bg-secondary: #1f2937; /* gray-800 */
 
   /* Màu thương hiệu */
   --primary: #ef4444;

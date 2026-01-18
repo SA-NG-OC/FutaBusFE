@@ -245,6 +245,29 @@ export default function ClientBookingCheckoutPage() {
 
         // Redirect to MoMo
         window.location.href = paymentResponse.payUrl;
+      } else if (paymentMethod === "bypass") {
+        // Bypass payment - instant confirmation
+        setProcessingStep("Đang xác nhận thanh toán...");
+        
+        const confirmedBooking = await paymentApi.bypassPayment(
+          bookingResponse.bookingId,
+        );
+        
+        console.log("Bypass payment completed:", confirmedBooking);
+        
+        // Cleanup session storage
+        sessionStorage.removeItem("bookingInfo");
+        sessionStorage.removeItem("selectedSeats");
+        sessionStorage.removeItem("seatHoldExpiry");
+        
+        // Disconnect WebSocket
+        wsContext.unsubscribeFromTrip();
+        
+        // Redirect to success page
+        setProcessingStep("Thanh toán thành công! Đang chuyển hướng...");
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        
+        router.push(`/client/payment/result?orderId=${bookingResponse.bookingCode}&resultCode=0&message=Thanh%20to%C3%A1n%20th%C3%A0nh%20c%C3%B4ng&bypass=true`);
       } else {
         // Other payment methods (not implemented yet)
         setError("Phương thức thanh toán này chưa được hỗ trợ");
@@ -400,14 +423,21 @@ export default function ClientBookingCheckoutPage() {
                 />
                 Thanh toán với MoMo
               </>
+            ) : paymentMethod === "bypass" ? (
+              <>
+                <span style={{ marginRight: 8 }}>⚡</span>
+                Xác nhận ngay (Demo)
+              </>
             ) : (
               "Xác nhận thanh toán"
             )}
           </button>
 
           <p className={styles.securityNote}>
-            🔒 Giao dịch được bảo mật bởi MoMo. Chúng tôi không lưu trữ thông
-            tin thanh toán của bạn.
+            {paymentMethod === "bypass" 
+              ? "⚠️ Chế độ Demo: Bỏ qua thanh toán thực, vé sẽ được xác nhận ngay lập tức."
+              : "🔒 Giao dịch được bảo mật bởi MoMo. Chúng tôi không lưu trữ thông tin thanh toán của bạn."
+            }
           </p>
         </div>
       </div>

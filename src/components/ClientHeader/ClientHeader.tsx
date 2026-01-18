@@ -28,10 +28,39 @@ const ClientHeader = () => {
     { name: "Liên hệ", path: "/client/contact" },
   ];
 
-  const dropdownItems = [
-    { name: "Hồ sơ", path: "/client/profile", icon: <BiUser size={20} /> },
-    { name: "Vé của tôi", path: "/client/my-ticket", icon: <MdConfirmationNumber size={20} /> },
-  ];
+  // Dynamic dropdown items based on user role
+  const getDropdownItems = () => {
+    if (!user) return [];
+    
+    const rolePrefix = user.role.roleName === 'ADMIN' ? '/admin' : 
+                       user.role.roleName === 'STAFF' ? '/employee' : '/client';
+    
+    // Admin và Staff có menu khác với User
+    if (user.role.roleName === 'ADMIN') {
+      return [
+        { name: "Dashboard", path: "/admin/dashboard", icon: <AiOutlineHome size={20} /> },
+        { name: "Hồ sơ", path: "/admin/profile", icon: <BiUser size={20} /> },
+      ];
+    } else if (user.role.roleName === 'STAFF') {
+      return [
+        { name: "Dashboard", path: "/employee/dashboard", icon: <AiOutlineHome size={20} /> },
+        { name: "Hồ sơ", path: "/employee/profile", icon: <BiUser size={20} /> },
+      ];
+    } else if (user.role.roleName === 'DRIVER') {
+      return [
+        { name: "Dashboard", path: "/test-driver", icon: <AiOutlineHome size={20} /> },
+        { name: "Hồ sơ", path: "/client/profile", icon: <BiUser size={20} /> },
+      ];
+    } else {
+      // USER role
+      return [
+        { name: "Hồ sơ", path: "/client/profile", icon: <BiUser size={20} /> },
+        { name: "Vé của tôi", path: "/client/my-ticket", icon: <MdConfirmationNumber size={20} /> },
+      ];
+    }
+  };
+  
+  const dropdownItems = getDropdownItems();
 
   const toggleMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
@@ -148,7 +177,7 @@ const ClientHeader = () => {
 
                   {/* Menu Items */}
                   <div className={styles["dropdown-items"]}>
-                    {dropdownItems.map((item) => (
+                    {dropdownItems.length > 0 && dropdownItems.map((item) => (
                       <Link
                         key={item.path}
                         href={item.path}

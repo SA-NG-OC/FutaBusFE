@@ -37,11 +37,6 @@
   font-size: 0.875rem;
 }
 
-.licensePlate {
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
 .tableHead {
   background-color: var(--bg-secondary);
   border-bottom: 1px solid var(--border-gray);
@@ -68,6 +63,11 @@
   padding: 1rem;
   color: var(--text-primary);
   vertical-align: middle;
+}
+
+.licensePlate {
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 /* Badges (Dùng biến từ global.css) */
@@ -130,6 +130,16 @@
 }
 
 .editButton:hover {
+  opacity: 0.8;
+}
+
+/* [NEW] Assign Route Button */
+.assignButton {
+  background-color: var(--stat-green-bg); /* Hoặc dùng Primary nhạt */
+  color: var(--stat-green-text);
+}
+
+.assignButton:hover {
   opacity: 0.8;
 }
 

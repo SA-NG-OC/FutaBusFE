@@ -1,0 +1,397 @@
+/* Modal Overlay */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.modalContent {
+  position: relative;
+  background: var(--background-paper);
+  border-radius: 16px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 95vh;
+  overflow-y: auto;
+  margin: auto;
+}
+
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background 0.2s;
+}
+
+.closeButton:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Container - reuse TicketDetail styles */
+.container {
+  max-width: 100%;
+  margin: 0;
+  padding: 1rem;
+}
+
+/* Ticket Card */
+.ticketCard {
+  background: var(--background-paper);
+  border-radius: 12px;
+  box-shadow: var(--modal-shadow);
+  overflow: hidden;
+}
+
+/* Header */
+.header {
+  background: var(--background-paper);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-gray);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.headerIcon {
+  font-size: 1.25rem;
+  color: var(--primary);
+}
+
+.headerTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bookingCode {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.statusBadge {
+  padding: 0.5rem 1rem;
+  border-radius: 16px;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.statusConfirmed {
+  background: #fee;
+  color: var(--primary);
+}
+
+.statusPending {
+  background: var(--stat-orange-bg);
+  color: var(--stat-orange-text);
+}
+
+.statusCancelled {
+  background: var(--badge-delayed-bg);
+  color: var(--badge-delayed-text);
+}
+
+/* QR Code */
+.qrSection {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  border-bottom: 1px solid var(--border-gray);
+}
+
+/* Content Grid - 2 columns */
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.leftColumn,
+.rightColumn {
+  padding: 1.5rem;
+}
+
+.leftColumn {
+  border-right: 1px solid var(--border-gray);
+}
+
+/* Sections */
+.section {
+  margin-bottom: 1.75rem;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-gray);
+}
+
+.sectionIcon {
+  font-size: 1.1rem;
+  color: var(--primary);
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Info Rows */
+.infoRow {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.infoIcon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.infoContent {
+  flex: 1;
+}
+
+.infoGroup {
+  margin-bottom: 0.75rem;
+}
+
+.infoGroupInline {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.infoLabel {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.infoValue {
+  font-size: 1rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.seatNumber {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+
+/* Important info - larger and bolder */
+.routeValue {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.customerName {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dateTimeValue {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.locationValue {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Location Box */
+.locationBox {
+  margin-bottom: 1rem;
+}
+
+.locationBox:last-child {
+  margin-bottom: 0;
+}
+
+.infoTime {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+/* Actions */
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: 1px solid var(--border-gray);
+}
+
+.downloadButton,
+.backButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.downloadButton {
+  background: var(--primary);
+  color: var(--text-white);
+  border-right: 1px solid var(--border-gray);
+}
+
+.downloadButton:hover {
+  background: var(--primary-hover);
+}
+
+.downloadButton span {
+  font-size: 1.1rem;
+}
+
+.backButton {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+.backButton:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.backButton span {
+  font-size: 1.1rem;
+}
+
+/* Download Progress Overlay */
+.downloadOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.downloadDialog {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f3f4f6;
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.downloadDialog p {
+  color: #374151;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modalOverlay {
+    padding: 0;
+  }
+
+  .modalContent {
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .container {
+    padding: 0.5rem;
+  }
+
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .leftColumn {
+    border-right: none;
+    border-bottom: 1px solid var(--border-gray);
+    padding-bottom: 1.5rem;
+  }
+
+  .rightColumn {
+    padding-top: 1.5rem;
+  }
+
+  .actions {
+    grid-template-columns: 1fr;
+  }
+
+  .downloadButton {
+    border-right: none;
+    border-bottom: 1px solid var(--border-gray);
+  }
+
+  .infoGroupInline {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}

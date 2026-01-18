@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaTruck } from "react-icons/fa";
+import { FaEdit, FaTrash, FaTruck, FaRoute } from "react-icons/fa"; // [ADDED] FaRoute
+import { vehicleRouteAssignmentApi } from "@/feature/vehicle/api/vehicleRouteAssignmentApi";
 import styles from "./VehicleTable.module.css";
 
 // Types for Vehicle data
@@ -10,6 +11,7 @@ interface VehicleData {
   capacity: number;
   status: "ACTIVE" | "INACTIVE" | "MAINTENANCE";
   createdAt: string;
+  assignedRoutes?: string[]; // Array of route names
 }
 
 interface VehicleTableProps {
@@ -17,6 +19,7 @@ interface VehicleTableProps {
   loading?: boolean;
   onEditVehicle: (vehicle: VehicleData) => void;
   onDeleteVehicle: (vehicleId: number) => void;
+  onAssignRoute?: (vehicleId: number) => void;
   currentPage?: number;
   totalPages?: number;
   totalElements?: number;
@@ -28,19 +31,58 @@ export default function VehicleTable({
   loading = false,
   onEditVehicle,
   onDeleteVehicle,
+  onAssignRoute,
   currentPage = 0,
   totalPages = 1,
   totalElements = 0,
   onPageChange,
 }: VehicleTableProps) {
-  // Format date helper
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString("vi-VN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
+  const [vehiclesWithRoutes, setVehiclesWithRoutes] =
+    useState<VehicleData[]>(vehicles);
+  const [loadingRoutes, setLoadingRoutes] = useState(false);
+
+  // Fetch assigned routes for all vehicles
+  // Note: Tốt nhất nên để BE trả về assignedRoutes luôn để tránh N+1 request ở FE
+  useEffect(() => {
+    const fetchAssignedRoutes = async () => {
+      if (!vehicles.length) {
+        setVehiclesWithRoutes([]);
+        return;
+      }
+
+      setLoadingRoutes(true);
+      try {
+        const vehiclesWithRoutesData = await Promise.all(
+          vehicles.map(async (vehicle) => {
+            try {
+              const assignments = await vehicleRouteAssignmentApi.getByVehicle(
+                vehicle.vehicleId,
+              );
+              const routeNames = assignments
+                .filter((a) => a.isActive) // Chỉ lấy các assignment đang active
+                .map((a) => a.routeName);
+              return { ...vehicle, assignedRoutes: routeNames };
+            } catch (error) {
+              console.error(
+                `Error fetching routes for vehicle ${vehicle.vehicleId}:`,
+                error,
+              );
+              return { ...vehicle, assignedRoutes: [] };
+            }
+          }),
+        );
+        setVehiclesWithRoutes(vehiclesWithRoutesData);
+      } catch (error) {
+        console.error("Error fetching vehicle routes:", error);
+        // Fallback: hiển thị danh sách gốc nếu lỗi
+        setVehiclesWithRoutes(vehicles);
+      } finally {
+        setLoadingRoutes(false);
+      }
+    };
+
+    fetchAssignedRoutes();
+  }, [vehicles]);
 
   // Get status badge class
   const getStatusClass = (status: string): string => {
@@ -134,6 +176,10 @@ export default function VehicleTable({
     );
   }
 
+  // Determine which data to display (use vehiclesWithRoutes if available, else vehicles)
+  const displayData =
+    vehiclesWithRoutes.length > 0 ? vehiclesWithRoutes : vehicles;
+
   return (
     <div className={styles.container}>
       {/* Table */}
@@ -145,13 +191,14 @@ export default function VehicleTable({
               <th className={styles.tableHeaderCell}>Loại xe</th>
               <th className={styles.tableHeaderCell}>Sức chứa</th>
               <th className={styles.tableHeaderCell}>Trạng thái</th>
+              <th className={styles.tableHeaderCell}>Tuyến đã gắn</th>
               <th className={styles.tableHeaderCell}>Thao tác</th>
             </tr>
           </thead>
           <tbody>
-            {vehicles.length === 0 ? (
+            {displayData.length === 0 ? (
               <tr>
-                <td colSpan={5}>
+                <td colSpan={6}>
                   <div className={styles.emptyState}>
                     <div className={styles.emptyStateIcon}>🚌</div>
                     <div className={styles.emptyStateText}>Chưa có xe nào</div>
@@ -162,7 +209,7 @@ export default function VehicleTable({
                 </td>
               </tr>
             ) : (
-              vehicles.map((vehicle) => (
+              displayData.map((vehicle) => (
                 <tr key={vehicle.vehicleId} className={styles.tableRow}>
                   <td className={styles.tableCell}>
                     <div className={styles.licensePlate}>
@@ -181,7 +228,66 @@ export default function VehicleTable({
                     </span>
                   </td>
                   <td className={styles.tableCell}>
+                    {loadingRoutes ? (
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          color: "var(--text-secondary)",
+                        }}
+                      >
+                        Đang tải...
+                      </span>
+                    ) : vehicle.assignedRoutes &&
+                      vehicle.assignedRoutes.length > 0 ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: "4px",
+                        }}
+                      >
+                        {vehicle.assignedRoutes.map((routeName, idx) => (
+                          <span
+                            key={idx}
+                            style={{
+                              fontSize: "11px",
+                              padding: "2px 6px",
+                              borderRadius: "4px",
+                              backgroundColor: "var(--bg-hover)",
+                              color: "var(--text-primary)",
+                              border: "1px solid var(--border-gray)",
+                            }}
+                          >
+                            {routeName}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          color: "var(--text-secondary)",
+                          fontStyle: "italic",
+                        }}
+                      >
+                        Chưa gắn tuyến
+                      </span>
+                    )}
+                  </td>
+                  <td className={styles.tableCell}>
                     <div className={styles.actionButtons}>
+                      {/* Nút Gán Tuyến */}
+                      {onAssignRoute && (
+                        <button
+                          onClick={() => onAssignRoute(vehicle.vehicleId)}
+                          className={`${styles.actionButton} ${styles.assignButton}`}
+                          title="Gán tuyến"
+                        >
+                          <FaRoute size={14} />
+                        </button>
+                      )}
+
+                      {/* Nút Sửa */}
                       <button
                         onClick={() => onEditVehicle(vehicle)}
                         className={`${styles.actionButton} ${styles.editButton}`}
@@ -189,6 +295,8 @@ export default function VehicleTable({
                       >
                         <FaEdit size={14} />
                       </button>
+
+                      {/* Nút Xóa */}
                       <button
                         onClick={() => onDeleteVehicle(vehicle.vehicleId)}
                         className={`${styles.actionButton} ${styles.deleteButton}`}
@@ -206,10 +314,10 @@ export default function VehicleTable({
       </div>
 
       {/* Pagination */}
-      {vehicles.length > 0 && (
+      {displayData.length > 0 && (
         <div className={styles.pagination}>
           <div className={styles.paginationInfo}>
-            Hiển thị {vehicles.length} / {totalElements} xe
+            Hiển thị {displayData.length} / {totalElements} xe
           </div>
           {renderPagination()}
         </div>

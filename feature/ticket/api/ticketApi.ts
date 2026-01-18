@@ -5,6 +5,8 @@ import {
   BookingListItem,
 } from "../types";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export const ticketApi = {
   // ================================
   // GET ALL BOOKINGS (Admin table)
@@ -116,5 +118,32 @@ export const ticketApi = {
   // ================================
   getTicketDetailByCode: async (ticketCode: string): Promise<BookingListItem> => {
     return api.get<BookingListItem>(`/bookings/ticket/${ticketCode}`);
+  },
+
+  getTicketQrImage: async (ticketCode: string): Promise<Blob> => {
+    const res = await fetch(`${API_BASE_URL}/tickets/${ticketCode}/qr`, {
+      method: "GET",
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to load QR code image");
+    }
+    return res.blob();
+  },
+
+  exportTicketPdf: async (ticketId: number, token?: string): Promise<Blob> => {
+    const headers: HeadersInit = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    const res = await fetch(`${API_BASE_URL}/tickets/${ticketId}/pdf`, {
+      method: "GET",
+      headers: headers,
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to export ticket PDF");
+    }
+    return res.blob();
   },
 };

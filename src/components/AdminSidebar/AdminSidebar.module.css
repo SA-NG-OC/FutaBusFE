@@ -16,6 +16,11 @@
     z-index: 1000; /* Đảm bảo sidebar nằm trên các thành phần khác */
 }
 
+:global(.dark) .admin-sidebar {
+    background-color: #1f2937; /* gray-800 */
+    border-color: #374151; /* gray-700 */
+}
+
 /* Các class header, nav, footer */
 .sidebar-header {
     height: 92.8px;
@@ -23,6 +28,10 @@
     border-bottom: 0.8px solid var(--text-gray);
     flex-shrink: 0;
     transition: border-color 0.2s ease;
+}
+
+:global(.dark) .sidebar-header {
+    border-color: #4b5563; /* gray-600 */
 }
 
 .logo-container {
@@ -60,6 +69,10 @@
     transition: color 0.2s ease;
 }
 
+:global(.dark) .brand-name {
+    color: #ef4444; /* red-500 */
+}
+
 .brand-highlight { 
     color: var(--primary);
     transition: color 0.2s ease;
@@ -70,6 +83,10 @@
     color: var(--text-gray); 
     margin: 0;
     transition: color 0.2s ease;
+}
+
+:global(.dark) .brand-subtitle {
+    color: #9ca3af; /* gray-400 */
 }
 
 .sidebar-navigation {
@@ -92,13 +109,25 @@
     cursor: pointer;
 }
 
+:global(.dark) .nav-link {
+    color: #d1d5db; /* gray-300 */
+}
+
 .nav-link:hover { 
     background-color: rgba(216, 62, 62, 0.1); 
+}
+
+:global(.dark) .nav-link:hover {
+    background-color: rgba(239, 68, 68, 0.2);
 }
 
 .active { 
     background-color: var(--primary); 
     color: var(--text-white) !important;
+}
+
+:global(.dark) .active {
+    background-color: #ef4444; /* red-500 */
 }
 
 .nav-icon { 
@@ -123,6 +152,10 @@
     transition: border-color 0.2s ease;
 }
 
+:global(.dark) .sidebar-footer {
+    border-color: #4b5563; /* gray-600 */
+}
+
 .logout-link { 
     display: flex; 
     align-items: center; 
@@ -132,6 +165,10 @@
     color: var(--primary); 
     cursor: pointer;
     transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+:global(.dark) .logout-link {
+    color: #ef4444; /* red-500 */
 }
 
 .logout-link:hover { 

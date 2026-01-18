@@ -1,16 +1,19 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useVehicles } from "@/feature/vehicle/hooks/useVehicle";
 import { Vehicle, VehicleRequest, VehicleType } from "@/feature/vehicle/types";
 import VehicleTable from "@/feature/vehicle/components/VehicleTable/VehicleTable";
 import VehicleModal from "@/feature/vehicle/components/VehicleModal/VehicleModal";
 import ConfirmDeleteModal from "@/feature/vehicle/components/ConfirmDeleteModal/ConfirmDeleteModal";
+// [NEW] Import Modal Gán tuyến
+import VehicleRouteAssignmentModal from "@/feature/vehicle/components/VehicleRouteAssignmentModal/VehicleRouteAssignmentModal";
+import { vehicleRouteAssignmentApi } from "@/feature/vehicle/api/vehicleRouteAssignmentApi";
 import PageHeader from "@/src/components/PageHeader/PageHeader";
-// [NEW] Import CSS Module
 import styles from "./VehiclePage.module.css";
+// [NEW] Import Filter
+import RouteFilter from "@/src/components/RouteFilter/RouteFilter";
 
-// --- TYPE ADAPTERS & HELPERS ---
-
+// --- Types & Helper Functions (Giữ nguyên như cũ) ---
 interface VehicleTableData {
   vehicleId: number;
   licensePlate: string;
@@ -34,7 +37,7 @@ interface VehicleModalData {
   notes?: string;
 }
 
-// Mock vehicle types - TODO: Fetch from API
+// Mock vehicle types
 const vehicleTypes: VehicleType[] = [
   { typeId: 1, typeName: "Limousine", capacity: 34 },
   { typeId: 2, typeName: "Giường nằm", capacity: 40 },
@@ -77,7 +80,7 @@ const convertToModalData = (vehicle: Vehicle): VehicleModalData => {
     status: mapApiStatusToComponentStatus(vehicle.status),
     insuranceNumber: vehicle.insuranceNumber,
     insuranceExpiry: vehicle.insuranceExpiry,
-    notes: undefined, // Add notes field if API supports it
+    notes: undefined,
   };
 };
 
@@ -110,17 +113,22 @@ const convertToApiRequest = (data: VehicleModalData): VehicleRequest => ({
   status: mapComponentStatusToApiStatus(data.status),
 });
 
-// Status mapping
 const mapApiStatusToComponentStatus = (
   apiStatus: string,
 ): "ACTIVE" | "INACTIVE" | "MAINTENANCE" => {
   switch (apiStatus.toLowerCase()) {
     case "operational":
       return "ACTIVE";
-    case "inactive":
-      return "INACTIVE";
     case "maintenance":
       return "MAINTENANCE";
+    case "inactive":
+      return "INACTIVE";
+    case "hoàn thiện":
+      return "ACTIVE"; // Fallback Vietnamese
+    case "hư hại":
+      return "MAINTENANCE";
+    case "phế liệu":
+      return "INACTIVE";
     default:
       return "ACTIVE";
   }
@@ -132,10 +140,10 @@ const mapComponentStatusToApiStatus = (
   switch (componentStatus) {
     case "ACTIVE":
       return "Operational";
-    case "INACTIVE":
-      return "Inactive";
     case "MAINTENANCE":
       return "Maintenance";
+    case "INACTIVE":
+      return "Inactive";
     default:
       return "Operational";
   }
@@ -159,16 +167,50 @@ export default function VehiclePage() {
     handleDeleteConfirm,
   } = useVehicles();
 
-  const tableVehicles = vehicles.map(convertToTableData);
+  // --- LOGIC ASSIGNMENT (Của bạn bạn) ---
+  const [showAssignmentModal, setShowAssignmentModal] = useState(false);
+  const [selectedVehicleForAssignment, setSelectedVehicleForAssignment] =
+    useState<{ vehicleId: number; licensePlate: string } | null>(null);
+  const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
+  const [filteredVehicles, setFilteredVehicles] = useState<Vehicle[]>([]);
 
+  // Filter logic
+  useEffect(() => {
+    let cancelled = false;
+    const filterVehiclesByRoute = async () => {
+      if (!selectedRouteId) return;
+      try {
+        const assignments =
+          await vehicleRouteAssignmentApi.getByRoute(selectedRouteId);
+        const vehicleIds = assignments.map((a) => a.vehicleId);
+        const filtered = vehicles.filter((v) =>
+          vehicleIds.includes(v.vehicleid),
+        );
+        if (!cancelled) setFilteredVehicles(filtered);
+      } catch (error) {
+        console.error("Error filtering vehicles:", error);
+        if (!cancelled) setFilteredVehicles([]);
+      }
+    };
+
+    if (selectedRouteId) {
+      filterVehiclesByRoute();
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedRouteId, vehicles]);
+
+  // Determine display list
+  const displayVehicles = selectedRouteId ? filteredVehicles : vehicles;
+  const tableVehicles = displayVehicles.map(convertToTableData);
+
+  // Handlers
   const handleEditClick = (tableVehicle: VehicleTableData) => {
-    // Need to find original vehicle to get all data including typeId
     const originalVehicle = vehicles.find(
       (v) => v.vehicleid === tableVehicle.vehicleId,
     );
     if (originalVehicle) {
-      // Mock opening logic handled by hook, pass ID to hook
-      // Since hook uses ID to find vehicle, we just need to pass ID
       openEditModal(tableVehicle.vehicleId);
     }
   };
@@ -180,6 +222,21 @@ export default function VehiclePage() {
   const handleModalSave = async (modalData: VehicleModalData) => {
     const apiData = convertToApiRequest(modalData);
     await handleSaveVehicle(apiData);
+  };
+
+  const handleAssignRouteClick = (vehicleId: number) => {
+    const vehicle = tableVehicles.find((v) => v.vehicleId === vehicleId);
+    if (vehicle) {
+      setSelectedVehicleForAssignment({
+        vehicleId: vehicle.vehicleId,
+        licensePlate: vehicle.licensePlate,
+      });
+      setShowAssignmentModal(true);
+    }
+  };
+
+  const handleAssignmentSuccess = () => {
+    // Refresh logic if needed
   };
 
   // Error State
@@ -220,6 +277,28 @@ export default function VehiclePage() {
         actionLabel="Thêm xe mới"
         onAction={openAddModal}
       />
+
+      {/* --- FILTER SECTION (Mới - CSS Module) --- */}
+      <div className={styles.filterSection}>
+        <RouteFilter
+          onRouteSelect={setSelectedRouteId}
+          selectedRouteId={selectedRouteId}
+          placeholder="Lọc theo tuyến đường"
+        />
+      </div>
+
+      {/* Statistics (Hiển thị khi lọc) */}
+      {selectedRouteId && (
+        <div className={styles.statsBox}>
+          <p className={styles.statsText}>
+            Hiển thị{" "}
+            <span className={styles.statsHighlight}>
+              {displayVehicles.length}
+            </span>{" "}
+            xe được gắn vào tuyến đã chọn
+          </p>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className={styles.contentWrapper}>
@@ -370,9 +449,11 @@ export default function VehiclePage() {
             loading={loading}
             onEditVehicle={handleEditClick}
             onDeleteVehicle={handleDeleteClick}
-            currentPage={1} // TODO: Implement pagination
+            // [NEW] Truyền prop để bật nút Gán tuyến
+            onAssignRoute={handleAssignRouteClick}
+            currentPage={1}
             totalPages={1}
-            totalElements={vehicles.length}
+            totalElements={displayVehicles.length}
             onPageChange={(page) => console.log("Page change:", page)}
           />
         </div>
@@ -397,6 +478,20 @@ export default function VehiclePage() {
         }
         loading={loading}
       />
+
+      {/* Route Assignment Modal */}
+      {selectedVehicleForAssignment && (
+        <VehicleRouteAssignmentModal
+          isOpen={showAssignmentModal}
+          onClose={() => {
+            setShowAssignmentModal(false);
+            setSelectedVehicleForAssignment(null);
+          }}
+          vehicleId={selectedVehicleForAssignment.vehicleId}
+          vehicleName={selectedVehicleForAssignment.licensePlate}
+          onSuccess={handleAssignmentSuccess}
+        />
+      )}
     </div>
   );
 }
