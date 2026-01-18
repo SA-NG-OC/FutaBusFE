@@ -41,26 +41,76 @@ export default function AdminDriversPage() {
   const [selectedDriverForAssignment, setSelectedDriverForAssignment] = useState<{id: number, name: string} | null>(null);
   const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
   const [filteredDrivers, setFilteredDrivers] = useState<Driver[]>([]);
+  const [driversWithRoutes, setDriversWithRoutes] = useState<Driver[]>([]);
+  const [loadingRoutes, setLoadingRoutes] = useState(false);
+
+  // Fetch assigned routes for all drivers
+  useEffect(() => {
+    const fetchAssignedRoutes = async () => {
+      if (!drivers.length) return;
+      
+      setLoadingRoutes(true);
+      try {
+        const driversWithRoutesData = await Promise.all(
+          drivers.map(async (driver) => {
+            try {
+              const assignments = await driverRouteAssignmentApi.getByDriver(driver.driverId);
+              const activeRoutes = assignments
+                .filter(a => {
+                  // Check if assignment is active (between start and end date)
+                  const startDate = new Date(a.startDate);
+                  const endDate = a.endDate ? new Date(a.endDate) : null;
+                  const today = new Date();
+                  return startDate <= today && (!endDate || endDate >= today);
+                })
+                .map(a => ({
+                  assignmentId: a.assignmentId,
+                  routeId: a.routeId,
+                  routeName: a.routeName,
+                  origin: a.origin,
+                  destination: a.destination,
+                  preferredRole: a.preferredRole,
+                  priority: a.priority,
+                  startDate: a.startDate,
+                  endDate: a.endDate
+                }));
+              return { ...driver, activeRoutes };
+            } catch (error) {
+              console.error(`Error fetching routes for driver ${driver.driverId}:`, error);
+              return { ...driver, activeRoutes: [] };
+            }
+          })
+        );
+        setDriversWithRoutes(driversWithRoutesData);
+      } catch (error) {
+        console.error('Error fetching driver routes:', error);
+      } finally {
+        setLoadingRoutes(false);
+      }
+    };
+
+    fetchAssignedRoutes();
+  }, [drivers]);
 
   // Only filter when route selection changes or when explicitly needed
   useEffect(() => {
     if (selectedRouteId) {
       filterDriversByRoute();
     } else {
-      setFilteredDrivers(drivers);
+      setFilteredDrivers(driversWithRoutes);
     }
-  }, [selectedRouteId]); // Removed 'drivers' dependency to prevent unnecessary re-filtering
+  }, [selectedRouteId, driversWithRoutes]);
 
   const filterDriversByRoute = async () => {
     if (!selectedRouteId) {
-      setFilteredDrivers(drivers);
+      setFilteredDrivers(driversWithRoutes);
       return;
     }
 
     try {
       const assignments = await driverRouteAssignmentApi.getByRoute(selectedRouteId);
       const driverIds = assignments.map(a => a.driverId);
-      const filtered = drivers.filter(d => driverIds.includes(d.driverId));
+      const filtered = driversWithRoutes.filter(d => driverIds.includes(d.driverId));
       setFilteredDrivers(filtered);
     } catch (error) {
       console.error('Error filtering drivers:', error);
@@ -80,7 +130,7 @@ export default function AdminDriversPage() {
     }
   };
 
-  const displayDrivers = selectedRouteId ? filteredDrivers : drivers;
+  const displayDrivers = selectedRouteId ? filteredDrivers : driversWithRoutes;
 
   return (
     <div>
