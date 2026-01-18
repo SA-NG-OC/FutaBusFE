@@ -17,12 +17,19 @@ export const dashboardApi = {
     // 3. Lấy danh sách chuyến đi hôm nay
     getTrip: async (
         date?: string,
+        routeId?: number | null, // 1. Thêm tham số routeId (cho phép number hoặc null)
         page: number = 0,
         size: number = 10
     ): Promise<PageResponse<DashboardTripDTO>> => {
         const params: any = { page, size };
+
         if (date) {
             params.date = date;
+        }
+
+        // 2. Kiểm tra nếu có routeId thì đẩy vào params
+        if (routeId) {
+            params.routeId = routeId;
         }
 
         return api.get<PageResponse<DashboardTripDTO>>('/dashboard/todays-trips', { params });

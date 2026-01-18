@@ -29,7 +29,7 @@ export default function AdminDriversPage() {
   } = useDrivers();
 
   return (
-    <div className="p-4 min-h-screen bg-(--background) text-(--foreground)">
+    <div className="min-h-screen bg-(--background) text-(--foreground)">
       <PageHeader
         title="Driver Management"
         subtitle="Manage your drivers and route assignments"

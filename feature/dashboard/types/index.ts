@@ -1,4 +1,4 @@
-// --- UI Types (Giữ nguyên để dùng cho Component) ---
+// --- UI Types ---
 export type StatVariant = 'green' | 'blue' | 'orange' | 'purple';
 
 export interface StatCardProps {
@@ -7,14 +7,14 @@ export interface StatCardProps {
     trendValue: string;
     variant: StatVariant;
     icon: React.ReactNode;
-    isIncrease?: boolean; // Thêm cái này để biết mũi tên lên hay xuống
+    isIncrease?: boolean;
 }
 
-// --- BACKEND DTO TYPES (Mới) ---
+// --- BACKEND DTO TYPES ---
 
 // 1. Stats DTO
 export interface StatItemDTO {
-    value: number;      // BigDecimal trả về number trong JSON
+    value: number;
     growth: number;
     label: string;
     isIncrease: boolean;
@@ -38,15 +38,20 @@ export interface DashboardChartDTO {
     weeklySales: ChartDataDTO[];
 }
 
-// 3. Trips DTO
-// Map chính xác các field status trả về từ BE
+// 3. Select Options DTO (MỚI THÊM)
+export interface RouteSelection {
+    routeId: number;
+    routeName: string;
+}
+
+// 4. Trips DTO
 export type TripStatus = 'Running' | 'Waiting' | 'Delayed' | 'Completed' | 'Cancelled';
 
 export interface DashboardTripDTO {
     tripIdDisplay: string;
     routeName: string;
-    status: TripStatus; // Hoặc string nếu BE trả về status lạ
+    status: TripStatus;
     statusClass: string;
-    departure: string; // LocalTime sẽ trả về string dạng "HH:mm:ss"
+    departure: string;
     seatsInfo: string;
 }

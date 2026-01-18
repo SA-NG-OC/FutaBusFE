@@ -14,12 +14,15 @@ const DashboardView = () => {
         stats,
         chartData,
         trips,
+        routes,
+        filters,
         loadingStats,
         loadingChart,
         loadingTrips,
         page,
         setPage,
-        totalPages
+        totalPages,
+        handleFilterChange
     } = useDashboard();
 
     const formatCurrency = (amount: number) =>
@@ -34,11 +37,10 @@ const DashboardView = () => {
     };
 
     return (
-        // Responsive Padding: p-4 mobile, p-6 tablet+
         <div className="w-full bg-[var(--background)] text-[var(--foreground)] transition-colors duration-200">
             <PageHeader title="Overview Dashboard" subtitle='Overview of your bus ticket management system' />
 
-            {/* STATS GRID: 1 cột (mobile) -> 2 cột (tablet) -> 4 cột (desktop lớn) */}
+            {/* STATS GRID */}
             <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
                 <StatCard
                     variant="green"
@@ -74,7 +76,7 @@ const DashboardView = () => {
                 />
             </div>
 
-            {/* CHARTS GRID: 1 cột (mobile/tablet) -> 2 cột (desktop) */}
+            {/* CHARTS GRID */}
             <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                 <ChartCard
                     title="Revenue Trends"
@@ -91,12 +93,19 @@ const DashboardView = () => {
                 </ChartCard>
             </div>
 
-            {/* TRIP TABLE SECTION */}
+            {/* TRIP TABLE SECTION - Đã cập nhật props */}
             <div className="mt-6">
-                {/* Table Component tự handle khung viền của nó */}
                 <TripTable
+                    // Data & Loading
                     data={trips}
                     isLoading={loadingTrips}
+
+                    // Filter Logic
+                    routes={routes}                 // Truyền list dropdown
+                    filters={filters}               // Truyền giá trị đang chọn
+                    onFilterChange={handleFilterChange} // Truyền hàm xử lý
+
+                    // Pagination
                     pagination={{
                         currentPage: page,
                         totalPages: totalPages,
