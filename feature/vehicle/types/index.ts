@@ -1,9 +1,19 @@
 export type Vehicle = {
   vehicleid: number;
   licenseplate: string;
-  vehicletype: string;
-  totalseats: number;
-  status: 'Operational' | 'Inactive' | string;
+  typeId: number;
+  vehicletype?: string; // Will be resolved from typeId
+  totalseats?: number; // Will be resolved from typeId  
+  insuranceNumber?: string;
+  insuranceExpiry?: string; // ISO date string
+  status: 'Operational' | 'Inactive' | 'Maintenance' | string;
+};
+
+export type VehicleType = {
+  typeId: number;
+  typeName: string;
+  capacity: number;
+  description?: string;
 };
 
 export type SortInfo = {
@@ -43,9 +53,10 @@ export type ApiResponse<T> = {
 };
 
 export type VehicleRequest = {
-      licenseplate: string;
-  vehicletype: string;
-  totalseats: number;
+  licensePlate: string;
+  typeId: number;
+  insuranceNumber?: string;
+  insuranceExpiry?: string; // ISO date string (YYYY-MM-DD)
   status: string;
 }
 
