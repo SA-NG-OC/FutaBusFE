@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { driverApi, Driver, DriverRequest } from '../api/driverApi';
+import { driverApi, Driver, DriverRequest, CreateDriverWithAccountRequest } from '../api/driverApi';
 
 export const useDrivers = () => {
   const [drivers, setDrivers] = useState<Driver[]>([]);
@@ -105,6 +105,18 @@ export const useDrivers = () => {
     }
   };
 
+  // Create driver with account
+  const handleCreateWithAccount = async (data: CreateDriverWithAccountRequest, avatarFile?: File) => {
+    try {
+      await driverApi.createWithAccount(data, avatarFile);
+      closeModal();
+      fetchDrivers(currentPage, keyword);
+    } catch (err) {
+      console.error('Create driver with account failed', err);
+      throw err;
+    }
+  };
+
   return {
     drivers,
     loading,
@@ -123,5 +135,6 @@ export const useDrivers = () => {
     closeModal,
     handleSaveDriver,
     handleDeleteConfirm,
+    handleCreateWithAccount,
   };
 };
