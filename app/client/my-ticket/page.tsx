@@ -1,11 +1,12 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 import TicketCard from "@/feature/ticket/components/TicketCard";
 import { useMyTickets } from "@/feature/ticket/hooks/useMyTickets";
 import { useAuth } from "@/src/context/AuthContext";
 import { ticketApi } from "@/feature/ticket/api/ticketApi";
+import TicketDetailModal from "@/feature/ticket/components/TicketDetailModal";
 
 export default function MyTicketsPage() {
   const router = useRouter();
@@ -20,6 +21,11 @@ export default function MyTicketsPage() {
   const [cancellationLoading, setCancellationLoading] = React.useState<
     number | null
   >(null);
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState<any>(null);
+  const [loadingTicket, setLoadingTicket] = useState(false);
 
   // Redirect or show login modal if not authenticated
   React.useEffect(() => {
@@ -46,10 +52,81 @@ export default function MyTicketsPage() {
     refetch,
   } = useMyTickets(token);
 
-  const handleViewDetails = (bookingCode: string) => {
+  const handleViewDetails = async (bookingCode: string) => {
     console.log("View details for booking:", bookingCode);
-    // Navigate to ticket lookup with booking code
-    router.push(`/client/ticket-lookup?code=${bookingCode}`);
+
+    setLoadingTicket(true);
+    try {
+      const response = await ticketApi.getBookingByCode(bookingCode);
+
+      if (response && response.success && response.data) {
+        const booking = response.data;
+        const firstTicket = booking.tickets[0];
+
+        if (!firstTicket) {
+          alert("Không tìm thấy vé trong booking");
+          return;
+        }
+
+        // Map data to modal format
+        const ticketData = {
+          bookingCode: booking.bookingCode,
+          status: booking.bookingStatus,
+          qrCode: firstTicket.ticketCode,
+          fromLocation:
+            booking.tripInfo.routeName.split("→")[0]?.trim() ||
+            booking.tripInfo.pickupLocation ||
+            "",
+          toLocation:
+            booking.tripInfo.routeName.split("→")[1]?.trim() ||
+            booking.tripInfo.dropoffLocation ||
+            "",
+          departureDate: new Date(
+            booking.tripInfo.departureTime,
+          ).toLocaleDateString("vi-VN"),
+          departureTime: new Date(
+            booking.tripInfo.departureTime,
+          ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+          duration: `${Math.round(
+            (new Date(booking.tripInfo.arrivalTime).getTime() -
+              new Date(booking.tripInfo.departureTime).getTime()) /
+              (1000 * 60 * 60),
+          )}h`,
+          vehicleType: "Limousine",
+          licensePlate: booking.tripInfo.vehiclePlate || "N/A",
+          driverName: booking.tripInfo.driverName,
+          customerName: firstTicket.passenger?.fullName || booking.customerName,
+          customerPhone:
+            firstTicket.passenger?.phoneNumber || booking.customerPhone,
+          customerEmail: firstTicket.passenger?.email || booking.customerEmail,
+          customerIdCard: "",
+          seatNumber: booking.tickets.map((t: any) => t.seatNumber).join(", "),
+          seatFloor: `Tầng ${firstTicket.floorNumber}`,
+          pickupLocation: booking.tripInfo.pickupLocation || "",
+          pickupTime: new Date(
+            booking.tripInfo.pickupTime || booking.tripInfo.departureTime,
+          ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+          dropoffLocation: booking.tripInfo.dropoffLocation || "",
+          dropoffTime: new Date(
+            booking.tripInfo.dropoffTime || booking.tripInfo.arrivalTime,
+          ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+        };
+
+        setSelectedTicket(ticketData);
+        setIsModalOpen(true);
+      } else {
+        alert("Không thể tải thông tin vé. Vui lòng thử lại.");
+      }
+    } catch (err) {
+      console.error("Error fetching ticket details:", err);
+      alert(
+        err instanceof Error
+          ? err.message
+          : "Không thể tải thông tin vé. Vui lòng thử lại.",
+      );
+    } finally {
+      setLoadingTicket(false);
+    }
   };
 
   const handleCancelBooking = async (bookingId: number) => {
@@ -237,6 +314,45 @@ export default function MyTicketsPage() {
           >
             Next
           </button>
+        </div>
+      )}
+
+      {/* Ticket Detail Modal */}
+      <TicketDetailModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        ticket={selectedTicket}
+      />
+
+      {/* Loading overlay for fetching ticket */}
+      {loadingTicket && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 999,
+          }}
+        >
+          <div
+            style={{
+              background: "white",
+              padding: "2rem",
+              borderRadius: "12px",
+              textAlign: "center",
+            }}
+          >
+            <div className={styles.spinner}></div>
+            <p style={{ color: "#374151", fontWeight: 500, marginTop: "1rem" }}>
+              Đang tải thông tin vé...
+            </p>
+          </div>
         </div>
       )}
     </div>

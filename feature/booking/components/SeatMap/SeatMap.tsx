@@ -24,16 +24,25 @@ interface Floor {
   seats: Seat[];
 }
 
+interface LockedSeatInfo {
+  seatId: number;
+  seatNumber: string;
+  userId: string;
+  lockedAt: string;
+  expiresAt: string;
+}
+
 interface SeatMapProps {
   seatMapData?: SeatMapResponse | null;
   loading?: boolean;
   selectedSeats: SelectedSeat[];
   currentUserId: string;
   wsConnected?: boolean;
+  wsLockedSeats?: LockedSeatInfo[]; // NEW: WebSocket locked seats
   onSeatClick?: (
     seatId: number,
     seatNumber: string,
-    isSelected: boolean
+    isSelected: boolean,
   ) => void;
   maxSeats?: number;
   lockTimers?: Record<number, string>; // seatId -> remaining time string
@@ -43,7 +52,7 @@ interface SeatMapProps {
 function mapApiStatus(
   apiStatus: string,
   lockedBy: string | null,
-  currentUserId: string
+  currentUserId: string,
 ): SeatStatus {
   switch (apiStatus) {
     case "Available":
@@ -65,12 +74,33 @@ function mapApiStatus(
 function convertApiSeats(
   apiSeats: TripSeatDto[],
   currentUserId: string,
-  selectedSeats: SelectedSeat[]
+  selectedSeats: SelectedSeat[],
+  wsLockedSeats: LockedSeatInfo[] = [],
 ): Seat[] {
   const selectedSeatIds = new Set(selectedSeats.map((s) => s.seatId));
+  const wsLockedMap = new Map(wsLockedSeats.map((s) => [s.seatId, s]));
 
   return apiSeats.map((seat) => {
-    let status = mapApiStatus(seat.status, seat.lockedBy, currentUserId);
+    // First check WebSocket data for real-time status
+    const wsLock = wsLockedMap.get(seat.seatId);
+    let lockedBy = seat.lockedBy;
+    let lockExpiry = seat.holdExpiry;
+
+    if (wsLock) {
+      lockedBy = wsLock.userId;
+      lockExpiry = wsLock.expiresAt;
+    }
+
+    let status = mapApiStatus(seat.status, lockedBy, currentUserId);
+
+    // If WebSocket shows it's locked, override status
+    if (wsLock) {
+      if (wsLock.userId === currentUserId) {
+        status = "held-by-me";
+      } else {
+        status = "held";
+      }
+    }
 
     // Override with selected if it's in our selected list
     if (selectedSeatIds.has(seat.seatId)) {
@@ -82,8 +112,8 @@ function convertApiSeats(
       seatId: seat.seatId,
       status,
       seatType: seat.seatType,
-      lockExpiry: seat.holdExpiry,
-      lockedBy: seat.lockedBy,
+      lockExpiry,
+      lockedBy,
     };
   });
 }
@@ -92,13 +122,19 @@ function convertApiSeats(
 function convertSeatMapData(
   seatMapData: SeatMapResponse | null | undefined,
   currentUserId: string,
-  selectedSeats: SelectedSeat[]
+  selectedSeats: SelectedSeat[],
+  wsLockedSeats: LockedSeatInfo[] = [],
 ): Floor[] {
   if (!seatMapData?.floors) return [];
   return seatMapData.floors.map((floor) => ({
     floorNumber: floor.floorNumber,
     floorLabel: floor.floorLabel,
-    seats: convertApiSeats(floor.seats, currentUserId, selectedSeats),
+    seats: convertApiSeats(
+      floor.seats,
+      currentUserId,
+      selectedSeats,
+      wsLockedSeats,
+    ),
   }));
 }
 
@@ -108,14 +144,21 @@ export default function SeatMap({
   selectedSeats,
   currentUserId,
   wsConnected = false,
+  wsLockedSeats = [],
   onSeatClick,
   maxSeats = 5,
   lockTimers = {},
 }: SeatMapProps) {
   // Convert API data to floors with memoization
   const floors = useMemo(
-    () => convertSeatMapData(seatMapData, currentUserId, selectedSeats),
-    [seatMapData, currentUserId, selectedSeats]
+    () =>
+      convertSeatMapData(
+        seatMapData,
+        currentUserId,
+        selectedSeats,
+        wsLockedSeats,
+      ),
+    [seatMapData, currentUserId, selectedSeats, wsLockedSeats],
   );
 
   const handleSeatClick = useCallback(
@@ -137,7 +180,7 @@ export default function SeatMap({
       // Notify parent
       onSeatClick?.(seat.seatId, seat.id, isCurrentlySelected);
     },
-    [selectedSeats.length, maxSeats, onSeatClick]
+    [selectedSeats.length, maxSeats, onSeatClick],
   );
 
   const renderSeat = useCallback(
@@ -161,8 +204,8 @@ export default function SeatMap({
             isDisabled
               ? "Ghế đang được người khác chọn"
               : isSelected
-              ? `Ghế ${seat.id} - Đang chọn`
-              : `Ghế ${seat.id} - Còn trống`
+                ? `Ghế ${seat.id} - Đang chọn`
+                : `Ghế ${seat.id} - Còn trống`
           }
         >
           <span className={styles.seatNumber}>{seat.id}</span>
@@ -172,7 +215,7 @@ export default function SeatMap({
         </button>
       );
     },
-    [handleSeatClick, lockTimers]
+    [handleSeatClick, lockTimers],
   );
 
   // Loading state
