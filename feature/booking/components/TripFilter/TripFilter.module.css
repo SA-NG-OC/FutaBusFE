@@ -1,0 +1,272 @@
+/* TripFilter.module.css - Responsive & Dark Mode Support */
+
+.container {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 20rem;
+}
+
+/* Dark mode for container */
+:global(.dark) .container {
+  background-color: #1f2937;
+}
+
+/* Header section */
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.filterIcon {
+  color: #ef4444;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+.title {
+  margin-left: 0.75rem;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+:global(.dark) .title {
+  color: #e5e7eb;
+}
+
+/* Section styles */
+.section {
+  margin-bottom: 1.5rem;
+}
+
+.sectionLarge {
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 1rem;
+}
+
+:global(.dark) .sectionTitle {
+  color: #d1d5db;
+}
+
+/* Input container */
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Input styles */
+.input {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #111827;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.input::placeholder {
+  color: #6b7280;
+}
+
+.input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.3);
+}
+
+/* Dark mode for inputs */
+:global(.dark) .input {
+  border-color: #4b5563;
+  background-color: #374151;
+  color: #f9fafb;
+}
+
+:global(.dark) .input::placeholder {
+  color: #9ca3af;
+}
+
+:global(.dark) .input:focus {
+  box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.4);
+}
+
+/* Checkbox container */
+.checkboxContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Checkbox label */
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  color: #4b5563;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.checkboxLabel:hover {
+  color: #1f2937;
+}
+
+:global(.dark) .checkboxLabel {
+  color: #d1d5db;
+}
+
+:global(.dark) .checkboxLabel:hover {
+  color: #f9fafb;
+}
+
+/* Checkbox input */
+.checkbox {
+  height: 1.25rem;
+  width: 1.25rem;
+  border-radius: 0.25rem;
+  border: 1px solid #d1d5db;
+  color: #ef4444;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+.checkbox:focus {
+  box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.4);
+}
+
+:global(.dark) .checkbox {
+  border-color: #4b5563;
+  background-color: #374151;
+  color: #f87171;
+}
+
+:global(.dark) .checkbox:focus {
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.3);
+}
+
+/* Checkbox text */
+.checkboxText {
+  margin-left: 0.75rem;
+}
+
+/* Button container */
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Apply button */
+.applyButton {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: #ef4444;
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 0.5rem;
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.applyButton:hover {
+  background-color: #dc2626;
+}
+
+.applyButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.4);
+}
+
+:global(.dark) .applyButton:hover {
+  background-color: #f87171;
+}
+
+:global(.dark) .applyButton:focus {
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.3);
+}
+
+/* Clear button */
+.clearButton {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: #e5e7eb;
+  color: #374151;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.clearButton:hover {
+  background-color: #d1d5db;
+}
+
+.clearButton:focus {
+  outline: none;
+}
+
+:global(.dark) .clearButton {
+  background-color: #4b5563;
+  color: #e5e7eb;
+}
+
+:global(.dark) .clearButton:hover {
+  background-color: #6b7280;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 639px) {
+  .container {
+    padding: 1rem;
+    max-width: 100%;
+  }
+  
+  .header {
+    margin-bottom: 1rem;
+  }
+  
+  .section {
+    margin-bottom: 1rem;
+  }
+  
+  .sectionLarge {
+    margin-bottom: 1.5rem;
+  }
+  
+  .title {
+    font-size: 1.125rem;
+    line-height: 1.625rem;
+  }
+  
+  .sectionTitle {
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .container {
+    max-width: 18rem;
+  }
+}
+
+/* Desktop adjustments */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 20rem;
+  }
+}

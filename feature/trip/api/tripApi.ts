@@ -1,22 +1,12 @@
-import axios from "axios";
+import { api } from '@/shared/utils/apiClient';
+import { PageResponse } from '@/shared/utils';
 import {
-  PageResponse,
-  ApiResponse,
   TripData,
   RouteSelection,
   VehicleSelection,
   DriverSelection,
   TripFormData,
 } from "../types";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5230";
-
-const axiosClient = axios.create({
-  baseURL: API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
 
 export interface GetTripsParams {
   page?: number;
@@ -101,15 +91,7 @@ export const tripApi = {
     });
   }
 
-  const response = await axiosClient.get<
-    ApiResponse<PageResponse<TripData>>
-  >(`/trips?${queryParams.toString()}`);
-
-  if (!response.data.success) {
-    throw new Error(response.data.message);
-  }
-
-  return response.data.data;
+  return api.get<PageResponse<TripData>>(`/trips?${queryParams.toString()}`);
 },
 
 
@@ -124,80 +106,45 @@ export const tripApi = {
     if (status && status !== "ALL") params.status = status;
     if (date) params.date = date;
 
-    const response = await axiosClient.get<ApiResponse<PageResponse<TripData>>>(
-      "/trips",
-      { params }
-    );
-    if (!response.data.success) throw new Error(response.data.message);
-    return response.data.data;
+    return api.get<PageResponse<TripData>>("/trips", { params });
   },
 
   // 2. Get Calendar Dates (Backend: TripController @GetMapping("/calendar-dates"))
   getTripDates: async (start: string, end: string): Promise<string[]> => {
-    const response = await axiosClient.get<ApiResponse<string[]>>(
-      "/trips/calendar-dates",
-      {
+    try {
+      return await api.get<string[]>("/trips/calendar-dates", {
         params: { start, end },
-      }
-    );
-
-    if (!response.data.success) {
-      console.error("Failed to fetch calendar", response.data.message);
+      });
+    } catch (error) {
+      console.error("Failed to fetch calendar", error);
       return [];
     }
-    return response.data.data;
   },
 
   // 3. Update Status
   updateStatus: async (tripId: number, newStatus: string) => {
-    const response = await axiosClient.patch<ApiResponse<any>>(
-      `/trips/${tripId}/status`,
-      { status: newStatus }
-    );
-    if (!response.data.success) throw new Error(response.data.message);
+    await api.patch(`/trips/${tripId}/status`, { status: newStatus });
     return true;
   },
 
   // 4. Create Trip
-  createTrip: async (data: TripFormData) => {
-    const response = await axiosClient.post<ApiResponse<TripData>>(
-      "/trips",
-      data
-    );
-    if (!response.data.success) throw new Error(response.data.message);
-    return response.data.data;
+  createTrip: async (data: TripFormData): Promise<TripData> => {
+    return api.post<TripData>("/trips", data);
   },
 
   // --- SELECTION APIs (Call directly to Backend endpoints) ---
 
   getRoutesSelection: async (): Promise<RouteSelection[]> => {
-    // Backend: RouteController @GetMapping("/selection")
-    const response = await axiosClient.get<ApiResponse<RouteSelection[]>>(
-      "/routes/selection"
-    );
-    if (!response.data.success) throw new Error(response.data.message);
-    return response.data.data;
+    return api.get<RouteSelection[]>("/routes/selection");
   },
 
   getVehiclesSelection: async (): Promise<VehicleSelection[]> => {
-    // Backend: VehicleController @GetMapping("/selection")
-    const response = await axiosClient.get<ApiResponse<VehicleSelection[]>>(
-      "/vehicles/selection"
-    );
-    if (!response.data.success) throw new Error(response.data.message);
-    return response.data.data;
+    return api.get<VehicleSelection[]>("/vehicles/selection");
   },
 
   getDriversSelection: async (): Promise<DriverSelection[]> => {
-    // Backend: Chưa thấy DriverController trong file bạn gửi,
-    // nhưng giả định nó có cấu trúc tương tự VehicleController
-    // Nếu chưa có, bạn có thể dùng tạm API mock hoặc bảo bạn của bạn thêm endpoint này.
     try {
-      const response = await axiosClient.get<ApiResponse<DriverSelection[]>>(
-        "/drivers/selection"
-      );
-      if (!response.data.success) throw new Error(response.data.message);
-      return response.data.data;
+      return await api.get<DriverSelection[]>("/drivers/selection");
     } catch (e) {
       console.warn("Driver selection API not found, mocking empty list");
       return [];
@@ -205,19 +152,11 @@ export const tripApi = {
   },
 
   deleteTrip: async (tripId: number) => {
-    const response = await axiosClient.delete<ApiResponse<any>>(
-      `/trips/${tripId}`
-    );
-    if (!response.data.success) throw new Error(response.data.message);
+    await api.delete(`/trips/${tripId}`);
     return true;
   },
 
-  updateTripInfo: async (tripId: number, data: any) => {
-    const response = await axiosClient.put<ApiResponse<TripData>>(
-      `/trips/${tripId}`,
-      data
-    );
-    if (!response.data.success) throw new Error(response.data.message);
-    return response.data.data;
+  updateTripInfo: async (tripId: number, data: any): Promise<TripData> => {
+    return api.put<TripData>(`/trips/${tripId}`, data);
   },
 };

@@ -9,15 +9,7 @@
  * - Refresh token
  */
 
-const API_BASE_URL = 'http://localhost:5230';
-
-interface ApiResponse<T> {
-  success: boolean;
-  message: string;
-  data?: T;
-  errorCode?: string;
-  timestamp: string;
-}
+import { api, API_BASE_URL } from '@/shared/utils/apiClient';
 
 export interface LoginRequest {
   emailOrPhone: string;
@@ -57,105 +49,73 @@ export interface AuthResponse {
  * Login user
  */
 export async function login(request: LoginRequest): Promise<AuthResponse> {
-  const response = await fetch(`${API_BASE_URL}/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(request),
-  });
-
-  const data: ApiResponse<AuthResponse> = await response.json();
-
-  if (!data.success) {
-    throw new Error(data.message || 'Đăng nhập thất bại');
+  console.log('[Auth API] Login request:', { emailOrPhone: request.emailOrPhone });
+  console.log('[Auth API] Calling:', `${API_BASE_URL}/auth/login`);
+  
+  try {
+    const data = await api.post<AuthResponse>('/auth/login', request);
+    console.log('[Auth API] Login successful');
+    return data;
+  } catch (error) {
+    console.error('[Auth API] Login failed:', error);
+    throw error;
   }
-
-  return data.data!;
 }
 
 /**
  * Register new user
  */
 export async function register(request: RegisterRequest): Promise<AuthResponse> {
-  const response = await fetch(`${API_BASE_URL}/auth/register`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(request),
-  });
-
-  const data: ApiResponse<AuthResponse> = await response.json();
-
-  if (!data.success) {
-    throw new Error(data.message || 'Đăng ký thất bại');
+  console.log('[Auth API] Register request:', { email: request.email, fullName: request.fullName });
+  console.log('[Auth API] Calling:', `${API_BASE_URL}/auth/register`);
+  
+  try {
+    const data = await api.post<AuthResponse>('/auth/register', request);
+    console.log('[Auth API] Register successful');
+    return data;
+  } catch (error) {
+    console.error('[Auth API] Register failed:', error);
+    throw error;
   }
-
-  return data.data!;
 }
 
 /**
  * Request password reset (sends email/SMS with reset link)
  */
 export async function forgotPassword(request: ForgotPasswordRequest): Promise<string> {
-  const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(request),
-  });
-
-  const data: ApiResponse<string> = await response.json();
-
-  if (!data.success) {
-    throw new Error(data.message || 'Yêu cầu đặt lại mật khẩu thất bại');
+  try {
+    const data = await api.post<string>('/auth/forgot-password', request);
+    return data || 'Reset link sent successfully';
+  } catch (error) {
+    console.error('[Auth API] Forgot password failed:', error);
+    throw error;
   }
-
-  return data.data || data.message;
 }
 
 /**
  * Reset password with token
  */
 export async function resetPassword(request: ResetPasswordRequest): Promise<string> {
-  const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(request),
-  });
-
-  const data: ApiResponse<string> = await response.json();
-
-  if (!data.success) {
-    throw new Error(data.message || 'Đặt lại mật khẩu thất bại');
+  try {
+    const data = await api.post<string>('/auth/reset-password', request);
+    return data || 'Password reset successfully';
+  } catch (error) {
+    console.error('[Auth API] Reset password failed:', error);
+    throw error;
   }
-
-  return data.data || data.message;
 }
 
 /**
  * Refresh access token
  */
 export async function refreshToken(refreshToken: string): Promise<AuthResponse> {
-  const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(refreshToken),
-  });
-
-  const data: ApiResponse<AuthResponse> = await response.json();
-
-  if (!data.success) {
-    throw new Error(data.message || 'Làm mới token thất bại');
+  try {
+    const data = await api.post<AuthResponse>('/auth/refresh', { refreshToken });
+    return data;
+  } catch (error) {
+    console.error('[Auth API] Refresh token failed:', error);
+    throw error;
   }
-
-  return data.data!;
 }
 
 /**
@@ -163,10 +123,10 @@ export async function refreshToken(refreshToken: string): Promise<AuthResponse> 
  */
 export async function validateResetToken(token: string): Promise<boolean> {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/reset-password?token=${token}`);
-    const data: ApiResponse<string> = await response.json();
-    return data.success;
+    await api.get<string>(`/auth/reset-password?token=${token}`);
+    return true;
   } catch (error) {
+    console.error('[Auth API] Token validation failed:', error);
     return false;
   }
 }

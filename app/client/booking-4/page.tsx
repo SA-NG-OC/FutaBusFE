@@ -6,24 +6,31 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useSeatMap } from "@/feature/booking/hooks/useSeatMap";
 import { useWebSocket } from "@/src/context/WebSocketContext";
+import { useAuth } from "@/src/context/AuthContext";
 import { SelectedSeat, SeatMapResponse } from "@/feature/booking/types";
 import styles from "./page.module.css";
 
-// Generate a unique user ID (in production, get from auth)
-function getUserId(): string {
+// Generate a unique guest user ID for non-authenticated users
+function getGuestUserId(): string {
   if (typeof window === "undefined") return "";
-  let userId = sessionStorage.getItem("booking_user_id");
+  let userId = sessionStorage.getItem("booking_guest_id");
   if (!userId) {
-    userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    sessionStorage.setItem("booking_user_id", userId);
+    userId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    sessionStorage.setItem("booking_guest_id", userId);
   }
   return userId;
 }
 
 export default function ClientBookingDetailPage() {
+  const { user, isAuthenticated } = useAuth();
   const [selectedSeats, setSelectedSeats] = useState<SelectedSeat[]>([]);
   const [tripId, setTripId] = useState<number | null>(null);
-  const [userId] = useState<string>(getUserId);
+
+  // Use real userId if authenticated, otherwise use guest ID
+  const userId =
+    isAuthenticated && user ? String(user.userId) : getGuestUserId();
+  const isGuestBooking = !isAuthenticated || !user;
+
   const [lockTimers, setLockTimers] = useState<Record<number, string>>({});
   const [notification, setNotification] = useState<{
     type: "success" | "error" | "warning";
@@ -34,7 +41,7 @@ export default function ClientBookingDetailPage() {
   const timerIntervalsRef = useRef<Record<number, NodeJS.Timeout>>({});
   const seatMapRef = useRef<SeatMapResponse | null>(null);
 
-  const { seatMap, tripInfo, loading, error, fetchBookingData} = useSeatMap();
+  const { seatMap, tripInfo, loading, error, fetchBookingData } = useSeatMap();
   const wsContext = useWebSocket();
 
   // Keep seatMapRef in sync
@@ -48,54 +55,57 @@ export default function ClientBookingDetailPage() {
       setNotification({ type, message });
       setTimeout(() => setNotification(null), 3000);
     },
-    []
+    [],
   );
 
   // Timer management
-  const startLockTimer = useCallback((seatId: number, lockExpiry: string) => {
-    // Clear existing timer
-    if (timerIntervalsRef.current[seatId]) {
-      clearInterval(timerIntervalsRef.current[seatId]);
-    }
-
-    const expiryTime = new Date(lockExpiry).getTime();
-
-    const updateTimer = () => {
-      const now = Date.now();
-      const remaining = expiryTime - now;
-
-      if (remaining <= 0) {
+  const startLockTimer = useCallback(
+    (seatId: number, lockExpiry: string) => {
+      // Clear existing timer
+      if (timerIntervalsRef.current[seatId]) {
         clearInterval(timerIntervalsRef.current[seatId]);
-        delete timerIntervalsRef.current[seatId];
-        setLockTimers((prev) => {
-          const newTimers = { ...prev };
-          delete newTimers[seatId];
-          return newTimers;
-        });
-        return;
       }
 
-      const minutes = Math.floor(remaining / 60000);
-      const seconds = Math.floor((remaining % 60000) / 1000);
-      const displayTime = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+      const expiryTime = new Date(lockExpiry).getTime();
 
-      setLockTimers((prev) => ({
-        ...prev,
-        [seatId]: displayTime,
-      }));
+      const updateTimer = () => {
+        const now = Date.now();
+        const remaining = expiryTime - now;
 
-      // Warning when 1 minute left
-      if (remaining <= 60000 && remaining > 59000) {
-        showNotification("warning", "Còn 1 phút để hoàn tất đặt vé!");
-      }
-    };
+        if (remaining <= 0) {
+          clearInterval(timerIntervalsRef.current[seatId]);
+          delete timerIntervalsRef.current[seatId];
+          setLockTimers((prev) => {
+            const newTimers = { ...prev };
+            delete newTimers[seatId];
+            return newTimers;
+          });
+          return;
+        }
 
-    // Update immediately
-    updateTimer();
+        const minutes = Math.floor(remaining / 60000);
+        const seconds = Math.floor((remaining % 60000) / 1000);
+        const displayTime = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
-    // Then update every second
-    timerIntervalsRef.current[seatId] = setInterval(updateTimer, 1000);
-  }, [showNotification]);
+        setLockTimers((prev) => ({
+          ...prev,
+          [seatId]: displayTime,
+        }));
+
+        // Warning when 1 minute left
+        if (remaining <= 60000 && remaining > 59000) {
+          showNotification("warning", "Còn 1 phút để hoàn tất đặt vé!");
+        }
+      };
+
+      // Update immediately
+      updateTimer();
+
+      // Then update every second
+      timerIntervalsRef.current[seatId] = setInterval(updateTimer, 1000);
+    },
+    [showNotification],
+  );
 
   const stopLockTimer = useCallback((seatId: number) => {
     if (timerIntervalsRef.current[seatId]) {
@@ -161,7 +171,12 @@ export default function ClientBookingDetailPage() {
   // Subscribe to trip updates when tripId is ready
   useEffect(() => {
     if (tripId && connected) {
-      console.log("Attempting to subscribe to trip:", tripId, "Connected:", connected);
+      console.log(
+        "Attempting to subscribe to trip:",
+        tripId,
+        "Connected:",
+        connected,
+      );
       wsContext.subscribeToTrip(tripId);
     }
 
@@ -186,7 +201,7 @@ export default function ClientBookingDetailPage() {
         wsContext.lockSeat(tripId, seatId, userId);
       }
     },
-    [connected, tripId, userId, wsContext, showNotification]
+    [connected, tripId, userId, wsContext, showNotification],
   );
 
   const handleContinue = () => {
@@ -196,24 +211,26 @@ export default function ClientBookingDetailPage() {
     }
     // Save selected seats to sessionStorage
     sessionStorage.setItem("selectedSeats", JSON.stringify(selectedSeats));
-    
+
     // Save booking info for checkout page
     const bookingInfo = {
       pricePerSeat,
-      tripInfo: tripInfo ? {
-        routeName: tripInfo.routeName,
-        date: tripInfo.date,
-        departureTime: tripInfo.departureTime,
-        arrivalTime: tripInfo.arrivalTime,
-      } : null,
+      tripInfo: tripInfo
+        ? {
+            routeName: tripInfo.routeName,
+            date: tripInfo.date,
+            departureTime: tripInfo.departureTime,
+            arrivalTime: tripInfo.arrivalTime,
+          }
+        : null,
     };
     sessionStorage.setItem("bookingInfo", JSON.stringify(bookingInfo));
-    
+
     // Navigate to checkout page
     router.push(
       `/client/booking-6?seats=${selectedSeats
         .map((s) => s.seatNumber)
-        .join(",")}`
+        .join(",")}`,
     );
   };
 

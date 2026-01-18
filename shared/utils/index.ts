@@ -1,3 +1,7 @@
+// Export API client and utilities
+export * from './apiClient';
+
+// Legacy type exports (kept for backward compatibility)
 export interface ApiResponse<T> {
     success: boolean;
     message: string;

@@ -50,10 +50,8 @@ export const useMyTickets = (
     if (!token) return;
 
     try {
-      const response = await ticketApi.getMyTicketsCount(token);
-      if (response.success) {
-        setCounts(response.data);
-      }
+      const response = await ticketApi.getMyTicketsCount();
+      setCounts(response);
     } catch (err) {
       console.error("Error fetching ticket counts:", err);
       if (err instanceof Error && err.message.includes("Unauthorized")) {
@@ -74,20 +72,15 @@ export const useMyTickets = (
 
     try {
       const response = await ticketApi.getMyTickets(
-        token,
         activeTab,
         currentPage,
         pageSize
       );
 
-      if (response.success) {
-        setTickets(response.data.bookings);
-        setTotalPages(response.data.totalPages);
-        setIsFirst(response.data.isFirst);
-        setIsLast(response.data.isLast);
-      } else {
-        setError(response.message);
-      }
+      setTickets(response.bookings);
+      setTotalPages(response.totalPages);
+      setIsFirst(response.isFirst);
+      setIsLast(response.isLast);
     } catch (err) {
       console.error("Error fetching tickets:", err);
       if (err instanceof Error) {

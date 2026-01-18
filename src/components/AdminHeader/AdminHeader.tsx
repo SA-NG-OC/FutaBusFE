@@ -1,13 +1,27 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import styles from './AdminHeader.module.css';
 import { useTheme } from '../../../src/context/ThemeContext';
+import { useAuth } from '../../../src/context/AuthContext';
 
 import { FiSearch, FiMoon, FiBell, FiSun } from 'react-icons/fi';
 
 const AdminHeader = () => {
     const { theme, toggleTheme } = useTheme();
+    const { user } = useAuth();
+
+    // Get user initials for fallback
+    const getInitials = (name: string) => {
+        return name
+            .split(' ')
+            .map(word => word[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 2);
+    };
+
     return (
         <header className={styles['admin-header']}>
             <div className={styles['header-container']}>
@@ -15,7 +29,7 @@ const AdminHeader = () => {
                 {/* Left Section: Welcome Text */}
                 <div className={styles['welcome-section']}>
                     <h2 className={styles['welcome-title']}>
-                        Welcome Admin <span role="img" aria-label="wave">👋</span>
+                        Welcome {user?.fullName || 'Admin'} <span role="img" aria-label="wave">👋</span>
                     </h2>
                     <p className={styles['welcome-subtitle']}>
                         Here's what's happening with your store today.
@@ -57,7 +71,19 @@ const AdminHeader = () => {
 
                         {/* User Avatar */}
                         <button className={styles['avatar-button']} aria-label="User Profile">
-                            <span className={styles['avatar-text']}>AU</span>
+                            {user?.avt ? (
+                                <Image 
+                                    src={user.avt} 
+                                    alt={user.fullName}
+                                    width={40}
+                                    height={40}
+                                    className={styles['avatar-image']}
+                                />
+                            ) : (
+                                <span className={styles['avatar-text']}>
+                                    {user ? getInitials(user.fullName) : 'AU'}
+                                </span>
+                            )}
                         </button>
                     </div>
                 </div>

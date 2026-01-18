@@ -1,5 +1,6 @@
 import React from "react";
 import { TripData } from "@/feature/trip/types";
+import styles from "./TripCard.module.css";
 
 type TripCardProps = {
   tripDetail?: TripData;
@@ -11,7 +12,7 @@ export default function TripCard({
   handleSelectSeat,
 }: TripCardProps) {
   if (!tripDetail) {
-    return <div>Loading trip...</div>; // Or a proper skeleton loader
+    return <div className={styles.loading}>Loading trip...</div>;
   }
 
   // Split routeName into departure and arrival cities
@@ -45,72 +46,76 @@ export default function TripCard({
 
   const duration = calculateDuration(
     tripDetail.departureTime,
-    tripDetail.arrivalTime
+    tripDetail.arrivalTime,
   );
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-5 border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+    <div className={styles.card}>
       {/* Left Section */}
-      <div className="flex-1 space-y-4">
+      <div className={styles.leftSection}>
         {/* Header */}
-        <div className="flex items-center gap-3">
-          <div className="bg-[#FFF0EF] p-3 rounded-lg text-[#D83E3E] text-2xl">
-            🚌
-          </div>
-          <div>
-            <p className="font-bold text-gray-800">{tripDetail.routeName}</p>
-            <span className="bg-gray-200 text-gray-600 text-xs font-semibold px-2 py-1 rounded-md">
-              {tripDetail.vehicleInfo}
-            </span>
+        <div className={styles.header}>
+          <div className={styles.busIcon}>🚌</div>
+          <div className={styles.headerInfo}>
+            <p className={styles.routeName}>{tripDetail.routeName}</p>
+            <div className={styles.badges}>
+              <span className={styles.vehicleBadge}>
+                {tripDetail.vehicleInfo}
+              </span>
+              <span className={styles.dateBadge}>
+                📅 {new Date(tripDetail.date).toLocaleDateString("vi-VN")}
+              </span>
+            </div>
           </div>
         </div>
 
         {/* Details */}
-        <div className="flex items-end justify-between gap-4">
+        <div className={styles.details}>
           {/* Departure */}
-          <div className="space-y-1">
-            <p className="text-sm text-gray-500">Departure</p>
-            <p className="text-lg font-bold text-gray-800 flex items-center gap-1.5">
-              <span className="text-red-500">🕒</span>{" "}
+          <div className={styles.locationInfo}>
+            <p className={styles.locationLabel}>Departure</p>
+            <p className={styles.timeInfo}>
+              <span className={styles.timeIcon}>🕒</span>{" "}
               {tripDetail.departureTime}
             </p>
-            <p className="text-sm text-gray-600">{departureCity}</p>
+            <p className={styles.cityName}>{departureCity}</p>
           </div>
 
           {/* Duration */}
-          <div className="text-center hidden md:block">
-            <p className="text-sm text-gray-500">Duration</p>
-            <div className="flex items-center gap-2">
-              <div className="grow border-t border-gray-300"></div>
-              <p className="text-sm text-gray-600">{duration}</p>
-              <div className="grow border-t border-gray-300"></div>
+          <div className={styles.duration}>
+            <p className={styles.durationLabel}>Duration</p>
+            <div className={styles.durationLine}>
+              <div className={styles.durationBorder}></div>
+              <p className={styles.durationText}>{duration}</p>
+              <div className={styles.durationBorder}></div>
             </div>
           </div>
 
           {/* Arrival */}
-          <div className="space-y-1 text-left">
-            <p className="text-sm text-gray-500">Arrival</p>
-            <p className="text-lg font-bold text-gray-800 flex items-center gap-1.5">
-              {tripDetail.arrivalTime} <span className="text-red-500">📍</span>
+          <div className={styles.locationInfo}>
+            <p className={styles.locationLabel}>Arrival</p>
+            <p className={styles.timeInfo}>
+              {tripDetail.arrivalTime}{" "}
+              <span className={styles.timeIcon}>📍</span>
             </p>
-            <p className="text-sm text-gray-600">{arrivalCity}</p>
+            <p className={styles.cityName}>{arrivalCity}</p>
           </div>
         </div>
 
-        <div className="text-sm text-gray-600 flex items-center gap-2">
+        <div className={styles.seatsInfo}>
           <span>👥</span>
           {tripDetail.totalSeats} seats available
         </div>
       </div>
 
       {/* Right Section */}
-      <div className="w-full sm:w-auto flex flex-col items-stretch sm:items-end justify-center gap-2 pt-4 sm:pt-0 border-t sm:border-t-0 sm:border-l border-gray-200 sm:pl-6">
-        <div className="text-2xl font-bold text-[#D83E3E] text-right">
+      <div className={styles.rightSection}>
+        <div className={styles.price}>
           {tripDetail.price.toLocaleString("vi-VN")}đ
         </div>
         <button
           onClick={() => handleSelectSeat(tripDetail.tripId)}
-          className="bg-[#D83E3E] text-white font-semibold py-2 px-5 rounded-lg hover:bg-[#B93434] transition-colors w-full"
+          className={styles.selectButton}
         >
           Select Seats
         </button>

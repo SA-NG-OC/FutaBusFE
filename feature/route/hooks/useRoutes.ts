@@ -31,9 +31,9 @@ export const useRoutes = () => {
             const pageData = await routeApi.getAll(page, 10, searchKw);
 
             // Logic map dữ liệu giữ nguyên như cũ
-            setRoutes(pageData.data.content);
-            setTotalPages(pageData.data.totalPages);
-            setCurrentPage(pageData.data.number);
+            setRoutes(pageData.content);
+            setTotalPages(pageData.totalPages);
+            setCurrentPage(pageData.number);
 
         } catch (err: any) {
             console.error("Fetch routes failed", err);

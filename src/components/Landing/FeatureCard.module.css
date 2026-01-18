@@ -7,10 +7,20 @@
   transition: all 0.3s;
 }
 
+:global(.dark) .card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
 .card:hover {
   border-color: #D83E3E;
   box-shadow: 0 8px 24px rgba(216, 62, 62, 0.1);
   transform: translateY(-4px);
+}
+
+:global(.dark) .card:hover {
+  border-color: #ef4444;
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.2);
 }
 
 .icon {
@@ -25,8 +35,16 @@
   margin-bottom: 12px;
 }
 
+:global(.dark) .title {
+  color: #f8fafc;
+}
+
 .description {
   font-size: 14px;
   color: #666;
   line-height: 1.6;
+}
+
+:global(.dark) .description {
+  color: #94a3b8;
 }

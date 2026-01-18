@@ -8,6 +8,7 @@ import {
   FaSearch,
 } from "react-icons/fa";
 import { useRoutes } from "@/feature/route/hooks/useRoutes";
+import styles from "./TripSearch.module.css";
 
 interface TripSearchProps {
   onSearch: (params: {
@@ -73,18 +74,19 @@ export default function TripSearch({ onSearch }: TripSearchProps) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-xl shadow-lg w-full mx-auto"
-    >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <form onSubmit={handleSubmit} className={styles.searchForm}>
+      <div className={styles.gridContainer}>
         {/* Origin City Dropdown */}
-        <div className="relative flex items-center">
-          <FaMapMarkerAlt className="absolute left-4 text-red-500 z-10" />
+        <div className={styles.inputGroup}>
+          <label className={styles.label}>
+            <FaMapMarkerAlt className={styles.icon} />
+            Điểm đi
+          </label>
           <select
             value={originId}
             onChange={(e) => setOriginId(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300 appearance-none cursor-pointer"
+            className={styles.select}
+            required
           >
             <option value="">Select Origin</option>
             {locations.map((location) => (
@@ -96,12 +98,16 @@ export default function TripSearch({ onSearch }: TripSearchProps) {
         </div>
 
         {/* Destination City Dropdown */}
-        <div className="relative flex items-center">
-          <FaMapMarkerAlt className="absolute left-4 text-red-500 z-10" />
+        <div className={styles.inputGroup}>
+          <label className={styles.label}>
+            <FaMapMarkerAlt className={styles.icon} />
+            Điểm đến
+          </label>
           <select
             value={destId}
             onChange={(e) => setDestId(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300 appearance-none cursor-pointer"
+            className={styles.select}
+            required
           >
             <option value="">Select Destination</option>
             {locations.map((location) => (
@@ -113,41 +119,43 @@ export default function TripSearch({ onSearch }: TripSearchProps) {
         </div>
 
         {/* Date Input */}
-        <div className="relative flex items-center">
-          <FaCalendarAlt className="absolute left-4 text-red-500 z-10" />
+        <div className={styles.inputGroup}>
+          <label className={styles.label}>
+            <FaCalendarAlt className={styles.icon} />
+            Ngày đi
+          </label>
           <input
             type="date"
-            placeholder="Ngày đi"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
+            className={styles.input}
+            required
           />
         </div>
 
         {/* Passengers Input */}
-        <div className="relative flex items-center">
-          <FaUserFriends className="absolute left-4 text-red-500 z-10" />
+        <div className={styles.inputGroup}>
+          <label className={styles.label}>
+            <FaUserFriends className={styles.icon} />
+            Số hành khách
+          </label>
           <input
             type="number"
             value={passengers}
             onChange={(e) => setPassengers(parseInt(e.target.value) || 1)}
             min={1}
-            placeholder="Number of passengers"
-            className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
+            max={10}
+            className={styles.input}
+            required
           />
         </div>
       </div>
 
       {/* Submit Button */}
-      <div className="flex items-center justify-center mt-6 space-x-10 w-full">
-        <button
-          type="submit"
-          className="flex items-center w-full justify-center py-3 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 transition-colors"
-        >
-          <FaSearch className="mr-2" />
-          Tìm kiếm chuyến xe
-        </button>
-      </div>
+      <button type="submit" className={styles.searchButton}>
+        <FaSearch className={styles.buttonIcon} />
+        Tìm kiếm chuyến xe
+      </button>
     </form>
   );
 }

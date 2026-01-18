@@ -28,15 +28,11 @@ export const useTickets = (
         status,
         search
       );
-      if (response.success) {
-        setTickets(response.data.bookings);
-        setTotalPages(response.data.totalPages);
-        setTotalElements(response.data.totalElements);
-        setIsFirst(response.data.isFirst);
-        setIsLast(response.data.isLast);
-      } else {
-        setError(response.message);
-      }
+      setTickets(response.bookings);
+      setTotalPages(response.totalPages);
+      setTotalElements(response.totalElements);
+      setIsFirst(response.isFirst);
+      setIsLast(response.isLast);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch tickets");
     } finally {
@@ -50,12 +46,9 @@ export const useTickets = (
 
   const confirmBooking = async (bookingId: number) => {
     try {
-      const response = await ticketApi.confirmBooking(bookingId);
-      if (response.success) {
-        await fetchTickets();
-        return true;
-      }
-      return false;
+      await ticketApi.confirmBooking(bookingId);
+      await fetchTickets();
+      return true;
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to confirm booking"
@@ -66,12 +59,9 @@ export const useTickets = (
 
   const cancelBooking = async (bookingId: number, userId: number = 1) => {
     try {
-      const response = await ticketApi.cancelBooking(bookingId, userId);
-      if (response.success) {
-        await fetchTickets(); // Refresh the list
-        return true;
-      }
-      return false;
+      await ticketApi.cancelBooking(bookingId, userId);
+      await fetchTickets(); // Refresh the list
+      return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to cancel booking");
       return false;

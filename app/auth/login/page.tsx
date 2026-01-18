@@ -5,34 +5,106 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/src/context/AuthContext';
 import { COLORS } from '@/shared/constants/colors';
 
-type LoginMode = 'phone' | 'email';
-
 /**
  * Login Page Component
  * 
- * Standalone login page with phone/email toggle
+ * Standalone login page
  * Matches the brand design and uses AuthContext for authentication
  */
 export default function LoginPage() {
   const { login } = useAuth();
   const router = useRouter();
-  const [loginMode, setLoginMode] = useState<LoginMode>('phone');
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Input sanitization to prevent SQL injection
+  const sanitizeInput = (input: string): string => {
+    return input
+      .replace(/[<>"'`]/g, '') // Remove potential XSS characters
+      .replace(/[;\-\-]/g, '') // Remove SQL comment markers
+      .replace(/(\/\*|\*\/)/g, '') // Remove SQL block comments
+      .trim();
+  };
+
+  const validateInput = (): boolean => {
+    const sanitized = sanitizeInput(emailOrPhone);
+    
+    // Check for SQL injection patterns
+    const sqlPatterns = [
+      /('|(\-\-)|(;)|(\|\|)|(\*))/i,
+      /(\bOR\b|\bAND\b|\bUNION\b|\bSELECT\b|\bDROP\b|\bINSERT\b|\bUPDATE\b|\bDELETE\b)/i,
+      /(exec|execute|script|javascript|alert)/i
+    ];
+
+    for (const pattern of sqlPatterns) {
+      if (pattern.test(sanitized)) {
+        setError('Dữ liệu đầu vào không hợp lệ');
+        return false;
+      }
+    }
+
+    // Validate email or phone format
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sanitized);
+    const isPhone = /^[0-9]{10}$/.test(sanitized);
+
+    if (!isEmail && !isPhone) {
+      setError('Vui lòng nhập email hoặc số điện thoại hợp lệ');
+      return false;
+    }
+
+    if (password.length < 6) {
+      setError('Mật khẩu phải có ít nhất 6 ký tự');
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!validateInput()) {
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      await login({ emailOrPhone, password, rememberMe });
-      // Redirect to home or dashboard after successful login
-      router.push('/client');
+      const sanitizedInput = sanitizeInput(emailOrPhone);
+      console.log('[LoginPage] Attempting login with:', sanitizedInput);
+      
+      await login({ emailOrPhone: sanitizedInput, password, rememberMe });
+      
+      // Get user data after successful login
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        const user = JSON.parse(userData);
+        console.log('[LoginPage] Login successful, user role:', user.role.roleName);
+        
+        // Redirect based on role
+        if (user.role.roleName === 'ADMIN') {
+          console.log('[LoginPage] Redirecting to admin dashboard');
+          router.push('/admin/dashboard');
+        } else if (user.role.roleName === 'DRIVER') {
+          console.log('[LoginPage] Redirecting to driver dashboard');
+          router.push('/employee/dashboard');
+        } else if (user.role.roleName === 'STAFF') {
+          console.log('[LoginPage] Redirecting to staff dashboard');
+          router.push('/employee/dashboard');
+        } else {
+          console.log('[LoginPage] Redirecting to home page');
+          router.push('/');
+        }
+      } else {
+        console.log('[LoginPage] No user data found, redirecting to home');
+        router.push('/');
+      }
     } catch (err) {
+      console.error('[LoginPage] Login failed:', err);
       setError(err instanceof Error ? err.message : 'Đăng nhập thất bại');
     } finally {
       setIsLoading(false);
@@ -48,127 +120,90 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#EAEAEA] items-center justify-center p-8">
-      {/* Login Card - Single Block */}
-      <div className="flex bg-white rounded-3xl shadow-2xl max-w-[1100px] w-full overflow-hidden">
-        {/* Left Side - Branding */}
-        <div className="flex-1 flex items-center justify-center p-16 bg-gradient-to-br from-gray-50 to-gray-100">
-          <div className="max-w-[500px]">
-          <div className="flex items-center gap-4 mb-10">
+    <div className="min-h-screen bg-[#EAEAEA] flex items-center justify-center p-4 lg:p-8" style={{ colorScheme: 'light' }}>
+      <div className="w-full max-w-7xl flex flex-col lg:flex-row items-center justify-center gap-0 lg:gap-20 xl:gap-32">
+        {/* Left Side - Branding (No Block) - Hidden on mobile */}
+        <div className="hidden lg:flex flex-1 items-center justify-center p-4 md:p-8 w-full">
+          <div className="max-w-[600px] w-full">
+          <div className="flex items-center gap-3 md:gap-4 mb-8 md:mb-10">
             <div 
-              className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl shadow-lg"
+              className="w-12 h-12 md:w-16 md:h-16 rounded-2xl flex items-center justify-center text-3xl md:text-4xl shadow-lg"
               style={{ backgroundColor: COLORS.primary, boxShadow: `0 4px 12px ${COLORS.primary}33` }}
             >
               🚌
             </div>
-            <h1 className="text-5xl font-bold text-gray-800">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800">
               FUBA<span style={{ color: COLORS.primary }}>Bus</span>
             </h1>
           </div>
 
-          <h2 className="text-4xl font-semibold text-gray-800 mb-4">Welcome Back!</h2>
-          <p className="text-base text-gray-600 leading-relaxed mb-12">
-            Sign in to book your tickets, manage your trips, or access the admin dashboard.
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-gray-800 mb-3 md:mb-4">Chào mừng trở lại!</h2>
+          <p className="text-sm md:text-base text-gray-600 leading-relaxed mb-8 md:mb-12">
+            Đăng nhập để đặt vé, quản lý chuyến đi hoặc truy cập bảng điều khiển quản trị.
           </p>
 
-          <div className="flex flex-col gap-6">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-4 md:gap-6">
+            <div className="flex items-center gap-3 md:gap-4 p-3 md:p-4 border-2 border-transparent rounded-xl transition-all hover:border-[#ECDDC0] hover:bg-[#F5EFE1]/30 cursor-default">
               <div 
-                className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl"
+                className="w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center text-xl md:text-2xl shrink-0"
                 style={{ backgroundColor: COLORS.secondary }}
               >
                 🎫
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-1">Easy Booking</h3>
-                <p className="text-sm text-gray-600">Book tickets in seconds</p>
+                <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-0.5 md:mb-1">Đặt vé dễ dàng</h3>
+                <p className="text-xs md:text-sm text-gray-600">Đặt vé chỉ trong vài giây</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 md:gap-4 p-3 md:p-4 border-2 border-transparent rounded-xl transition-all hover:border-[#ECDDC0] hover:bg-[#F5EFE1]/30 cursor-default">
               <div 
-                className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl"
+                className="w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center text-xl md:text-2xl shrink-0"
                 style={{ backgroundColor: COLORS.secondary }}
               >
                 🔒
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-1">Secure Payment</h3>
-                <p className="text-sm text-gray-600">100% safe transactions</p>
+                <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-0.5 md:mb-1">Thanh toán bảo mật</h3>
+                <p className="text-xs md:text-sm text-gray-600">Giao dịch an toàn 100%</p>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Right Side - Login Form */}
-        <div className="flex-1 flex items-center justify-center p-12 bg-white">
-          <div className="w-full max-w-[420px]">
-            <h2 className="text-4xl font-semibold text-center mb-2 text-gray-800">Sign In</h2>
-            <p className="text-center text-gray-600 text-sm mb-8">Choose your account type to continue</p>
-
-            {/* Login Mode Toggle */}
-            <div className="flex gap-3 mb-6">
-              <button
-                type="button"
-              className={`flex-1 px-4 py-3 border-2 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-2 hover:bg-gray-50 ${
-                loginMode === 'phone' ? 'border-[#ECDDC0]' : 'border-gray-300'
-              }`}
-              onClick={() => setLoginMode('phone')}
-              style={{
-                backgroundColor: loginMode === 'phone' ? COLORS.secondary : 'transparent',
-              }}
-            >
-                <span className="text-lg">📱</span>
-                Số điện thoại
-              </button>
-              <button
-                type="button"
-              className={`flex-1 px-4 py-3 border-2 rounded-lg font-medium text-sm transition-all flex items-center justify-center gap-2 hover:bg-gray-50 ${
-                loginMode === 'email' ? 'border-[#ECDDC0]' : 'border-gray-300'
-              }`}
-              onClick={() => setLoginMode('email')}
-              style={{
-                backgroundColor: loginMode === 'email' ? COLORS.secondary : 'transparent',
-              }}
-            >
-                <span className="text-lg">✉️</span>
-                Email
-              </button>
-            </div>
+        {/* Right Side - Login Form (White Block) */}
+        <div className="w-full lg:flex-1 lg:max-w-[650px]">
+          <div className="bg-white rounded-2xl lg:rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-12">
+          <div className="w-full max-w-[500px] mx-auto">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-center mb-2 text-gray-800">Đăng nhập</h2>
+            <p className="text-center text-gray-600 text-sm mb-6 lg:mb-8">Nhập thông tin đăng nhập để tiếp tục</p>
 
             {/* Login Form */}
             <form onSubmit={handleSubmit} className="flex flex-col gap-5">
               <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-gray-800">
-                {loginMode === 'phone' ? 'Số điện thoại' : 'Email'}
-              </label>
-              <div className="relative flex items-center">
-                <span className="absolute left-4 text-lg text-gray-400">
-                  {loginMode === 'phone' ? '📧' : '✉️'}
-                </span>
+                <label className="text-sm font-medium text-gray-800">
+                  SĐT/Email
+                </label>
                 <input
-                  type={loginMode === 'phone' ? 'tel' : 'email'}
+                  type="text"
                   value={emailOrPhone}
                   onChange={(e) => setEmailOrPhone(e.target.value)}
-                  placeholder={loginMode === 'phone' ? '0989999934' : 'example@email.com'}
-                  className="w-full py-3.5 pl-12 pr-4 border-2 border-gray-200 rounded-lg text-[15px] transition-all outline-none focus:border-[#D83E3E] focus:shadow-[0_0_0_3px_rgba(216,62,62,0.1)] placeholder:text-gray-500"
+                  placeholder="0989999934 hoặc example@email.com"
+                  className="text-gray-800 w-full py-3.5 px-4 border-2 border-gray-200 rounded-lg text-[15px] transition-all outline-none focus:border-[#D83E3E] focus:shadow-[0_0_0_3px_rgba(216,62,62,0.1)] placeholder:text-gray-500"
                   required
                 />
-                </div>
               </div>
 
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium text-gray-800">Mật khẩu</label>
-              <div className="relative flex items-center">
-                <span className="absolute left-4 text-lg text-gray-400">🔒</span>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full py-3.5 pl-12 pr-4 border-2 border-gray-200 rounded-lg text-[15px] transition-all outline-none focus:border-[#D83E3E] focus:shadow-[0_0_0_3px_rgba(216,62,62,0.1)] placeholder:text-gray-500"
+                  className="text-gray-800 w-full py-3.5 px-4 border-2 border-gray-200 rounded-lg text-[15px] transition-all outline-none focus:border-[#D83E3E] focus:shadow-[0_0_0_3px_rgba(216,62,62,0.1)] placeholder:text-gray-500"
                   required
                 />
-                </div>
               </div>
 
               {error && (
@@ -185,7 +220,7 @@ export default function LoginPage() {
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="w-4 h-4 cursor-pointer"
                 />
-                Remember me
+                Ghi nhớ đăng nhập
               </label>
               <button
                 type="button"
@@ -193,7 +228,7 @@ export default function LoginPage() {
                 className="text-sm font-medium transition-opacity hover:opacity-80 hover:underline"
                 style={{ color: COLORS.primary }}
               >
-                Forgot password?
+                Quên mật khẩu?
                 </button>
               </div>
 
@@ -206,25 +241,25 @@ export default function LoginPage() {
                 boxShadow: !isLoading ? `0 4px 12px ${COLORS.primary}4D` : 'none',
               }}
             >
-                {isLoading ? 'Đang đăng nhập...' : 'Sign In'}
+                {isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}
               </button>
             </form>
 
             <div className="text-center mt-6 text-sm text-gray-600">
-            Don't have an account?{' '}
+            Chưa có tài khoản?{' '}
             <button
               type="button"
               onClick={handleSignUp}
               className="font-semibold transition-opacity hover:opacity-80 hover:underline bg-transparent border-none cursor-pointer text-sm"
               style={{ color: COLORS.primary }}
             >
-                Sign up
+                Đăng ký ngay
               </button>
-            </div>
+          </div>
+        </div>
           </div>
         </div>
       </div>
     </div>
-    </div>
   );
-}
+} 
