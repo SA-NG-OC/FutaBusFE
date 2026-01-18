@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import TicketLookup from "@/feature/ticket/components/TicketLookup";
 import TicketDetail from "@/feature/ticket/components/TicketDetail";
 import BookingList from "@/feature/ticket/components/BookingList";
+import PrintableTicket from "@/feature/ticket/components/PrintableTicket";
 import { ticketApi } from "@/feature/ticket/api/ticketApi";
 import { BookingListItem, TicketInfo } from "@/feature/ticket/types";
 import styles from "./page.module.css";
@@ -87,17 +88,14 @@ export default function TicketLookupPage() {
   };
 
   const handleSearchByCode = async (ticketCode: string) => {
-    const response = await ticketApi.getTicketDetailByCode(ticketCode);
+    const booking = await ticketApi.getTicketDetailByCode(ticketCode) as BookingListItem;
 
-    if (response && response.success && response.data) {
-      const booking = response.data;
+    // Find the ticket with matching ticketCode
+    const ticket = booking.tickets.find((t) => t.ticketCode === ticketCode);
 
-      // Find the ticket with matching ticketCode
-      const ticket = booking.tickets.find((t) => t.ticketCode === ticketCode);
-
-      if (!ticket) {
-        throw new Error("Không tìm thấy vé trong booking");
-      }
+    if (!ticket) {
+      throw new Error("Không tìm thấy vé trong booking");
+    }
 
       const mappedData: TicketDetailData = {
         bookingCode: booking.bookingCode,
@@ -143,10 +141,6 @@ export default function TicketLookupPage() {
 
       setTicketData(mappedData);
       setViewState("ticketDetail");
-    } else {
-      setError("Không tìm thấy thông tin vé. Vui lòng kiểm tra lại mã vé.");
-      setViewState("search");
-    }
   };
 
   // New function to search by booking code (from my-ticket page)
@@ -155,13 +149,10 @@ export default function TicketLookupPage() {
     setError(null);
 
     try {
-      const response = await ticketApi.getBookingByCode(bookingCode);
+      const booking = await ticketApi.getBookingByCode(bookingCode) as BookingListItem;
 
-      if (response && response.success && response.data) {
-        const booking = response.data;
-
-        // Get the first ticket from the booking
-        const firstTicket = booking.tickets[0];
+      // Get the first ticket from the booking
+      const firstTicket = booking.tickets[0];
 
         if (!firstTicket) {
           throw new Error("Không tìm thấy vé trong booking");
@@ -214,12 +205,6 @@ export default function TicketLookupPage() {
 
         setTicketData(mappedData);
         setViewState("ticketDetail");
-      } else {
-        setError(
-          "Không tìm thấy thông tin vé. Vui lòng kiểm tra lại mã đặt vé.",
-        );
-        setViewState("search");
-      }
     } catch (err) {
       console.error("Error fetching booking:", err);
       setError(
@@ -234,15 +219,10 @@ export default function TicketLookupPage() {
   };
 
   const handleSearchByPhone = async (phone: string) => {
-    const response = await ticketApi.getBookingsByPhone(phone);
+    const bookings = await ticketApi.getBookingsByPhone(phone) as BookingListItem[];
 
-    if (
-      response &&
-      response.success &&
-      response.data &&
-      response.data.length > 0
-    ) {
-      setBookingList(response.data);
+    if (bookings && bookings.length > 0) {
+      setBookingList(bookings);
       setViewState("bookingList");
     } else {
       setError("Không tìm thấy booking nào với số điện thoại này.");
@@ -251,15 +231,10 @@ export default function TicketLookupPage() {
   };
 
   const handleSearchByEmail = async (email: string) => {
-    const response = await ticketApi.getBookingsByEmail(email);
+    const bookings = await ticketApi.getBookingsByEmail(email) as BookingListItem[];
 
-    if (
-      response &&
-      response.success &&
-      response.data &&
-      response.data.length > 0
-    ) {
-      setBookingList(response.data);
+    if (bookings && bookings.length > 0) {
+      setBookingList(bookings);
       setViewState("bookingList");
     } else {
       setError("Không tìm thấy booking nào với email này.");
@@ -289,7 +264,7 @@ export default function TicketLookupPage() {
   };
 
   const handleDownload = async () => {
-    if (!ticketData || !ticketRef.current) {
+    if (!ticketData) {
       alert("Không tìm thấy thông tin vé để tải xuống");
       return;
     }
@@ -297,21 +272,85 @@ export default function TicketLookupPage() {
     setIsDownloading(true);
 
     try {
-      // Find the ticket card element
-      const ticketElement = ticketRef.current.querySelector(
-        '[class*="ticketCard"]',
-      ) as HTMLElement;
+      // Create iframe to completely isolate from Tailwind CSS and global styles
+      const iframe = document.createElement('iframe');
+      iframe.style.cssText = `
+        position: absolute;
+        left: -9999px;
+        top: 0;
+        width: 800px;
+        height: 1px;
+        border: none;
+      `;
+      document.body.appendChild(iframe);
 
-      if (!ticketElement) {
-        throw new Error("Không tìm thấy thông tin vé");
+      // Get iframe's document
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (!iframeDoc) throw new Error('Cannot access iframe document');
+
+      // Write minimal HTML structure with NO external CSS
+      iframeDoc.open();
+      iframeDoc.write('<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0;padding:0;background:#fff;"></body></html>');
+      iframeDoc.close();
+
+      // Inject strict reset CSS into iframe to prevent any Tailwind/variable styles from applying
+      const resetStyle = iframeDoc.createElement('style');
+      resetStyle.innerHTML = `
+        /* Force safe colors and disable complex functions */
+        * { color: #000 !important; background: transparent !important; background-color: transparent !important; border-color: #e2e8f0 !important; box-shadow: none !important; }
+        body { background: #ffffff !important; color: #000 !important; font-family: Arial, Helvetica, sans-serif !important; }
+        .statusBadge, .downloadButton, .backButton { box-shadow: none !important; }
+        svg, foreignObject { overflow: visible !important; }
+        img { image-rendering: crisp-edges; max-width: 100%; }
+      `;
+      iframeDoc.head.appendChild(resetStyle);
+
+      // Create container in iframe
+      const printContainer = iframeDoc.createElement('div');
+      iframeDoc.body.appendChild(printContainer);
+
+      // Render PrintableTicket component to iframe container
+      const { createRoot } = await import('react-dom/client');
+      const root = createRoot(printContainer);
+      
+      // Render and wait for it to be ready
+      await new Promise<void>((resolve) => {
+        root.render(
+          <PrintableTicket {...ticketData} />
+        );
+        // Wait for render to complete
+        setTimeout(() => resolve(), 400);
+      });
+
+      const ticketElement = printContainer.firstChild as HTMLElement;
+      // Ensure element is visible and not clipped
+      ticketElement.style.overflow = 'visible';
+      // Resize iframe to match rendered content so html2canvas captures full QR
+      try {
+        const height = ticketElement.scrollHeight || ticketElement.clientHeight || 1000;
+        const width = ticketElement.scrollWidth || ticketElement.clientWidth || 800;
+        iframe.style.height = `${height + 40}px`;
+        iframe.style.width = `${width + 40}px`;
+      } catch (e) {
+        // ignore
       }
+      // allow layout to settle
+      await new Promise((r) => setTimeout(r, 200));
 
-      // Create canvas from the ticket element
+      // Create canvas from the ticket element - now completely isolated from main page CSS
       const canvas = await html2canvas(ticketElement, {
         useCORS: true,
         allowTaint: true,
         logging: false,
+        backgroundColor: '#ffffff',
+        scale: 2,
+        windowWidth: ticketElement.scrollWidth || 800,
+        windowHeight: ticketElement.scrollHeight || 1000,
       });
+
+      // Cleanup
+      root.unmount();
+      document.body.removeChild(iframe);
 
       // Calculate dimensions for PDF (A4 size in mm)
       const imgWidth = 210; // A4 width in mm
