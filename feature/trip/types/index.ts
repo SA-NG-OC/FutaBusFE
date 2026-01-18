@@ -13,6 +13,8 @@ export interface TripData {
   totalSeats?: number;
   bookedSeats?: number;
   checkedInSeats?: number;
+  originName: string;
+  destinationName: string;
 }
 
 export interface RouteSelection {

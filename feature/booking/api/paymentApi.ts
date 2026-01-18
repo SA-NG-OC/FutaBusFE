@@ -1,4 +1,4 @@
-import { api } from '@/shared/utils/apiClient';
+import { api } from "@/shared/utils/apiClient";
 
 // ===== TYPES =====
 export interface BookingData {
@@ -56,13 +56,25 @@ export interface BookingResponse {
   createdAt: string;
 }
 
+export interface CounterBookingRequest {
+  tripId: number;
+  seatIds: number[];
+  userId: string;
+  customerName: string;
+  customerPhone: string;
+  customerEmail?: string;
+  notes?: string;
+}
+
 // ===== PAYMENT API =====
 export const paymentApi = {
   // =====================================================
   // 📝 CREATE BOOKING - Tạo booking mới (status = "Held")
   // URL: POST /bookings/confirm
   // =====================================================
-  createBooking: async (data: CreateBookingRequest): Promise<BookingResponse> => {
+  createBooking: async (
+    data: CreateBookingRequest,
+  ): Promise<BookingResponse> => {
     return api.post<BookingResponse>("/bookings/confirm", data);
   },
 
@@ -70,7 +82,9 @@ export const paymentApi = {
   // 💳 CREATE MOMO PAYMENT - Tạo thanh toán MoMo
   // URL: POST /payments/momo/create/{bookingId}
   // =====================================================
-  createMomoPayment: async (bookingId: number): Promise<MomoPaymentResponse> => {
+  createMomoPayment: async (
+    bookingId: number,
+  ): Promise<MomoPaymentResponse> => {
     return api.post<MomoPaymentResponse>(`/payments/momo/create/${bookingId}`);
   },
 
@@ -80,7 +94,7 @@ export const paymentApi = {
   // =====================================================
   checkPaymentStatus: async (
     orderId: string,
-    requestId: string
+    requestId: string,
   ): Promise<MomoStatusResponse> => {
     return api.get<MomoStatusResponse>("/payments/momo/status", {
       params: { orderId, requestId },
@@ -101,5 +115,13 @@ export const paymentApi = {
   // =====================================================
   getBookingByCode: async (bookingCode: string): Promise<BookingResponse> => {
     return api.get<BookingResponse>(`/bookings/code/${bookingCode}`);
+  },
+
+  // API dành riêng cho Admin bán vé tại quầy (1 phát ăn ngay: Book + Confirm + Paid)
+  // URL: POST /bookings/counter
+  createCounterBooking: async (
+    data: CounterBookingRequest,
+  ): Promise<BookingResponse> => {
+    return api.post<BookingResponse>("/bookings/counter", data);
   },
 };
