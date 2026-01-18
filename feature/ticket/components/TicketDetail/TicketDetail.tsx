@@ -1,12 +1,12 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./TicketDetail.module.css";
-import { QRCodeSVG } from "qrcode.react";
+import { ticketApi } from "@/feature/ticket/api/ticketApi";
 
 interface TicketDetailData {
   bookingCode: string;
   status: string;
-  qrCode?: string;
+  qrCode?: string; // Đây là mã vé (VD: TK-001) dùng để gọi API
   fromLocation: string;
   toLocation: string;
   departureDate: string;
@@ -38,14 +38,55 @@ export default function TicketDetail({
   onBack,
   onDownload,
 }: TicketDetailProps) {
+  // State quản lý ảnh QR
+  const [qrImageUrl, setQrImageUrl] = useState<string | null>(null);
+  const [loadingQr, setLoadingQr] = useState<boolean>(false);
+
+  // Effect: Gọi API lấy ảnh QR từ Backend (Ảnh này chứa link web)
+  useEffect(() => {
+    let objectUrl: string | null = null;
+
+    const fetchQr = async () => {
+      // Ưu tiên dùng ticketCode (qrCode), nếu không có thì dùng bookingCode
+      const codeToFetch = ticket.qrCode || ticket.bookingCode;
+
+      if (!codeToFetch) return;
+
+      setLoadingQr(true);
+      try {
+        // Gọi API getTicketQrImage (nhớ đảm bảo API này trả về Blob)
+        const blob = await ticketApi.getTicketQrImage(codeToFetch);
+
+        // Tạo URL ảo từ Blob
+        objectUrl = URL.createObjectURL(blob);
+        setQrImageUrl(objectUrl);
+      } catch (error) {
+        console.error("Lỗi khi tải mã QR:", error);
+        setQrImageUrl(null);
+      } finally {
+        setLoadingQr(false);
+      }
+    };
+
+    fetchQr();
+
+    // Cleanup: Xóa URL ảo khi component unmount để tránh leak memory
+    return () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [ticket.qrCode, ticket.bookingCode]);
+
   const getStatusColor = (status: string) => {
-    switch (status.toUpperCase()) {
+    switch (status?.toUpperCase()) {
       case "CONFIRMED":
       case "PAID":
         return styles.statusConfirmed;
       case "PENDING":
         return styles.statusPending;
       case "CANCELLED":
+      case "FAILED":
         return styles.statusCancelled;
       default:
         return styles.statusDefault;
@@ -53,13 +94,14 @@ export default function TicketDetail({
   };
 
   const getStatusText = (status: string) => {
-    switch (status.toUpperCase()) {
+    switch (status?.toUpperCase()) {
       case "CONFIRMED":
       case "PAID":
         return "Đã xác nhận";
       case "PENDING":
-        return "Chờ xác nhận";
+        return "Chờ thanh toán";
       case "CANCELLED":
+      case "FAILED":
         return "Đã hủy";
       default:
         return status;
@@ -76,7 +118,7 @@ export default function TicketDetail({
             <div>
               <div className={styles.headerTitle}>Thông tin vé</div>
               <div className={styles.bookingCode}>
-                Mã vé: {ticket.bookingCode}
+                Mã: {ticket.bookingCode}
               </div>
             </div>
           </div>
@@ -87,16 +129,50 @@ export default function TicketDetail({
           </div>
         </div>
 
-        {/* QR Code */}
-        <div className={styles.qrSection}>
-          <QRCodeSVG
-            value={ticket.qrCode || ticket.bookingCode}
-            size={220}
-            level="H"
-            includeMargin={false}
-          />
+        {/* QR Code Section */}
+        <div className={styles.qrSection} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <div
+            style={{
+              width: "280px",  // Tăng kích thước khung chứa (Cũ là 220px)
+              height: "280px", // Tăng kích thước khung chứa
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#fff", // Nên để nền trắng cho QR dễ đọc
+              borderRadius: "16px",
+              border: "2px solid #eee", // Viền nhẹ cho đẹp
+              boxShadow: "0 4px 12px rgba(0,0,0,0.05)", // Đổ bóng nhẹ
+              padding: "10px"
+            }}
+          >
+            {loadingQr ? (
+              // Loading Skeleton
+              <div style={{ color: "#999", fontSize: "0.9rem", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+                <div style={{ width: "30px", height: "30px", border: "3px solid #ccc", borderTopColor: "var(--primary)", borderRadius: "50%", animation: "spin 1s linear infinite" }}></div>
+                <span>Đang tạo QR...</span>
+              </div>
+            ) : qrImageUrl ? (
+              // Success Image
+              <img
+                src={qrImageUrl}
+                alt="Mã QR Vé"
+                style={{
+                  width: "100%",      // Ăn theo khung cha (280px)
+                  height: "100%",
+                  objectFit: "contain",
+                  borderRadius: "8px",
+                  display: "block"    // Loại bỏ khoảng trắng thừa của thẻ img
+                }}
+              />
+            ) : (
+              // Error State
+              <div style={{ color: "#ff4d4f", fontSize: "0.85rem", padding: "0 20px", textAlign: "center" }}>
+                ⚠️ Lỗi tải QR
+              </div>
+            )}
+          </div>
         </div>
-
         {/* Two Column Layout */}
         <div className={styles.contentGrid}>
           {/* Left Column */}
@@ -160,32 +236,27 @@ export default function TicketDetail({
                 </div>
               </div>
 
-              <div className={styles.infoGroupInline}>
-                <div>
-                  <div className={styles.infoLabel}>Email</div>
-                  <div className={styles.infoValue}>{ticket.customerEmail}</div>
-                </div>
-                {ticket.customerIdCard && (
-                  <div>
-                    <div className={styles.infoLabel}>CMND/CCCD</div>
-                    <div className={styles.infoValue}>
-                      {ticket.customerIdCard}
-                    </div>
-                  </div>
-                )}
+              <div className={styles.infoGroup}>
+                <div className={styles.infoLabel}>Email</div>
+                <div className={styles.infoValue} style={{ wordBreak: 'break-all' }}>{ticket.customerEmail}</div>
               </div>
             </div>
 
             {/* Thông tin ghế */}
             <div className={styles.section}>
               <div className={styles.sectionHeader}>
-                <span className={styles.sectionIcon}>🎫</span>
+                <span className={styles.sectionIcon}>💺</span>
                 <span className={styles.sectionTitle}>Thông tin ghế</span>
               </div>
 
               <div className={styles.infoGroup}>
                 <div className={styles.infoLabel}>Số ghế</div>
                 <div className={styles.seatNumber}>{ticket.seatNumber}</div>
+              </div>
+
+              <div className={styles.infoGroup}>
+                <div className={styles.infoLabel}>Vị trí</div>
+                <div className={styles.infoValue}>{ticket.seatFloor}</div>
               </div>
             </div>
           </div>
@@ -201,7 +272,7 @@ export default function TicketDetail({
 
               <div
                 className={styles.infoValue}
-                style={{ marginBottom: "0.75rem" }}
+                style={{ marginBottom: "0.75rem", fontWeight: 600 }}
               >
                 {ticket.vehicleType}
               </div>
@@ -230,7 +301,7 @@ export default function TicketDetail({
                   {ticket.pickupLocation}
                 </div>
                 <div className={styles.infoTime}>
-                  Thời gian: {ticket.pickupTime}
+                  {ticket.pickupTime}
                 </div>
               </div>
 
@@ -240,7 +311,7 @@ export default function TicketDetail({
                   {ticket.dropoffLocation}
                 </div>
                 <div className={styles.infoTime}>
-                  Thời gian dự kiến: {ticket.dropoffTime}
+                  {ticket.dropoffTime}
                 </div>
               </div>
             </div>
@@ -255,12 +326,20 @@ export default function TicketDetail({
           </button>
           {onBack && (
             <button onClick={onBack} className={styles.backButton}>
-              <span>🎫</span>
-              Vé của tôi
+              <span>↩</span>
+              Quay lại
             </button>
           )}
         </div>
       </div>
+
+      {/* CSS Animation cho Spinner nếu chưa có trong global css */}
+      <style jsx global>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }

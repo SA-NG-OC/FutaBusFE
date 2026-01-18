@@ -214,4 +214,31 @@ export const ticketApi = {
     }
     return res.json();
   },
+
+  getTicketQrImage: async (ticketCode: string): Promise<Blob> => {
+    const res = await fetch(`${API_BASE_URL}/tickets/${ticketCode}/qr`, {
+      method: "GET",
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to load QR code image");
+    }
+    return res.blob();
+  },
+
+  exportTicketPdf: async (ticketId: number, token?: string): Promise<Blob> => {
+    const headers: HeadersInit = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    const res = await fetch(`${API_BASE_URL}/tickets/${ticketId}/pdf`, {
+      method: "GET",
+      headers: headers,
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to export ticket PDF");
+    }
+    return res.blob();
+  },
 };
