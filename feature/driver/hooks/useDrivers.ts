@@ -136,5 +136,6 @@ export const useDrivers = () => {
     handleSaveDriver,
     handleDeleteConfirm,
     handleCreateWithAccount,
+    fetchDrivers,
   };
 };

@@ -1,8 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './RouteCard.module.css';
 import { RouteData } from '../../types';
+import { vehicleRouteAssignmentApi } from '@/feature/vehicle/api/vehicleRouteAssignmentApi';
+import { driverRouteAssignmentApi } from '@/feature/driver/api/driverRouteAssignmentApi';
 
 interface RouteCardProps {
     data: RouteData;
@@ -11,6 +13,28 @@ interface RouteCardProps {
 }
 
 const RouteCard = ({ data, onEdit, onDelete }: RouteCardProps) => {
+    const [vehicleCount, setVehicleCount] = useState<number>(0);
+    const [driverCount, setDriverCount] = useState<number>(0);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchAssignments();
+    }, [data.routeId]);
+
+    const fetchAssignments = async () => {
+        try {
+            const [vehicles, drivers] = await Promise.all([
+                vehicleRouteAssignmentApi.getByRoute(data.routeId),
+                driverRouteAssignmentApi.getByRoute(data.routeId)
+            ]);
+            setVehicleCount(vehicles.length);
+            setDriverCount(drivers.length);
+        } catch (error) {
+            console.error('Error fetching assignments:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // --- Helper: Format số phút thành giờ phút (ví dụ: 150 -> 2h 30m) ---
     const formatDuration = (minutes: number) => {
@@ -70,6 +94,25 @@ const RouteCard = ({ data, onEdit, onDelete }: RouteCardProps) => {
                         <p className={styles['info-value']}>
                             {data.totalStops > 0 ? `${data.totalStops} stops` : 'Direct'}
                         </p>
+                    </div>
+                </div>
+
+                {/* --- Resource Statistics --- */}
+                <div className={styles['info-row']} style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--border-color, #e5e7eb)' }}>
+                    <div className={styles['info-item']}>
+                        <p className={styles['info-label']}>Vehicles</p>
+                        <p className={styles['info-value']} style={{ color: 'var(--primary, #d83e3e)' }}>
+                            {loading ? '...' : `${vehicleCount} xe`}
+                        </p>
+                    </div>
+                    <div className={styles['info-item']}>
+                        <p className={styles['info-label']}>Drivers</p>
+                        <p className={styles['info-value']} style={{ color: 'var(--primary, #d83e3e)' }}>
+                            {loading ? '...' : `${driverCount} tài xế`}
+                        </p>
+                    </div>
+                    <div className={styles['info-item']}>
+                        {/* Empty for spacing */}
                     </div>
                 </div>
 

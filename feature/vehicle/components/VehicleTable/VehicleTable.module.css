@@ -1,16 +1,16 @@
 /* VehicleTable.module.css - Responsive & Dark Mode Support */
 
 .container {
-  background-color: #ffffff;
+  background-color: #f9fafb; /* gray-50 */
   border-radius: 0.75rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   overflow: hidden;
-  border: 1px solid #f3f4f6;
+  border: 1px solid #e5e7eb;
 }
 
 /* Dark mode for container */
 :global(.dark) .container {
-  background-color: #1f2937;
+  background-color: #1f2937; /* gray-800 */
   border-color: #374151;
 }
 
@@ -127,6 +127,15 @@
   color: #d1d5db;
 }
 
+.licensePlate {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+:global(.dark) .licensePlate {
+  color: #f9fafb;
+}
+
 /* Status badge */
 .statusBadge {
   display: inline-flex;
@@ -213,6 +222,15 @@
   background-color: #c7d2fe;
 }
 
+.assignButton {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.assignButton:hover {
+  background-color: #bfdbfe;
+}
+
 .deleteButton {
   background-color: #fef2f2;
   color: #991b1b;
@@ -229,6 +247,15 @@
 
 :global(.dark) .editButton:hover {
   background-color: #3730a3;
+}
+
+:global(.dark) .assignButton {
+  background-color: #1e3a8a;
+  color: #93c5fd;
+}
+
+:global(.dark) .assignButton:hover {
+  background-color: #1e40af;
 }
 
 :global(.dark) .deleteButton {

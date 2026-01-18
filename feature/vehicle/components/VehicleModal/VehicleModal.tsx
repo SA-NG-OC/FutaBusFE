@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
 import styles from "./VehicleModal.module.css";
+import { vehicleTypeApi, VehicleTypeResponse } from "@/feature/vehicle/api/vehicleTypeApi";
 
 // Vehicle data interface
 interface VehicleData {
@@ -29,22 +30,6 @@ interface FormErrors {
   vehicleType?: string;
 }
 
-// Vehicle type options - TODO: Fetch from API
-const vehicleTypeOptions = [
-  { typeId: 1, label: "Limousine", capacity: 34 },
-  { typeId: 2, label: "Giường nằm", capacity: 40 },
-  { typeId: 3, label: "Ghế ngồi", capacity: 45 },
-  { typeId: 4, label: "Limousine 34 Phòng", capacity: 34 },
-  { typeId: 5, label: "Xe buýt", capacity: 50 },
-];
-
-// Status options
-const statusOptions = [
-  { value: "ACTIVE" as const, label: "Hoạt động" },
-  { value: "INACTIVE" as const, label: "Không hoạt động" },
-  { value: "MAINTENANCE" as const, label: "Bảo trì" },
-];
-
 export default function VehicleModal({
   isOpen,
   onClose,
@@ -52,12 +37,23 @@ export default function VehicleModal({
   vehicle = null,
   loading = false,
 }: VehicleModalProps) {
+  // Vehicle type options state - loaded from API
+  const [vehicleTypeOptions, setVehicleTypeOptions] = useState<VehicleTypeResponse[]>([]);
+  const [loadingTypes, setLoadingTypes] = useState(false);
+
+  // Status options
+  const statusOptions = [
+    { value: "ACTIVE" as const, label: "Hoạt động" },
+    { value: "INACTIVE" as const, label: "Không hoạt động" },
+    { value: "MAINTENANCE" as const, label: "Bảo trì" },
+  ];
+  
   // Form state
   const [formData, setFormData] = useState<VehicleData>({
     licensePlate: "",
     vehicleType: "",
-    typeId: 1,
-    capacity: 16,
+    typeId: 0,
+    capacity: 0,
     status: "ACTIVE",
     insuranceNumber: "",
     insuranceExpiry: "",
@@ -66,6 +62,33 @@ export default function VehicleModal({
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Fetch vehicle types on component mount
+  useEffect(() => {
+    fetchVehicleTypes();
+  }, []);
+
+  const fetchVehicleTypes = async () => {
+    setLoadingTypes(true);
+    try {
+      const types = await vehicleTypeApi.getAllForSelection();
+      setVehicleTypeOptions(types);
+      
+      // Set default typeId if not editing
+      if (!vehicle && types.length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          typeId: types[0].typeId,
+          vehicleType: types[0].typeName,
+          capacity: types[0].totalSeats
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching vehicle types:', error);
+    } finally {
+      setLoadingTypes(false);
+    }
+  };
 
   // Initialize form data when modal opens or vehicle changes
   useEffect(() => {
@@ -79,12 +102,13 @@ export default function VehicleModal({
           notes: vehicle.notes || "",
         });
       } else {
-        // Add mode - reset form
+        // Add mode - reset form with first vehicle type as default
+        const firstType = vehicleTypeOptions.length > 0 ? vehicleTypeOptions[0] : null;
         setFormData({
           licensePlate: "",
-          vehicleType: "",
-          typeId: 1,
-          capacity: 16,
+          vehicleType: firstType?.typeName || "",
+          typeId: firstType?.typeId || 0,
+          capacity: firstType?.totalSeats || 0,
           status: "ACTIVE",
           insuranceNumber: "",
           insuranceExpiry: "",
@@ -93,7 +117,7 @@ export default function VehicleModal({
       }
       setErrors({});
     }
-  }, [isOpen, vehicle]);
+  }, [isOpen, vehicle, vehicleTypeOptions]);
 
   // Form validation
   const validateForm = (): boolean => {
@@ -242,25 +266,25 @@ export default function VehicleModal({
                 <select
                   value={formData.typeId}
                   onChange={(e) => {
-                    const typeId = parseInt(e.target.value);
+                    const typeId = parseInt(e.target.value || "0", 10);
                     const selectedType = vehicleTypeOptions.find(
                       (t) => t.typeId === typeId,
                     );
                     handleInputChange("typeId", typeId);
                     if (selectedType) {
-                      handleInputChange("vehicleType", selectedType.label);
-                      handleInputChange("capacity", selectedType.capacity);
+                      handleInputChange("vehicleType", selectedType.typeName);
+                      handleInputChange("capacity", selectedType.totalSeats);
                     }
                   }}
                   className={`${styles.select} ${
                     errors.vehicleType ? styles.selectError : ""
                   }`}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || loadingTypes}
                 >
-                  <option value="">Chọn loại xe</option>
+                  <option value="">{loadingTypes ? "Đang tải..." : "Chọn loại xe"}</option>
                   {vehicleTypeOptions.map((option) => (
-                    <option key={option.typeId} value={option.typeId}>
-                      {option.label} ({option.capacity} chỗ)
+                    <option key={option.typeId} value={String(option.typeId)}>
+                      {option.typeName} ({option.totalSeats} chỗ)
                     </option>
                   ))}
                 </select>

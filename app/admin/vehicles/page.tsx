@@ -1,11 +1,14 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useVehicles } from "@/feature/vehicle/hooks/useVehicle";
 import { Vehicle, VehicleRequest, VehicleType } from "@/feature/vehicle/types";
 import VehicleTable from "@/feature/vehicle/components/VehicleTable/VehicleTable";
 import VehicleModal from "@/feature/vehicle/components/VehicleModal/VehicleModal";
 import ConfirmDeleteModal from "@/feature/vehicle/components/ConfirmDeleteModal/ConfirmDeleteModal";
+import VehicleRouteAssignmentModal from "@/feature/vehicle/components/VehicleRouteAssignmentModal/VehicleRouteAssignmentModal";
+import { vehicleRouteAssignmentApi } from "@/feature/vehicle/api/vehicleRouteAssignmentApi";
 import PageHeader from "@/src/components/PageHeader/PageHeader";
+import RouteFilter from "@/src/components/RouteFilter/RouteFilter";
 
 // Type adapters to bridge API types with component types
 interface VehicleTableData {
@@ -159,8 +162,40 @@ export default function VehiclePage() {
     handleDeleteConfirm,
   } = useVehicles();
 
-  // Convert vehicles for table display
-  const tableVehicles = vehicles.map(convertToTableData);
+  const [showAssignmentModal, setShowAssignmentModal] = useState(false);
+  const [selectedVehicleForAssignment, setSelectedVehicleForAssignment] = useState<{ vehicleId: number; licensePlate: string } | null>(null);
+  const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
+  const [filteredVehicles, setFilteredVehicles] = useState<Vehicle[]>([]);
+
+  // Filter vehicles by route when selectedRouteId changes
+  useEffect(() => {
+    let cancelled = false;
+
+    const filterVehiclesByRoute = async () => {
+      if (!selectedRouteId) return;
+
+      try {
+        const assignments = await vehicleRouteAssignmentApi.getByRoute(selectedRouteId);
+        const vehicleIds = assignments.map((a) => a.vehicleId);
+        const filtered = vehicles.filter((v) => vehicleIds.includes(v.vehicleid));
+        if (!cancelled) setFilteredVehicles(filtered);
+      } catch (error) {
+        console.error("Error filtering vehicles:", error);
+        if (!cancelled) setFilteredVehicles([]);
+      }
+    };
+
+    if (selectedRouteId) {
+      filterVehiclesByRoute();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedRouteId, vehicles]);
+
+  const displayVehicles = selectedRouteId ? filteredVehicles : vehicles;
+  const tableVehicles = displayVehicles.map(convertToTableData);
 
   // Handle edit vehicle click
   const handleEditClick = (tableVehicle: VehicleTableData) => {
@@ -178,10 +213,27 @@ export default function VehiclePage() {
     await handleSaveVehicle(apiData);
   };
 
+  // Handle assign route click
+  const handleAssignRouteClick = (vehicleId: number) => {
+    const vehicle = tableVehicles.find(v => v.vehicleId === vehicleId);
+    if (vehicle) {
+      setSelectedVehicleForAssignment({ 
+        vehicleId: vehicle.vehicleId, 
+        licensePlate: vehicle.licensePlate 
+      });
+      setShowAssignmentModal(true);
+    }
+  };
+
+  const handleAssignmentSuccess = () => {
+    // Trigger re-fetch by updating a dependency
+    // The useEffect will automatically re-run when vehicles change
+  };
+
   // Error display component
   if (error) {
     return (
-      <div className="min-h-screen p-6">
+      <div>
         <PageHeader
           title="Quản lý xe"
           subtitle="Quản lý thông tin xe và tài xế"
@@ -212,7 +264,7 @@ export default function VehiclePage() {
   }
 
   return (
-    <div className="min-h-screen dark:bg-gray-900">
+    <div>
       {/* Page Header */}
       <PageHeader
         title="Quản lý xe"
@@ -221,17 +273,33 @@ export default function VehiclePage() {
         onAction={openAddModal}
       />
 
+      {/* Route Filter */}
+      <div className="px-6 mb-6">
+        <RouteFilter
+          onRouteSelect={setSelectedRouteId}
+          selectedRouteId={selectedRouteId}
+          placeholder="Tất cả tuyến đường"
+        />
+        {selectedRouteId && (
+          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <p className="text-sm text-blue-800 dark:text-blue-200">
+              Hiển thị <span className="font-bold">{displayVehicles.length}</span> xe được gắn vào tuyến đã chọn
+            </p>
+          </div>
+        )}
+      </div>
+
       {/* Main Content */}
-      <div className="">
-        <div className=" dark:bg-gray-800 ">
+      <div className="px-6">
+        <div>
           {/* Statistics Cards */}
           <div className="py-6 border-b border-gray-200 dark:border-gray-700">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+              <div className="bg-blue-600 dark:bg-blue-900/20 rounded-lg p-4">
                 <div className="flex items-center">
-                  <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
+                  <div className="p-2 bg-blue-600 dark:bg-blue-900/40 rounded-lg">
                     <svg
-                      className="w-6 h-6 text-blue-600 dark:text-blue-400"
+                      className="w-6 h-6 text-white dark:text-blue-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -240,26 +308,26 @@ export default function VehiclePage() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2v0a2 2 0 01-2-2v-2a2 2 0 00-2-2H8z"
+                        d="M5 13l4 4L19 7"
                       />
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                    <p className="text-sm font-extrabold text-white dark:text-blue-300">
                       Tổng số xe
                     </p>
-                    <p className="text-2xl font-semibold text-blue-900 dark:text-blue-100">
+                    <p className="text-2xl font-extrabold text-white dark:text-blue-100">
                       {vehicles.length}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+              <div className="bg-green-600 dark:bg-green-900/20 rounded-lg p-4">
                 <div className="flex items-center">
-                  <div className="p-2 bg-green-100 dark:bg-green-900/40 rounded-lg">
+                  <div className="p-2 bg-green-700 dark:bg-green-900/40 rounded-lg">
                     <svg
-                      className="w-6 h-6 text-green-600 dark:text-green-400"
+                      className="w-6 h-6 text-white dark:text-green-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -273,10 +341,10 @@ export default function VehiclePage() {
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                    <p className="text-sm font-extrabold text-white dark:text-green-300">
                       Đang hoạt động
                     </p>
-                    <p className="text-2xl font-semibold text-green-900 dark:text-green-100">
+                    <p className="text-2xl font-extrabold text-white dark:text-green-100">
                       {
                         vehicles.filter(
                           (v) => v.status.toLowerCase() === "operational",
@@ -287,11 +355,11 @@ export default function VehiclePage() {
                 </div>
               </div>
 
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4">
+              <div className="bg-yellow-500 dark:bg-yellow-900/20 rounded-lg p-4">
                 <div className="flex items-center">
-                  <div className="p-2 bg-yellow-100 dark:bg-yellow-900/40 rounded-lg">
+                  <div className="p-2 bg-yellow-600 dark:bg-yellow-900/40 rounded-lg">
                     <svg
-                      className="w-6 h-6 text-yellow-600 dark:text-yellow-400"
+                      className="w-6 h-6 text-white dark:text-yellow-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -305,10 +373,10 @@ export default function VehiclePage() {
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                    <p className="text-sm font-extrabold text-white dark:text-yellow-300">
                       Bảo trì
                     </p>
-                    <p className="text-2xl font-semibold text-yellow-900 dark:text-yellow-100">
+                    <p className="text-2xl font-extrabold text-white dark:text-yellow-100">
                       {
                         vehicles.filter(
                           (v) => v.status.toLowerCase() === "maintenance",
@@ -319,11 +387,11 @@ export default function VehiclePage() {
                 </div>
               </div>
 
-              <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
+              <div className="bg-red-600 dark:bg-red-900/20 rounded-lg p-4">
                 <div className="flex items-center">
-                  <div className="p-2 bg-red-100 dark:bg-red-900/40 rounded-lg">
+                  <div className="p-2 bg-red-700 dark:bg-red-900/40 rounded-lg">
                     <svg
-                      className="w-6 h-6 text-red-600 dark:text-red-400"
+                      className="w-6 h-6 text-white dark:text-red-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -337,10 +405,10 @@ export default function VehiclePage() {
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                    <p className="text-sm font-extrabold text-white dark:text-red-300">
                       Không hoạt động
                     </p>
-                    <p className="text-2xl font-semibold text-red-900 dark:text-red-100">
+                    <p className="text-2xl font-extrabold text-white dark:text-red-100">
                       {
                         vehicles.filter(
                           (v) => v.status.toLowerCase() === "inactive",
@@ -360,11 +428,11 @@ export default function VehiclePage() {
               loading={loading}
               onEditVehicle={handleEditClick}
               onDeleteVehicle={handleDeleteClick}
-              currentPage={1} // TODO: Implement pagination from useVehicles hook
+              onAssignRoute={handleAssignRouteClick}
+              currentPage={1}
               totalPages={1}
-              totalElements={vehicles.length}
+              totalElements={displayVehicles.length}
               onPageChange={(page) => {
-                // TODO: Implement pagination
                 console.log("Page change:", page);
               }}
             />
@@ -391,6 +459,20 @@ export default function VehiclePage() {
         }
         loading={loading}
       />
+
+      {/* Route Assignment Modal */}
+      {selectedVehicleForAssignment && (
+        <VehicleRouteAssignmentModal
+          isOpen={showAssignmentModal}
+          onClose={() => {
+            setShowAssignmentModal(false);
+            setSelectedVehicleForAssignment(null);
+          }}
+          vehicleId={selectedVehicleForAssignment.vehicleId}
+          vehicleName={selectedVehicleForAssignment.licensePlate}
+          onSuccess={handleAssignmentSuccess}
+        />
+      )}
     </div>
   );
 }

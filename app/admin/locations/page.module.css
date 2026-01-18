@@ -24,6 +24,10 @@
   gap: 12px;
 }
 
+:global(.dark) .headerContent h1 {
+  color: #f9fafb; /* gray-50 */
+}
+
 .titleIcon {
   color: #D83E3E;
   font-size: 24px;
@@ -34,6 +38,10 @@
   color: #64748b;
   font-size: 16px;
   line-height: 1.5;
+}
+
+:global(.dark) .subtitle {
+  color: #9ca3af; /* gray-400 */
 }
 
 .headerActions {
@@ -581,4 +589,131 @@
   .formActions {
     flex-direction: column;
   }
+}
+
+/* =========================
+   DARK MODE SUPPORT
+   ========================= */
+
+/* Map Toggle & Buttons */
+:global(.dark) .mapToggle {
+  background: #1f2937;
+  border-color: #374151;
+  color: #9ca3af;
+}
+
+:global(.dark) .mapToggle:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+:global(.dark) .mapToggle.active {
+  background: #ef4444;
+  border-color: #ef4444;
+}
+
+:global(.dark) .addButton {
+  background: #ef4444;
+}
+
+:global(.dark) .addButton:hover {
+  background: #dc2626;
+}
+
+/* Filter Bar */
+:global(.dark) .filterBar {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+:global(.dark) .searchIcon {
+  color: #6b7280;
+}
+
+:global(.dark) .searchInput {
+  background: #111827;
+  border-color: #374151;
+  color: #f9fafb;
+}
+
+:global(.dark) .searchInput:focus {
+  border-color: #ef4444;
+}
+
+:global(.dark) .filterSelect {
+  background: #111827;
+  border-color: #374151;
+  color: #f9fafb;
+}
+
+:global(.dark) .filterSelect:focus {
+  border-color: #ef4444;
+}
+
+/* Error Alert */
+:global(.dark) .errorAlert {
+  background: #7f1d1d;
+  border-color: #991b1b;
+  color: #fca5a5;
+}
+
+/* Table */
+:global(.dark) .tableContainer {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+:global(.dark) .table th {
+  background: #111827;
+  border-color: #374151;
+  color: #d1d5db;
+}
+
+:global(.dark) .table td {
+  border-color: #374151;
+  color: #d1d5db;
+}
+
+:global(.dark) .table tr:hover {
+  background: #374151;
+}
+
+:global(.dark) .nameCell {
+  color: #f9fafb;
+}
+
+:global(.dark) .coordsCell {
+  color: #9ca3af;
+}
+
+/* Type Badges */
+:global(.dark) .typePickup {
+  background: #064e3b;
+  color: #4ade80;
+  border-color: #065f46;
+}
+
+:global(.dark) .typeDropoff {
+  background: #7f1d1d;
+  color: #fca5a5;
+  border-color: #991b1b;
+}
+
+:global(.dark) .typeBoth {
+  background: #7f1d1d;
+  color: #f87171;
+  border-color: #991b1b;
+}
+
+/* Status Badges */
+:global(.dark) .statusBadge.active {
+  background: #064e3b;
+  color: #4ade80;
+  border-color: #065f46;
+}
+
+:global(.dark) .statusBadge.inactive {
+  background: #374151;
+  color: #9ca3af;
+  border-color: #4b5563;
 }

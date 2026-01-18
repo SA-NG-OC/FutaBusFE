@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaTruck } from "react-icons/fa";
+import { vehicleRouteAssignmentApi } from "@/feature/vehicle/api/vehicleRouteAssignmentApi";
 import styles from "./VehicleTable.module.css";
 
 // Types for Vehicle data
@@ -10,6 +11,7 @@ interface VehicleData {
   capacity: number;
   status: "ACTIVE" | "INACTIVE" | "MAINTENANCE";
   createdAt: string;
+  assignedRoutes?: string[]; // Array of route names
 }
 
 interface VehicleTableProps {
@@ -17,6 +19,7 @@ interface VehicleTableProps {
   loading?: boolean;
   onEditVehicle: (vehicle: VehicleData) => void;
   onDeleteVehicle: (vehicleId: number) => void;
+  onAssignRoute?: (vehicleId: number) => void;
   currentPage?: number;
   totalPages?: number;
   totalElements?: number;
@@ -28,11 +31,47 @@ export default function VehicleTable({
   loading = false,
   onEditVehicle,
   onDeleteVehicle,
+  onAssignRoute,
   currentPage = 0,
   totalPages = 1,
   totalElements = 0,
   onPageChange,
 }: VehicleTableProps) {
+  const [vehiclesWithRoutes, setVehiclesWithRoutes] = useState<VehicleData[]>(vehicles);
+  const [loadingRoutes, setLoadingRoutes] = useState(false);
+
+  // Fetch assigned routes for all vehicles
+  useEffect(() => {
+    const fetchAssignedRoutes = async () => {
+      if (!vehicles.length) return;
+      
+      setLoadingRoutes(true);
+      try {
+        const vehiclesWithRoutesData = await Promise.all(
+          vehicles.map(async (vehicle) => {
+            try {
+              const assignments = await vehicleRouteAssignmentApi.getByVehicle(vehicle.vehicleId);
+              const routeNames = assignments
+                .filter(a => a.isActive)
+                .map(a => a.routeName);
+              return { ...vehicle, assignedRoutes: routeNames };
+            } catch (error) {
+              console.error(`Error fetching routes for vehicle ${vehicle.vehicleId}:`, error);
+              return { ...vehicle, assignedRoutes: [] };
+            }
+          })
+        );
+        setVehiclesWithRoutes(vehiclesWithRoutesData);
+      } catch (error) {
+        console.error('Error fetching vehicle routes:', error);
+      } finally {
+        setLoadingRoutes(false);
+      }
+    };
+
+    fetchAssignedRoutes();
+  }, [vehicles]);
+
   // Format date helper
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString("vi-VN", {
@@ -145,13 +184,14 @@ export default function VehicleTable({
               <th className={styles.tableHeaderCell}>Loại xe</th>
               <th className={styles.tableHeaderCell}>Sức chứa</th>
               <th className={styles.tableHeaderCell}>Trạng thái</th>
+              <th className={styles.tableHeaderCell}>Tuyến đã gắn</th>
               <th className={styles.tableHeaderCell}>Thao tác</th>
             </tr>
           </thead>
           <tbody>
-            {vehicles.length === 0 ? (
+            {vehiclesWithRoutes.length === 0 ? (
               <tr>
-                <td colSpan={5}>
+                <td colSpan={6}>
                   <div className={styles.emptyState}>
                     <div className={styles.emptyStateIcon}>🚌</div>
                     <div className={styles.emptyStateText}>Chưa có xe nào</div>
@@ -162,10 +202,10 @@ export default function VehicleTable({
                 </td>
               </tr>
             ) : (
-              vehicles.map((vehicle) => (
+              vehiclesWithRoutes.map((vehicle) => (
                 <tr key={vehicle.vehicleId} className={styles.tableRow}>
                   <td className={styles.tableCell}>
-                    <div style={{ fontWeight: 600, color: "#1f2937" }}>
+                    <div className={styles.licensePlate}>
                       {vehicle.licensePlate}
                     </div>
                   </td>
@@ -181,7 +221,34 @@ export default function VehicleTable({
                     </span>
                   </td>
                   <td className={styles.tableCell}>
+                    {loadingRoutes ? (
+                      <span className="text-gray-400 text-sm">Đang tải...</span>
+                    ) : vehicle.assignedRoutes && vehicle.assignedRoutes.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {vehicle.assignedRoutes.map((routeName, idx) => (
+                          <span
+                            key={idx}
+                            className="inline-block px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded"
+                          >
+                            {routeName}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 dark:text-gray-500 text-sm">Chưa gắn tuyến</span>
+                    )}
+                  </td>
+                  <td className={styles.tableCell}>
                     <div className={styles.actionButtons}>
+                      {onAssignRoute && (
+                        <button
+                          onClick={() => onAssignRoute(vehicle.vehicleId)}
+                          className={`${styles.actionButton} ${styles.assignButton}`}
+                          title="Gắn tuyến"
+                        >
+                          <FaTruck size={14} />
+                        </button>
+                      )}
                       <button
                         onClick={() => onEditVehicle(vehicle)}
                         className={`${styles.actionButton} ${styles.editButton}`}
