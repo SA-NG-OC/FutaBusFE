@@ -8,17 +8,19 @@ import TripSort from "@/feature/booking/components/TripSort/TripSort";
 import TripCard from "@/feature/booking/components/TripCard/TripCard";
 import Pagination from "@/src/components/Pagination/Pagination";
 
-// [NEW] Import component chọn ghế
+// [NEW] Import 2 component con của quy trình đặt vé
 import AdminSeatSelection from "@/feature/ticket/components/AdminSeatSelection/AdminSeatSelection";
+import AdminPassengerInfo from "@/feature/ticket/components/AdminPassengerInfo/AdminPassengerInfo";
 
-// Hook
+// Hook & Types
 import { useTrips } from "@/feature/trip/hooks/useTrips";
+import { SelectedSeat } from "@/feature/booking/types";
+import { TripData } from "@/feature/trip/types"; // Import type chuẩn
 
 interface AdminBookingViewProps {
   onBack: () => void;
 }
 
-// Định nghĩa Interface chuẩn cho Filters để tránh lỗi TypeScript
 interface BookingFilters {
   page: number;
   originId?: number;
@@ -34,11 +36,13 @@ interface BookingFilters {
 
 export default function AdminBookingView({ onBack }: AdminBookingViewProps) {
   // --- STATE QUẢN LÝ FLOW ---
-  // Step 1: Chọn chuyến (Search)
-  // Step 2: Chọn ghế (Seat Selection)
-  // Step 3: Điền thông tin (Sẽ làm sau)
+  // Step 1: Search Trip -> Step 2: Select Seat -> Step 3: Passenger Info
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
-  const [selectedTrip, setSelectedTrip] = useState<any | null>(null);
+
+  // Data tạm để truyền giữa các bước
+  const [selectedTrip, setSelectedTrip] = useState<TripData | null>(null);
+  const [bookingSeats, setBookingSeats] = useState<SelectedSeat[]>([]);
+  const [bookingTotal, setBookingTotal] = useState<number>(0);
 
   // --- STATE FILTERS ---
   const [filters, setFilters] = useState<BookingFilters>({
@@ -63,36 +67,24 @@ export default function AdminBookingView({ onBack }: AdminBookingViewProps) {
     fetchTripsForBooking,
   } = useTrips();
 
-  // Gọi API khi filters thay đổi
   useEffect(() => {
     fetchTripsForBooking(filters);
   }, [filters, fetchTripsForBooking]);
 
-  // --- HANDLERS CHO FILTER & SEARCH ---
-
-  const handleSearch = (searchParams: {
+  // --- HANDLERS FILTERS ---
+  const handleSearch = (params: {
     originId?: number;
     destId?: number;
     date?: string;
   }) => {
-    setFilters((prev) => ({
-      ...prev,
-      ...searchParams,
-      page: 0,
-    }));
+    setFilters((prev) => ({ ...prev, ...params, page: 0 }));
   };
 
   const handleFilterChange = (newFilters: any) => {
     setFilters((prev) => ({
       ...prev,
       ...newFilters,
-      // Ép kiểu thủ công để TS không báo lỗi
-      timeRanges: newFilters.timeRanges as (
-        | "Morning"
-        | "Afternoon"
-        | "Evening"
-        | "Night"
-      )[],
+      timeRanges: newFilters.timeRanges as any,
       page: 0,
     }));
   };
@@ -100,8 +92,8 @@ export default function AdminBookingView({ onBack }: AdminBookingViewProps) {
   const handleSortChange = (sortBy: string, sortDir: string) => {
     setFilters((prev) => ({
       ...prev,
-      sortBy: sortBy as "price" | "departureTime" | "rating",
-      sortDir: sortDir as "asc" | "desc",
+      sortBy: sortBy as any,
+      sortDir: sortDir as any,
       page: 0,
     }));
   };
@@ -110,64 +102,76 @@ export default function AdminBookingView({ onBack }: AdminBookingViewProps) {
     setFilters((prev) => ({ ...prev, page }));
   };
 
-  // --- HANDLERS CHO BOOKING FLOW ---
+  // --- HANDLERS BOOKING FLOW ---
 
-  // Chuyển từ Step 1 -> Step 2
-  const handleSelectSeat = (tripIdOrObj: any) => {
-    // Tìm object trip đầy đủ từ mảng trips dựa vào ID (vì TripCard thường chỉ trả về ID)
+  // B1 -> B2: Chọn chuyến xe
+  const handleSelectTrip = (tripIdOrObj: any) => {
     const tripData =
       typeof tripIdOrObj === "number"
         ? trips.find((t) => t.tripId === tripIdOrObj)
         : tripIdOrObj;
 
-    if (!tripData) {
-      alert("Không tìm thấy thông tin chuyến xe!");
-      return;
-    }
+    if (!tripData) return alert("Lỗi: Không tìm thấy chuyến xe");
 
-    console.log("Selected Trip:", tripData);
     setSelectedTrip(tripData);
     setCurrentStep(2);
-
-    // Scroll lên đầu trang cho mượt
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Quay lại từ Step 2 -> Step 1
-  const handleBackToSearch = () => {
+  // B2 -> B3: Đã chọn ghế xong, sang điền thông tin
+  const handleSeatSelectionDone = (seats: SelectedSeat[], total: number) => {
+    setBookingSeats(seats);
+    setBookingTotal(total);
+    setCurrentStep(3);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // B3 -> Success: Đặt vé thành công
+  const handleBookingSuccess = (bookingCode: string) => {
+    alert(`✅ Đặt vé thành công!\nMã đặt chỗ: ${bookingCode}`);
+    // Reset về trang tìm kiếm để đặt vé mới
     setCurrentStep(1);
     setSelectedTrip(null);
+    setBookingSeats([]);
+    // Reload lại danh sách chuyến (để cập nhật số ghế trống)
+    fetchTripsForBooking(filters);
   };
 
-  // Chuyển từ Step 2 -> Step 3 (Form khách hàng)
-  const handleNextToForm = (seats: string[], total: number) => {
-    console.log("Seats:", seats, "Total:", total);
-    alert(
-      `Đã chọn ghế: ${seats.join(
-        ", "
-      )}. Code chuyển sang bước điền Form khách hàng sẽ nằm ở đây!`
-    );
-    // setCurrentStep(3); // Uncomment khi đã có component form
-  };
+  // --- RENDER LOGIC ---
 
-  // --- RENDER STEP 2: CHỌN GHẾ ---
-  if (currentStep === 2 && selectedTrip) {
+  // STEP 3: THÔNG TIN KHÁCH & THANH TOÁN
+  if (currentStep === 3 && selectedTrip) {
     return (
-      <AdminSeatSelection
+      <AdminPassengerInfo
         trip={selectedTrip}
-        onBack={handleBackToSearch}
-        onNext={handleNextToForm}
+        selectedSeats={bookingSeats}
+        totalAmount={bookingTotal}
+        onBack={() => setCurrentStep(2)} // Quay lại chọn ghế
+        onSuccess={handleBookingSuccess}
       />
     );
   }
 
-  // --- RENDER STEP 1: DANH SÁCH CHUYẾN XE ---
+  // STEP 2: CHỌN GHẾ
+  if (currentStep === 2 && selectedTrip) {
+    return (
+      <AdminSeatSelection
+        trip={selectedTrip}
+        onBack={() => {
+          setSelectedTrip(null);
+          setCurrentStep(1);
+        }}
+        onNext={handleSeatSelectionDone}
+      />
+    );
+  }
+
+  // STEP 1: DANH SÁCH CHUYẾN XE (SEARCH & FILTER)
   return (
     <div className={styles.container}>
-      {/* Header */}
       <div className={styles.header}>
         <button onClick={onBack} className={styles.backButton}>
-          ← Quay lại danh sách vé
+          ← Quay lại Dashboard
         </button>
         <h2 className={styles.title}>Đặt vé tại quầy (Walk-in Booking)</h2>
       </div>
@@ -183,7 +187,7 @@ export default function AdminBookingView({ onBack }: AdminBookingViewProps) {
           <TripFilter onFilterChange={handleFilterChange} />
         </div>
 
-        {/* Main Content */}
+        {/* List Result */}
         <div className={styles.tripList}>
           <div
             style={{
@@ -209,7 +213,7 @@ export default function AdminBookingView({ onBack }: AdminBookingViewProps) {
               <TripCard
                 key={trip.tripId}
                 tripDetail={trip}
-                handleSelectSeat={(id) => handleSelectSeat(id)}
+                handleSelectSeat={(id) => handleSelectTrip(id)}
               />
             ))
           )}

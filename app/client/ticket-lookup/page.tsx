@@ -331,7 +331,7 @@ export default function TicketLookupPage() {
         const width = ticketElement.scrollWidth || ticketElement.clientWidth || 800;
         iframe.style.height = `${height + 40}px`;
         iframe.style.width = `${width + 40}px`;
-      } catch (e) {
+      } catch {
         // ignore
       }
       // allow layout to settle
@@ -343,9 +343,7 @@ export default function TicketLookupPage() {
         allowTaint: true,
         logging: false,
         backgroundColor: '#ffffff',
-        scale: 2,
-        windowWidth: ticketElement.scrollWidth || 800,
-        windowHeight: ticketElement.scrollHeight || 1000,
+        scale: 2, // Higher quality rendering
       });
 
       // Cleanup

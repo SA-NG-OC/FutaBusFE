@@ -11,6 +11,11 @@
     position: relative;
 }
 
+:global(.dark) .admin-header {
+    background-color: #111827; /* gray-900 */
+    color: #f9fafb; /* gray-50 */
+}
+
 .admin-header::after {
     content: '';
     position: absolute;
@@ -20,6 +25,10 @@
     height: 1px; /* Độ dày border */
     background-color: var(--border-gray);
     transition: background-color 0.2s ease;
+}
+
+:global(.dark) .admin-header::after {
+    background-color: #374151; /* gray-700 */
 }
 
 .header-container {
@@ -46,6 +55,10 @@
     transition: color 0.2s ease;
 }
 
+:global(.dark) .welcome-title {
+    color: #f9fafb; /* gray-50 */
+}
+
 .welcome-subtitle {
     font-size: 14px;
     font-weight: 400;
@@ -53,6 +66,10 @@
     color: var(--text-gray); /* Thay #717182 */
     margin: 0;
     transition: color 0.2s ease;
+}
+
+:global(.dark) .welcome-subtitle {
+    color: #9ca3af; /* gray-400 */
 }
 
 /* Header Actions */
@@ -88,6 +105,10 @@
     transition: color 0.2s ease;
 }
 
+:global(.dark) .search-icon {
+    color: #9ca3af; /* gray-400 */
+}
+
 .search-input {
     width: 100%;
     height: 100%;
@@ -101,13 +122,28 @@
     transition: all 0.2s ease;
 }
 
+:global(.dark) .search-input {
+    background-color: #1f2937; /* gray-800 */
+    border-color: #374151; /* gray-700 */
+    color: #f9fafb; /* gray-50 */
+}
+
 .search-input::placeholder {
     color: var(--text-gray); /* Thay #717182 */
+}
+
+:global(.dark) .search-input::placeholder {
+    color: #6b7280; /* gray-500 */
 }
 
 .search-input:focus {
     border-color: var(--primary); /* Thay #d83e3e */
     background-color: var(--background); /* Thay #fff */
+}
+
+:global(.dark) .search-input:focus {
+    border-color: #ef4444; /* red-500 */
+    background-color: #111827; /* gray-900 */
 }
 
 /* Action Buttons */
@@ -131,9 +167,18 @@
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+:global(.dark) .icon-button {
+    color: #d1d5db; /* gray-300 */
+}
+
 .icon-button:hover {
     background-color: var(--border-gray); /* Thay #f3f4f6 */
     color: var(--foreground); /* Thay #2c2c2c */
+}
+
+:global(.dark) .icon-button:hover {
+    background-color: #374151; /* gray-700 */
+    color: #f9fafb; /* gray-50 */
 }
 
 /* Notification Button */
@@ -159,6 +204,11 @@
     transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
+:global(.dark) .notification-badge {
+    background-color: #ef4444; /* red-500 */
+    border-color: #111827; /* gray-900 */
+}
+
 /* Avatar Button */
 .avatar-button {
     width: 40px;
@@ -172,6 +222,10 @@
     cursor: pointer;
     transition: opacity 0.2s ease, background-color 0.2s ease;
     overflow: hidden;
+}
+
+:global(.dark) .avatar-button {
+    background-color: #7f1d1d; /* red-900 */
 }
 
 .avatar-button:hover {

@@ -1,31 +1,31 @@
-import React from 'react';
-import AdminSidebar from '../../src/components/AdminSidebar/AdminSidebar';
-import AdminHeader from '../../src/components/AdminHeader/AdminHeader';
-// Import css module vừa tạo
-import styles from './admin.module.css';
+import React from "react";
+import AdminSidebar from "../../src/components/AdminSidebar/AdminSidebar";
+import AdminHeader from "../../src/components/AdminHeader/AdminHeader";
+import styles from "./admin.module.css";
+
+import { WebSocketProvider } from "@/src/context/WebSocketContext";
 
 export default function AdminLayout({
-    children,
+  children,
 }: {
-    children: React.ReactNode
+  children: React.ReactNode;
 }) {
-    return (
-        <div className={styles.container}>
-            {/* 1. Sidebar */}
-            <AdminSidebar />
+  return (
+    // [FIX] Xóa prop userId, chỉ để lại children
+    <WebSocketProvider>
+      <div className={styles.container}>
+        {/* 1. Sidebar */}
+        <AdminSidebar />
 
-            {/* 2. Main Area */}
-            <div className={styles['main-area']}>
+        {/* 2. Main Area */}
+        <div className={styles["main-area"]}>
+          {/* Header */}
+          <AdminHeader />
 
-                {/* Header sẽ đứng yên ở trên cùng */}
-                <AdminHeader />
-
-                {/* Nội dung thay đổi (Children) sẽ cuộn độc lập */}
-                <main className={styles['content-area']}>
-                    {children}
-                </main>
-
-            </div>
+          {/* Nội dung thay đổi */}
+          <main className={styles["content-area"]}>{children}</main>
         </div>
-    );
+      </div>
+    </WebSocketProvider>
+  );
 }

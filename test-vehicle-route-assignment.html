@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Vehicle Route Assignment API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #D83E3E;
+            margin-top: 0;
+        }
+        button {
+            background-color: #D83E3E;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #8B1A1A;
+        }
+        .result {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #D83E3E;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error {
+            border-left-color: #dc2626;
+            background-color: #fee;
+        }
+        .success {
+            border-left-color: #059669;
+            background-color: #efe;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚌 Test Vehicle Route Assignment API</h1>
+
+    <!-- GET All Assignments -->
+    <div class="test-section">
+        <h2>1. GET All Assignments</h2>
+        <button onclick="getAllAssignments()">Get All Assignments</button>
+        <div id="result1" class="result"></div>
+    </div>
+
+    <!-- GET Assignments by Vehicle -->
+    <div class="test-section">
+        <h2>2. GET Assignments by Vehicle</h2>
+        <label>Vehicle ID:</label>
+        <input type="number" id="vehicleId" value="1" />
+        <button onclick="getAssignmentsByVehicle()">Get by Vehicle</button>
+        <div id="result2" class="result"></div>
+    </div>
+
+    <!-- GET Assignments by Route -->
+    <div class="test-section">
+        <h2>3. GET Assignments by Route</h2>
+        <label>Route ID:</label>
+        <input type="number" id="routeId" value="1" />
+        <button onclick="getAssignmentsByRoute()">Get by Route</button>
+        <div id="result3" class="result"></div>
+    </div>
+
+    <!-- CREATE Assignment -->
+    <div class="test-section">
+        <h2>4. POST Create Assignment</h2>
+        <label>Vehicle ID:</label>
+        <input type="number" id="createVehicleId" value="1" />
+        <label>Route ID:</label>
+        <input type="number" id="createRouteId" value="1" />
+        <label>Priority:</label>
+        <input type="number" id="createPriority" value="1" />
+        <label>Start Date:</label>
+        <input type="date" id="createStartDate" value="2026-01-18" />
+        <label>Notes:</label>
+        <input type="text" id="createNotes" placeholder="Optional notes" />
+        <button onclick="createAssignment()">Create Assignment</button>
+        <div id="result4" class="result"></div>
+    </div>
+
+    <!-- GET Routes Selection -->
+    <div class="test-section">
+        <h2>5. GET Routes for Selection</h2>
+        <button onclick="getRoutesSelection()">Get Routes</button>
+        <div id="result5" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5230';
+
+        function displayResult(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.className = `result ${isError ? 'error' : 'success'}`;
+            element.textContent = JSON.stringify(data, null, 2);
+        }
+
+        async function getAllAssignments() {
+            try {
+                const response = await fetch(`${API_BASE}/vehicle-route-assignments?page=0&size=20`);
+                const data = await response.json();
+                displayResult('result1', data);
+            } catch (error) {
+                displayResult('result1', { error: error.message }, true);
+            }
+        }
+
+        async function getAssignmentsByVehicle() {
+            const vehicleId = document.getElementById('vehicleId').value;
+            try {
+                const response = await fetch(`${API_BASE}/vehicle-route-assignments/vehicle/${vehicleId}`);
+                const data = await response.json();
+                displayResult('result2', data);
+            } catch (error) {
+                displayResult('result2', { error: error.message }, true);
+            }
+        }
+
+        async function getAssignmentsByRoute() {
+            const routeId = document.getElementById('routeId').value;
+            try {
+                const response = await fetch(`${API_BASE}/vehicle-route-assignments/route/${routeId}`);
+                const data = await response.json();
+                displayResult('result3', data);
+            } catch (error) {
+                displayResult('result3', { error: error.message }, true);
+            }
+        }
+
+        async function createAssignment() {
+            const payload = {
+                vehicleId: parseInt(document.getElementById('createVehicleId').value),
+                routeId: parseInt(document.getElementById('createRouteId').value),
+                priority: parseInt(document.getElementById('createPriority').value),
+                startDate: document.getElementById('createStartDate').value,
+                notes: document.getElementById('createNotes').value || undefined
+            };
+
+            console.log('Sending payload:', payload);
+
+            try {
+                const response = await fetch(`${API_BASE}/vehicle-route-assignments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    displayResult('result4', { status: response.status, error: data }, true);
+                } else {
+                    displayResult('result4', data);
+                }
+            } catch (error) {
+                displayResult('result4', { error: error.message }, true);
+            }
+        }
+
+        async function getRoutesSelection() {
+            try {
+                const response = await fetch(`${API_BASE}/routes/selection`);
+                const data = await response.json();
+                displayResult('result5', data);
+            } catch (error) {
+                displayResult('result5', { error: error.message }, true);
+            }
+        }
+
+        // Auto-set today's date
+        document.getElementById('createStartDate').value = new Date().toISOString().split('T')[0];
+    </script>
+</body>
+</html>

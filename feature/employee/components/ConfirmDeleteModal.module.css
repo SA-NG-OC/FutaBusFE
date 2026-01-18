@@ -1,0 +1,143 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+}
+
+.header {
+  padding: 24px 24px 16px;
+  text-align: center;
+}
+
+.iconWarning {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.content {
+  padding: 0 24px 24px;
+}
+
+.message {
+  font-size: 16px;
+  color: #374151;
+  text-align: center;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.details {
+  background-color: #f9fafb;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border-left: 4px solid #D83E3E;
+}
+
+.details p {
+  margin: 6px 0;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.warning {
+  font-size: 14px;
+  color: #991b1b;
+  text-align: center;
+  background-color: #fee2e2;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 0;
+  border-left: 4px solid #dc2626;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  border-radius: 0 0 12px 12px;
+}
+
+.btnCancel,
+.btnDelete {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btnCancel {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.btnCancel:hover:not(:disabled) {
+  background-color: #d1d5db;
+}
+
+.btnDelete {
+  background-color: #dc2626;
+  color: white;
+}
+
+.btnDelete:hover:not(:disabled) {
+  background-color: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.btnCancel:disabled,
+.btnDelete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

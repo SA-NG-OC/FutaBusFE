@@ -9,6 +9,10 @@
   overflow: hidden; /* Không cho scroll ở body chính */
 }
 
+:global(.dark) .container {
+  background-color: #111827; /* gray-900 */
+}
+
 .main-area {
   flex: 1;
   display: flex;
@@ -16,6 +20,10 @@
   background-color: var(--background);
   height: 100%; /* Chiếm toàn bộ chiều cao cha */
   position: relative;
+}
+
+:global(.dark) .main-area {
+  background-color: #111827; /* gray-900 */
 }
 
 /* Header sẽ đứng yên vì nó nằm ngoài vùng scroll (content-area) */
@@ -31,6 +39,11 @@
   /* Tùy chỉnh thanh cuộn cho đẹp */
   scrollbar-width: thin;
   scrollbar-color: var(--text-gray) transparent;
+}
+
+:global(.dark) .content-area {
+  background-color: #111827; /* gray-900 */
+  color: #f9fafb; /* gray-50 */
 }
 
 .content-area::-webkit-scrollbar {

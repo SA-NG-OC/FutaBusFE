@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import styles from './AdminSidebar.module.css';
 import {
     FaBus, FaRoute, FaTicketAlt, FaUserTie, FaUsers,
-    FaChartBar, FaBell, FaSignOutAlt, FaBars, FaTimes
+    FaChartBar, FaSignOutAlt, FaBars, FaTimes, FaMapMarkerAlt
 } from 'react-icons/fa';
 import { MdDashboard, MdSchedule } from 'react-icons/md';
 
@@ -15,6 +15,7 @@ const ADMIN_MENU = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: <MdDashboard /> },
     { name: 'Vehicles', path: '/admin/vehicles', icon: <FaBus /> },
     { name: 'Routes', path: '/admin/routes', icon: <FaRoute /> },
+    { name: 'Locations', path: '/admin/locations', icon: <FaMapMarkerAlt /> },
     { name: 'Trip Scheduling', path: '/admin/trip-scheduling', icon: <MdSchedule /> },
     { name: 'Tickets', path: '/admin/tickets', icon: <FaTicketAlt /> },
     { name: 'Drivers', path: '/admin/drivers', icon: <FaUserTie /> },
@@ -47,11 +48,12 @@ const AdminSidebar = ({ role = 'admin' }: SidebarProps) => {
     // Tự động chọn menu dựa trên role được truyền vào
     const menuItems = role === 'employee' ? EMPLOYEE_MENU : ADMIN_MENU;
 
-    // Base path để active link chính xác (với admin là /admin, employee là /employee)
-    const basePath = role === 'employee' ? '/employee' : '/admin';
-
+    // Close sidebar when route changes
     useEffect(() => {
-        setIsOpen(false);
+        if (isOpen) {
+            setIsOpen(false);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pathname]);
 
     const toggleSidebar = () => setIsOpen(!isOpen);
