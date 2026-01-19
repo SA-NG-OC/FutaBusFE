@@ -1,0 +1,40 @@
+/* src/feature/routes/styles/RoutesPage.module.css */
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.error-message {
+    color: red;
+    margin-bottom: 16px;
+    padding: 12px;
+    border: 1px solid red;
+    border-radius: 8px;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-gray);
+}
+
+.grid-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(600px, 1fr));
+    gap: 24px;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-gray);
+    padding: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .grid-list {
+        grid-template-columns: 1fr;
+    }
+}

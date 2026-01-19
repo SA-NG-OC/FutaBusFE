@@ -17,6 +17,7 @@ interface FetchTripsParams {
   page: number;
   status?: string;
   date?: string | null;
+  routeId?: number;
 }
 
 // ============================================
@@ -25,18 +26,19 @@ interface FetchTripsParams {
 interface FetchTripsForBookingParams {
   page?: number;
   size?: number;
-  
+
   sortBy?: "price" | "departureTime" | "rating";
   sortDir?: "asc" | "desc";
-  
+
   search?: string;
   originId?: number;
   destId?: number;
+  routeId?: number;
   date?: string;
-  
+
   minPrice?: number;
   maxPrice?: number;
-  
+
   timeRanges?: Array<"Morning" | "Afternoon" | "Evening" | "Night">;
   vehicleTypes?: string[];
 }
@@ -109,6 +111,7 @@ export const useTrips = () => {
         page: params.page,
         status: params.status,
         date: params.date,
+        routeId: params.routeId,
       });
 
       if (data && Array.isArray(data.content)) {
@@ -251,11 +254,11 @@ export const useTrips = () => {
     totalPages,
     totalElements,
     setPage: setCurrentPage,
-    
+
     // === FETCH METHODS ===
     fetchTrips,                  // 📋 For Admin/Employee (status, date filter)
     fetchTripsForBooking,        // 🎫 For Client Booking (full filters & sorting)
-    
+
     // === SELECTION DATA ===
     routes,
     vehicles,
@@ -263,7 +266,7 @@ export const useTrips = () => {
     subDrivers,
     loadingSelection,
     fetchSelectionData,
-    
+
     // === TRIP MANAGEMENT ===
     updateTripStatus,
     createTrip,

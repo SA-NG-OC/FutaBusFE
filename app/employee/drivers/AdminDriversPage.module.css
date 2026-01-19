@@ -1,0 +1,160 @@
+/* Container chính của trang */
+.pageContainer {
+  padding: 24px;
+  min-height: 100vh;
+  background-color: var(--background);
+  color: var(--text-primary);
+  transition: background-color 0.2s ease;
+}
+
+/* --- FILTER SECTION (Mới) --- */
+/* Thay thế searchContainer cũ bằng layout Grid để chứa cả Search và Filter */
+.filterContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* Trên màn hình tablet trở lên, Search chiếm 2 phần, Filter chiếm 1 phần */
+@media (min-width: 768px) {
+  .filterContainer {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.searchBox {
+  width: 100%;
+}
+
+.routeFilterBox {
+  width: 100%;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  transition: all 0.2s ease;
+  height: 42px; /* Chiều cao cố định để khớp với RouteFilter */
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--input-focus);
+}
+
+.searchInput::placeholder {
+  color: var(--input-placeholder);
+}
+
+/* --- STATISTICS BOX (Mới) --- */
+.statsBox {
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background-color: var(--stat-blue-bg);
+  border: 1px solid var(--border-gray); /* Hoặc border nhẹ của stat */
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.statsText {
+  font-size: 14px;
+  color: var(--stat-blue-text);
+  margin: 0;
+}
+
+.statsHighlight {
+  font-weight: 700;
+  margin: 0 4px;
+}
+
+/* --- GRID LAYOUT --- */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* --- CARD WRAPPER & ASSIGN BUTTON (Mới) --- */
+/* Wrapper để định vị nút Gán tuyến đè lên Card */
+.cardWrapper {
+  position: relative;
+  height: 100%;
+}
+
+/* Nút Gán tuyến (+ Gán tuyến) */
+.assignButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  background-color: var(--primary);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  z-index: 10; /* Đảm bảo nút nằm trên Card */
+}
+
+.assignButton:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* --- STATES (Loading, Error, Empty) --- */
+.loadingText,
+.errorText {
+  text-align: center;
+  padding: 32px 0;
+  color: var(--text-secondary);
+}
+
+.errorText {
+  color: #dc2626;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 48px 0;
+  color: var(--text-secondary);
+  background-color: var(--background-paper);
+  border-radius: 12px;
+  border: 1px dashed var(--border-gray);
+}
+
+.emptyTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.emptySubtitle {
+  font-size: 14px;
+  opacity: 0.8;
+}

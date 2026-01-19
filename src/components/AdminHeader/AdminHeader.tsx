@@ -12,7 +12,7 @@ const AdminHeader = () => {
     const { theme, toggleTheme } = useTheme();
     const { user } = useAuth();
 
-    // Get user initials for fallback
+    // Lấy chữ cái đầu của tên để làm avatar mặc định
     const getInitials = (name: string) => {
         return name
             .split(' ')
@@ -26,20 +26,20 @@ const AdminHeader = () => {
         <header className={styles['admin-header']}>
             <div className={styles['header-container']}>
 
-                {/* Left Section: Welcome Text */}
+                {/* Phần bên trái: Lời chào */}
                 <div className={styles['welcome-section']}>
                     <h2 className={styles['welcome-title']}>
-                        Welcome {user?.fullName || 'Admin'} <span role="img" aria-label="wave">👋</span>
+                        Xin chào {user?.fullName || 'Quản trị viên'} <span role="img" aria-label="vẫy tay">👋</span>
                     </h2>
                     <p className={styles['welcome-subtitle']}>
-                        Here's what's happening with your store today.
+                        Đây là tình hình hoạt động cửa hàng của bạn hôm nay.
                     </p>
                 </div>
 
-                {/* Right Section: Search & Actions */}
+                {/* Phần bên phải: Tìm kiếm & Hành động */}
                 <div className={styles['header-actions']}>
 
-                    {/* Search Bar
+                    {/* Thanh tìm kiếm (Đang ẩn)
                     <div className={styles['search-container']}>
                         <div className={styles['search-icon']}>
                             <FiSearch size={18} />
@@ -47,33 +47,33 @@ const AdminHeader = () => {
                         <input
                             type="text"
                             className={styles['search-input']}
-                            placeholder="Search"
+                            placeholder="Tìm kiếm..."
                         />
                     </div> */}
 
-                    {/* Action Buttons */}
+                    {/* Các nút hành động */}
                     <div className={styles['action-buttons']}>
 
-                        {/* Theme Toggle Button */}
+                        {/* Nút chuyển đổi giao diện Sáng/Tối */}
                         <button
                             className={styles['icon-button']}
                             onClick={toggleTheme}
-                            aria-label="Toggle Theme"
+                            aria-label="Chuyển đổi giao diện"
                         >
                             {theme === 'dark' ? <FiSun size={20} /> : <FiMoon size={20} />}
                         </button>
 
-                        {/* Notification Button */}
-                        {/* <button className={`${styles['icon-button']} ${styles['notification-button']}`} aria-label="Notifications">
+                        {/* Nút thông báo */}
+                        {/* <button className={`${styles['icon-button']} ${styles['notification-button']}`} aria-label="Thông báo">
                             <FiBell size={20} />
                             <span className={styles['notification-badge']}>3</span>
                         </button> */}
 
-                        {/* User Avatar */}
-                        <button className={styles['avatar-button']} aria-label="User Profile">
+                        {/* Ảnh đại diện người dùng */}
+                        <button className={styles['avatar-button']} aria-label="Hồ sơ người dùng">
                             {user?.avt ? (
-                                <Image 
-                                    src={user.avt} 
+                                <Image
+                                    src={user.avt}
                                     alt={user.fullName}
                                     width={40}
                                     height={40}
@@ -81,7 +81,8 @@ const AdminHeader = () => {
                                 />
                             ) : (
                                 <span className={styles['avatar-text']}>
-                                    {user ? getInitials(user.fullName) : 'AU'}
+                                    {/* Thay 'AU' bằng 'QT' (Quản Trị) khi chưa có user */}
+                                    {user ? getInitials(user.fullName) : 'QT'}
                                 </span>
                             )}
                         </button>
