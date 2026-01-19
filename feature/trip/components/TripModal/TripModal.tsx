@@ -24,13 +24,13 @@ import {
 // --- INTERNAL CUSTOM SELECT COMPONENT ---
 interface CustomSelectProps<T> {
   options: T[];
-  value: string | number | undefined;
-  onChange: (value: string | number) => void; // Đã sửa -> thành =>
+  value: string | number | undefined | null; // [FIX] Cho phép null
+  onChange: (value: string | number) => void;
   placeholder: string;
   icon: React.ReactNode;
-  renderOption: (option: T) => React.ReactNode; // Đã sửa -> thành =>
-  renderSelected: (option: T) => React.ReactNode; // Đã sửa -> thành =>
-  keyExtractor: (option: T) => string | number; // Đã sửa -> thành =>
+  renderOption: (option: T) => React.ReactNode;
+  renderSelected: (option: T) => React.ReactNode;
+  keyExtractor: (option: T) => string | number;
   searchKeys?: (keyof T)[];
 }
 
@@ -63,7 +63,7 @@ function CustomSelect<T>({
   }, []);
 
   const selectedOption = options.find(
-    (opt) => keyExtractor(opt).toString() === value?.toString()
+    (opt) => keyExtractor(opt).toString() === value?.toString(),
   );
 
   const filteredOptions = options.filter((opt) => {
@@ -71,7 +71,7 @@ function CustomSelect<T>({
     if (searchKeys.length === 0) return true;
     const query = searchQuery.toLowerCase();
     return searchKeys.some((key) =>
-      String(opt[key]).toLowerCase().includes(query)
+      String(opt[key]).toLowerCase().includes(query),
     );
   });
 
@@ -102,7 +102,7 @@ function CustomSelect<T>({
               <input
                 type="text"
                 className={styles["search-input"]}
-                placeholder="Search..."
+                placeholder="Tìm kiếm..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onClick={(e) => e.stopPropagation()}
@@ -138,7 +138,7 @@ function CustomSelect<T>({
                   color: "var(--text-secondary)",
                 }}
               >
-                No results found
+                Không tìm thấy kết quả
               </div>
             )}
           </div>
@@ -177,11 +177,11 @@ const TripModal = ({
     const selectedDateTime = new Date(`${data.date}T${data.departureTime}`);
     const now = new Date();
     if (selectedDateTime < now) {
-      alert("Departure time cannot be in the past!");
+      alert("Thời gian khởi hành không được ở trong quá khứ!");
       return;
     }
     if (data.subDriverId && data.driverId === data.subDriverId) {
-      alert("Main Driver and Sub Driver cannot be the same!");
+      alert("Tài xế chính và Phụ xe không được trùng nhau!");
       return;
     }
     onSubmit(data);
@@ -199,7 +199,7 @@ const TripModal = ({
         </button>
 
         <div className={styles["modal-header"]}>
-          <h2 className={styles["modal-title"]}>Schedule New Trip</h2>
+          <h2 className={styles["modal-title"]}>Tạo Chuyến Mới</h2>
         </div>
 
         <form
@@ -209,18 +209,18 @@ const TripModal = ({
           {/* Select Route */}
           <div className={styles["form-field"]}>
             <label className={styles["form-label"]}>
-              Select Route <span style={{ color: "var(--primary)" }}>*</span>
+              Chọn Tuyến <span style={{ color: "var(--primary)" }}>*</span>
             </label>
             <Controller
               name="routeId"
               control={control}
-              rules={{ required: "Please select a route" }}
+              rules={{ required: "Vui lòng chọn tuyến đường" }}
               render={({ field }) => (
                 <CustomSelect
                   options={routes}
                   value={field.value}
                   onChange={field.onChange}
-                  placeholder="Choose a route..."
+                  placeholder="Chọn tuyến đường..."
                   icon={<FaMapMarkerAlt />}
                   keyExtractor={(r) => r.routeId}
                   searchKeys={["routeName"]}
@@ -251,19 +251,18 @@ const TripModal = ({
           <div className={styles["form-row"]}>
             <div className={styles["form-field"]}>
               <label className={styles["form-label"]}>
-                Select Vehicle{" "}
-                <span style={{ color: "var(--primary)" }}>*</span>
+                Chọn Xe <span style={{ color: "var(--primary)" }}>*</span>
               </label>
               <Controller
                 name="vehicleId"
                 control={control}
-                rules={{ required: "Please select a vehicle" }}
+                rules={{ required: "Vui lòng chọn xe" }}
                 render={({ field }) => (
                   <CustomSelect
                     options={vehicles}
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Choose vehicle..."
+                    placeholder="Chọn xe..."
                     icon={<FaBus />}
                     keyExtractor={(v) => v.vehicleId}
                     searchKeys={["licensePlate", "vehicleTypeName"]}
@@ -297,18 +296,18 @@ const TripModal = ({
 
             <div className={styles["form-field"]}>
               <label className={styles["form-label"]}>
-                Assign Driver <span style={{ color: "var(--primary)" }}>*</span>
+                Chọn Tài Xế <span style={{ color: "var(--primary)" }}>*</span>
               </label>
               <Controller
                 name="driverId"
                 control={control}
-                rules={{ required: "Please select a driver" }}
+                rules={{ required: "Vui lòng chọn tài xế" }}
                 render={({ field }) => (
                   <CustomSelect
                     options={drivers}
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Choose driver..."
+                    placeholder="Chọn tài xế..."
                     icon={<FaUser />}
                     keyExtractor={(d) => d.driverId}
                     searchKeys={["driverName", "driverLicense"]}
@@ -323,7 +322,7 @@ const TripModal = ({
                             {d.driverName}
                           </span>
                           <span className={styles["option-secondary-text"]}>
-                            Lic: {d.driverLicense}
+                            GPLX: {d.driverLicense}
                           </span>
                         </div>
                       </>
@@ -342,16 +341,18 @@ const TripModal = ({
           {/* Sub-Driver & Price */}
           <div className={styles["form-row"]}>
             <div className={styles["form-field"]}>
-              <label className={styles["form-label"]}>Assign Sub-Driver</label>
+              <label className={styles["form-label"]}>
+                Chọn Phụ Xe (Tùy chọn)
+              </label>
               <Controller
                 name="subDriverId"
                 control={control}
                 render={({ field }) => (
                   <CustomSelect
                     options={subDrivers}
-                    value={field.value}
+                    value={field.value ?? ""} // [FIX] Fix lỗi Type null
                     onChange={field.onChange}
-                    placeholder="Optional..."
+                    placeholder="Không có (Tùy chọn)..."
                     icon={<FaUser style={{ opacity: 0.7 }} />}
                     keyExtractor={(d) => d.driverId}
                     searchKeys={["driverName", "driverLicense"]}
@@ -366,7 +367,7 @@ const TripModal = ({
                             {d.driverName}
                           </span>
                           <span className={styles["option-secondary-text"]}>
-                            Lic: {d.driverLicense}
+                            GPLX: {d.driverLicense}
                           </span>
                         </div>
                       </>
@@ -378,8 +379,7 @@ const TripModal = ({
 
             <div className={styles["form-field"]}>
               <label className={styles["form-label"]}>
-                Ticket Price (₫){" "}
-                <span style={{ color: "var(--primary)" }}>*</span>
+                Giá Vé (₫) <span style={{ color: "var(--primary)" }}>*</span>
               </label>
               <div style={{ position: "relative" }}>
                 <FaRegMoneyBillAlt
@@ -396,10 +396,10 @@ const TripModal = ({
                   type="number"
                   className={styles["form-input"]}
                   style={{ paddingLeft: "48px", width: "100%" }}
-                  placeholder="e.g. 250000"
+                  placeholder="VD: 250000"
                   {...register("price", {
-                    required: "Please enter ticket price",
-                    min: { value: 0, message: "Price must be positive" },
+                    required: "Vui lòng nhập giá vé",
+                    min: { value: 0, message: "Giá vé phải lớn hơn 0" },
                   })}
                 />
               </div>
@@ -415,12 +415,13 @@ const TripModal = ({
           <div className={styles["form-row"]}>
             <div className={styles["form-field"]}>
               <label className={styles["form-label"]}>
-                Date <span style={{ color: "var(--primary)" }}>*</span>
+                Ngày Khởi Hành{" "}
+                <span style={{ color: "var(--primary)" }}>*</span>
               </label>
               <input
                 type="date"
                 className={styles["form-input"]}
-                {...register("date", { required: "Please select a date" })}
+                {...register("date", { required: "Vui lòng chọn ngày" })}
                 min={new Date().toISOString().split("T")[0]}
               />
               {errors.date && (
@@ -432,13 +433,12 @@ const TripModal = ({
 
             <div className={styles["form-field"]}>
               <label className={styles["form-label"]}>
-                Departure Time{" "}
-                <span style={{ color: "var(--primary)" }}>*</span>
+                Giờ Khởi Hành <span style={{ color: "var(--primary)" }}>*</span>
               </label>
               <input
                 type="time"
                 className={styles["form-input"]}
-                {...register("departureTime", { required: "Required" })}
+                {...register("departureTime", { required: "Bắt buộc" })}
               />
               {errors.departureTime && (
                 <span className={styles["error-text"]}>
@@ -453,7 +453,7 @@ const TripModal = ({
             className={styles["submit-button"]}
             disabled={isLoading}
           >
-            {isLoading ? "Saving..." : "Schedule Trip"}
+            {isLoading ? "Đang lưu..." : "Tạo Chuyến"}
           </button>
         </form>
       </div>

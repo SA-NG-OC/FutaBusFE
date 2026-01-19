@@ -1,3 +1,5 @@
+// src/feature/trip/components/TripTimeline/TripTimeline.tsx
+
 import React from "react";
 import TripCard from "../TripCard/TripCard";
 import styles from "./TripTimeline.module.css";
@@ -6,7 +8,7 @@ import { TripData } from "../../types";
 interface TripTimelineProps {
   trips: TripData[];
   onStatusUpdate: (id: number, newStatus: string) => void;
-  onCardClick?: (trip: TripData) => void; // Thêm prop này (optional)
+  onCardClick?: (trip: TripData) => void;
 }
 
 const TripTimeline = ({
@@ -29,7 +31,7 @@ const TripTimeline = ({
 
   if (trips.length === 0) {
     return (
-      <div className={styles.emptyState}>No trips scheduled for this date.</div>
+      <div className={styles.emptyState}>Không có chuyến nào cho ngày này.</div>
     );
   }
 
@@ -37,20 +39,17 @@ const TripTimeline = ({
     <div className={styles.timelineContainer}>
       {sortedTimes.map((time) => (
         <div key={time} className={styles.timelineGroup}>
-          {/* Time Column (Left) */}
+          {/* Cột trái: Giờ + Chấm tròn */}
           <div className={styles.timeColumn}>
             <div className={styles.timeBadge}>{time}</div>
-            <div className={styles.timelineLine}>
-              <div className={styles.timelineDot}></div>
-            </div>
+            <div className={styles.timelineDot}></div>
           </div>
 
-          {/* Cards Column (Right) */}
+          {/* Cột phải: Danh sách Cards */}
           <div className={styles.cardsColumn}>
             {groupedTrips[time].map((trip) => (
               <div
                 key={trip.tripId}
-                // Thêm sự kiện click tại đây
                 onClick={() => onCardClick && onCardClick(trip)}
                 style={{ cursor: onCardClick ? "pointer" : "default" }}
               >

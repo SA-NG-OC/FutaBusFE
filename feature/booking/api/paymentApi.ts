@@ -37,9 +37,22 @@ export interface CreateBookingRequest {
   customerName: string;
   customerPhone: string;
   customerEmail?: string;
+  pickupAddress?: string | null;
+  dropoffAddress?: string | null;
+  specialNote?: string | null;
   isGuestBooking?: boolean;
   guestSessionId?: string;
-  notes?: string;
+  // notes?: string;
+  passengers?: Array<{
+    seatId: number;
+    fullName: string;
+    phoneNumber?: string;
+    email?: string;
+
+    pickupAddress?: string;
+    dropoffAddress?: string;
+    specialNote?: string;
+  }>;
 }
 
 export interface BookingResponse {

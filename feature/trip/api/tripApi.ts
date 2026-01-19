@@ -7,6 +7,7 @@ import {
   DriverSelection,
   TripFormData,
 } from "../types";
+import { AlternativeTrip } from "@/feature/ticket/types/ticketChange";
 
 export interface GetTripsParams {
   page?: number;
@@ -172,5 +173,19 @@ export const tripApi = {
 
   updateTripInfo: async (tripId: number, data: any): Promise<TripData> => {
     return api.put<TripData>(`/trips/${tripId}`, data);
+  },
+
+  // Get alternative trips for ticket change (same route, future dates)
+  getAlternativeTrips: async (
+    routeId: number,
+    excludeTripId: number,
+    afterDateTime: string
+  ): Promise<AlternativeTrip[]> => {
+    const params = {
+      routeId: routeId.toString(),
+      excludeTripId: excludeTripId.toString(),
+      afterDateTime: afterDateTime,
+    };
+    return api.get<AlternativeTrip[]>("/trips/alternative", { params });
   },
 };

@@ -1,5 +1,5 @@
 .ticketsPage {
-  background-color: var(--background);
+  background-color: transparent;
   min-height: 100vh;
 }
 

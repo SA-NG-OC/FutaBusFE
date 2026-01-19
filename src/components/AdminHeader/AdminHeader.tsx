@@ -7,10 +7,12 @@ import { useTheme } from '../../../src/context/ThemeContext';
 import { useAuth } from '../../../src/context/AuthContext';
 
 import { FiSearch, FiMoon, FiBell, FiSun } from 'react-icons/fi';
+import { useRouter } from 'next/navigation';
 
 const AdminHeader = () => {
     const { theme, toggleTheme } = useTheme();
     const { user } = useAuth();
+    const router = useRouter();
 
     // Lấy chữ cái đầu của tên để làm avatar mặc định
     const getInitials = (name: string) => {
@@ -70,7 +72,12 @@ const AdminHeader = () => {
                         </button> */}
 
                         {/* Ảnh đại diện người dùng */}
-                        <button className={styles['avatar-button']} aria-label="Hồ sơ người dùng">
+                        <button
+                            className={styles['avatar-button']}
+                            aria-label="Hồ sơ người dùng"
+                            title="Xem hồ sơ"
+                            onClick={() => router.push('/admin/profile')}
+                        >
                             {user?.avt ? (
                                 <Image
                                     src={user.avt}

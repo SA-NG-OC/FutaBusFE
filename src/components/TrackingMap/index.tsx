@@ -8,7 +8,8 @@ import { FaMapMarkerAlt, FaRoute } from "react-icons/fa";
 const MapContent = dynamic(() => import("./MapContent"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full bg-gray-100 animate-pulse flex items-center justify-center text-gray-400 text-sm">
+    // [EDIT] Dùng var(--bg-secondary) và var(--text-secondary)
+    <div className="w-full h-full bg-[var(--bg-secondary)] animate-pulse flex items-center justify-center text-[var(--text-secondary)] text-sm">
       Loading Map Data...
     </div>
   ),
@@ -16,7 +17,6 @@ const MapContent = dynamic(() => import("./MapContent"), {
 
 interface TripMapProps {
   tripId: number;
-  // Props optional để truyền data ban đầu vào
   routeInfo?: {
     origin: string;
     destination: string;
@@ -26,8 +26,6 @@ interface TripMapProps {
 }
 
 const TripMap = ({ tripId, routeInfo }: TripMapProps) => {
-  // Kết hợp State: Ưu tiên dùng props truyền vào, nếu không có thì dùng state nội bộ
-  // (Giữ lại logic của bạn tui để sau này mở rộng update từ API)
   const [displayInfo, setDisplayInfo] = useState({
     origin: routeInfo?.origin || "Loading...",
     destination: routeInfo?.destination || "Loading...",
@@ -35,7 +33,6 @@ const TripMap = ({ tripId, routeInfo }: TripMapProps) => {
     endTime: routeInfo?.endTime || "--:--",
   });
 
-  // Nếu props routeInfo thay đổi, update lại state hiển thị
   useEffect(() => {
     if (routeInfo) {
       setDisplayInfo({
@@ -47,71 +44,87 @@ const TripMap = ({ tripId, routeInfo }: TripMapProps) => {
     }
   }, [routeInfo]);
 
-  // Callback nhận data từ MapContent (giữ logic của bạn tui để update real-time nếu có)
   const handleRouteLoaded = (data: any) => {
-    // Chỉ update nếu chưa có thông tin từ props (hoặc muốn override)
     if (data && !routeInfo) {
       setDisplayInfo((prev) => ({
         ...prev,
         origin: data.origin?.locationName || prev.origin,
         destination: data.destination?.locationName || prev.destination,
-        // Giữ nguyên time hoặc update nếu API có trả về
       }));
     }
   };
 
   return (
-    // [RESOLVED] Dùng layout FULL HEIGHT của bạn (đẹp hơn cho Modal)
-    <div className="w-full h-full bg-white flex flex-col overflow-hidden">
-      {/* Header nhỏ */}
-      <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center bg-white z-10 shrink-0">
+    // [EDIT] Outer container giữ var(--primary)
+    <div className="w-full h-full bg-[var(--primary)] flex flex-col overflow-hidden">
+
+      {/* --- Header --- */}
+      {/* [EDIT] Background: var(--background-paper), Border: var(--border-gray) */}
+      <div className="px-4 py-3 border-b border-[var(--border-gray)] flex justify-between items-center bg-[var(--background-paper)] z-10 shrink-0 transition-colors duration-200">
         <div className="flex items-center gap-2">
-          <div className="bg-red-50 p-1.5 rounded-md text-red-500">
+          {/* [EDIT] Icon Box: Dùng var(--primary) với opacity thấp để tạo nền nhạt, text chính var(--primary) */}
+          <div className="bg-[var(--primary)]/10 p-1.5 rounded-md text-[var(--primary)]">
             <FaRoute />
           </div>
-          <h3 className="text-gray-800 font-bold text-sm">Route Tracking</h3>
+          {/* [EDIT] Title: var(--text-primary) */}
+          <h3 className="text-[var(--text-primary)] font-bold text-sm">Route Tracking</h3>
         </div>
-        <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold uppercase tracking-wide flex items-center gap-1">
-          <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+
+        {/* [EDIT] Badge Live: Dùng var(--badge-running-*) từ file CSS */}
+        <span className="text-[10px] bg-[var(--badge-running-bg)] text-[var(--badge-running-text)] px-2 py-0.5 rounded-full font-bold uppercase tracking-wide flex items-center gap-1">
+          {/* [EDIT] Dot: Dùng currentColor hoặc var(--badge-running-text) */}
+          <span className="w-1.5 h-1.5 bg-current rounded-full animate-pulse"></span>
           Live
         </span>
       </div>
 
-      {/* Container Bản đồ: Dùng flex-1 để chiếm hết không gian còn lại */}
-      <div className="relative w-full flex-1 group bg-gray-50">
-        {/* Bản đồ */}
-        {/* Truyền thêm callback handleRouteLoaded để tương thích code bạn tui */}
+      {/* --- Map Container --- */}
+      {/* [EDIT] Background: var(--bg-secondary) */}
+      <div className="relative w-full flex-1 group bg-[var(--bg-secondary)]">
         <MapContent tripId={tripId} onRouteInfoLoaded={handleRouteLoaded} />
 
         {/* --- LỚP PHỦ THÔNG TIN (Overlay Card) --- */}
-        <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-xl shadow-lg border border-gray-100 z-[400] transition-all duration-300 hover:bg-white">
+        {/* [EDIT] 
+            - Bg: var(--background-paper) (Đảm bảo dark mode nền tối)
+            - Border: var(--border-gray) 
+            - Shadow giữ nguyên
+        */}
+        <div className="absolute bottom-4 left-4 right-4 bg-[var(--background-paper)]/95 backdrop-blur-sm p-3 rounded-xl shadow-lg border border-[var(--border-gray)] z-[400] transition-all duration-300">
           <div className="flex justify-between items-center">
+
             {/* Route Info */}
             <div className="flex items-center gap-3 overflow-hidden">
-              <div className="bg-gradient-to-br from-red-500 to-red-600 w-8 h-8 rounded-full flex items-center justify-center text-white shadow-md shrink-0">
+              {/* [EDIT] Gradient: Dùng var(--primary) -> var(--primary-active) */}
+              <div className="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-active)] w-8 h-8 rounded-full flex items-center justify-center text-white shadow-md shrink-0">
                 <FaMapMarkerAlt className="text-sm" />
               </div>
+
               <div className="min-w-0">
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                {/* [EDIT] Label: var(--text-secondary) */}
+                <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-wider">
                   Route
                 </p>
-                <div className="flex items-center gap-2 font-bold text-gray-800 text-sm truncate">
+                {/* [EDIT] Main Text: var(--text-primary) */}
+                <div className="flex items-center gap-2 font-bold text-[var(--text-primary)] text-sm truncate">
                   <span className="truncate">{displayInfo.origin}</span>
-                  <span className="text-gray-300 text-xs shrink-0">➝</span>
+                  {/* [EDIT] Arrow: var(--text-secondary) */}
+                  <span className="text-[var(--text-secondary)] text-xs shrink-0">➝</span>
                   <span className="truncate">{displayInfo.destination}</span>
                 </div>
               </div>
             </div>
 
             {/* Duration Info */}
-            <div className="text-right pl-4 border-l border-gray-100 shrink-0">
-              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+            {/* [EDIT] Border divider: var(--border-gray) */}
+            <div className="text-right pl-4 border-l border-[var(--border-gray)] shrink-0">
+              <p className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-wider">
                 Est. Time
               </p>
-              <p className="font-bold text-gray-800 text-sm whitespace-nowrap tabular-nums">
+              <p className="font-bold text-[var(--text-primary)] text-sm whitespace-nowrap tabular-nums">
                 {displayInfo.startTime} - {displayInfo.endTime}
               </p>
             </div>
+
           </div>
         </div>
       </div>

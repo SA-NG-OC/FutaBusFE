@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import styles from './AdminSidebar.module.css';
 import {
     FaBus, FaRoute, FaTicketAlt, FaUserTie, FaUsers,
-    FaChartBar, FaSignOutAlt, FaBars, FaTimes, FaMapMarkerAlt
+    FaChartBar, FaSignOutAlt, FaBars, FaTimes, FaMapMarkerAlt, FaHistory
 } from 'react-icons/fa';
 import { MdDashboard, MdSchedule } from 'react-icons/md';
 
@@ -22,6 +22,7 @@ const ADMIN_MENU = [
     { name: 'Employees', path: '/admin/employees', icon: <FaUsers /> },
     { name: 'Customers', path: '/admin/customers', icon: <FaUsers /> },
     { name: 'Reports', path: '/admin/reports', icon: <FaChartBar /> },
+    { name: 'Audit Logs', path: '/admin/audit-logs', icon: <FaHistory /> },
     //{ name: 'Notifications', path: '/admin/notifications', icon: <FaBell /> },
 ];
 

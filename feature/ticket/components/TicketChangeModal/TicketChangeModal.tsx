@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import styles from "./TicketChangeModal.module.css";
 import { AlternativeTrip, TicketChangeRequest } from "../../types/ticketChange";
 import { ticketApi } from "../../api/ticketApi";
+import { tripApi } from "@/feature/trip/api/tripApi";
 
 interface TicketChangeModalProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ interface TicketChangeModalProps {
   currentSeatNumber: string;
   currentRouteName: string;
   currentPrice: number;
+  currentDepartureTime: string;
   routeId: number;
   onSuccess: () => void;
 }
@@ -25,6 +27,7 @@ export const TicketChangeModal: React.FC<TicketChangeModalProps> = ({
   currentSeatNumber,
   currentRouteName,
   currentPrice,
+  currentDepartureTime,
   routeId,
   onSuccess,
 }) => {
@@ -44,16 +47,22 @@ export const TicketChangeModal: React.FC<TicketChangeModalProps> = ({
   const fetchAlternativeTrips = async () => {
     try {
       setLoading(true);
-      // TODO: Create API endpoint to fetch alternative trips for the same route
-      // For now, using mock data
-      // const trips = await tripApi.getAlternativeTrips(routeId, currentTripId);
-      // setAlternativeTrips(trips);
+      setError(null);
       
-      // Mock data for demonstration
-      setAlternativeTrips([]);
-      setError("Alternative trips API endpoint not yet implemented");
-    } catch (err) {
-      setError("Failed to load alternative trips");
+      // Call the API to fetch alternative trips
+      const trips = await tripApi.getAlternativeTrips(
+        routeId,
+        currentTripId,
+        currentDepartureTime
+      );
+      
+      setAlternativeTrips(trips);
+      
+      if (trips.length === 0) {
+        setError("No alternative trips available for this route");
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to load alternative trips");
       console.error(err);
     } finally {
       setLoading(false);

@@ -40,7 +40,6 @@ const TripCard = ({ trip, onStatusUpdate }: TripCardProps) => {
     { value: "Cancelled", label: "Cancelled", dotClass: styles.dotCancelled },
   ];
 
-  // Đóng dropdown khi click ra ngoài
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -54,13 +53,11 @@ const TripCard = ({ trip, onStatusUpdate }: TripCardProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // [FIX] Thêm e.stopPropagation() để không mở Modal chi tiết
   const toggleDropdown = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  // [FIX] Thêm e.stopPropagation() khi chọn item
   const handleStatusClick = (e: React.MouseEvent, newStatus: string) => {
     e.stopPropagation();
     if (newStatus !== trip.status) {
@@ -90,7 +87,7 @@ const TripCard = ({ trip, onStatusUpdate }: TripCardProps) => {
       {/* Time Section */}
       <div className={styles.timeSection}>
         <div className={styles.timePoint}>
-          <span className={styles.label}>Departure</span>
+          <span className={styles.label}>Xuất phát</span>
           <strong className={styles.timeVal}>
             {formatTime(trip.departureTime)}
           </strong>
@@ -101,7 +98,7 @@ const TripCard = ({ trip, onStatusUpdate }: TripCardProps) => {
           <span className={styles.line}></span>
         </div>
         <div className={styles.timePoint} style={{ textAlign: "right" }}>
-          <span className={styles.label}>Arrival</span>
+          <span className={styles.label}>Đến nơi</span>
           <strong className={styles.timeVal}>
             {formatTime(trip.arrivalTime)}
           </strong>
@@ -120,15 +117,15 @@ const TripCard = ({ trip, onStatusUpdate }: TripCardProps) => {
         <div className={styles.statsRow}>
           <div className={styles.statItem}>
             <span className={`${styles.dot} ${styles.checkInColor}`}></span>
-            <b>{checkedIn}</b> checked in
+            <b>{checkedIn}</b> lên xe
           </div>
           <div className={styles.statItem}>
             <span className={`${styles.dot} ${styles.bookedColor}`}></span>
-            <b>{booked}</b> booked
+            <b>{booked}</b> đã đặt
           </div>
           <div className={styles.statItem}>
             <span className={`${styles.dot} ${styles.totalColor}`}></span>
-            <b>{total}</b> total
+            <b>{total}</b> ghế
           </div>
         </div>
       </div>
@@ -138,15 +135,12 @@ const TripCard = ({ trip, onStatusUpdate }: TripCardProps) => {
       {/* Footer */}
       <div className={styles.footer}>
         <div className={styles.price}>
-          Price: <span>{formatCurrency(trip.price)}</span>
+          Giá vé: <span>{formatCurrency(trip.price)}</span>
         </div>
 
         {/* --- CUSTOM STATUS DROPDOWN --- */}
         <div className={styles.statusContainer} ref={dropdownRef}>
-          <div
-            className={styles.statusTrigger}
-            onClick={toggleDropdown} // [UPDATED]
-          >
+          <div className={styles.statusTrigger} onClick={toggleDropdown}>
             <span className={styles.statusText}>{trip.status}</span>
             <FaChevronDown className={styles.statusIcon} />
           </div>
@@ -159,7 +153,7 @@ const TripCard = ({ trip, onStatusUpdate }: TripCardProps) => {
                   className={`${styles.statusItem} ${
                     trip.status === option.value ? styles.active : ""
                   }`}
-                  onClick={(e) => handleStatusClick(e, option.value)} // [UPDATED]
+                  onClick={(e) => handleStatusClick(e, option.value)}
                 >
                   <span
                     className={`${styles.statusDot} ${option.dotClass}`}

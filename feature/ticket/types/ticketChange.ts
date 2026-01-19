@@ -27,14 +27,14 @@ export interface TicketChangeResponse {
 export interface AlternativeTrip {
   tripId: number;
   routeName: string;
-  routeId: number;
   departureTime: string;
   arrivalTime: string;
+  vehicleInfo: string;
+  vehicleTypeName: string;
+  driverName: string;
+  price: number;
+  totalSeats: number;
   availableSeats: number;
   bookedSeats: number;
-  totalSeats: number;
-  price: number;
-  vehicleTypeName: string;
-  licensePlate: string;
   status: string;
 }

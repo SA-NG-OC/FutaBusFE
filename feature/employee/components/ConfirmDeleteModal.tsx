@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Employee } from '../api/employeeApi';
-import styles from './ConfirmDeleteModal.module.css';
+import { useState } from "react";
+import { Employee } from "../api/employeeApi";
+import styles from "./ConfirmDeleteModal.module.css";
 
 interface ConfirmDeleteModalProps {
   isOpen: boolean;
@@ -23,7 +23,7 @@ export default function ConfirmDeleteModal({
       await onConfirm();
       onClose();
     } catch (error) {
-      console.error('Delete failed:', error);
+      console.error("Xóa thất bại:", error);
     } finally {
       setLoading(false);
     }
@@ -36,19 +36,25 @@ export default function ConfirmDeleteModal({
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <div className={styles.iconWarning}>⚠️</div>
-          <h2 className={styles.title}>Delete Employee</h2>
+          <h2 className={styles.title}>Xóa Nhân Viên</h2>
         </div>
 
         <div className={styles.content}>
           <p className={styles.message}>
-            Are you sure you want to delete employee <strong>{employee.fullName}</strong>?
+            Bạn có chắc chắn muốn xóa nhân viên{" "}
+            <strong>{employee.fullName}</strong> không?
           </p>
           <div className={styles.details}>
-            <p><strong>Email:</strong> {employee.email}</p>
-            <p><strong>Phone:</strong> {employee.phoneNumber}</p>
+            <p>
+              <strong>Email:</strong> {employee.email}
+            </p>
+            <p>
+              <strong>SĐT:</strong> {employee.phoneNumber}
+            </p>
           </div>
           <p className={styles.warning}>
-            This action cannot be undone. The employee will be permanently removed from the system.
+            Hành động này không thể hoàn tác. Nhân viên sẽ bị xóa vĩnh viễn khỏi
+            hệ thống.
           </p>
         </div>
 
@@ -58,14 +64,14 @@ export default function ConfirmDeleteModal({
             className={styles.btnCancel}
             disabled={loading}
           >
-            Cancel
+            Hủy
           </button>
           <button
             onClick={handleConfirm}
             className={styles.btnDelete}
             disabled={loading}
           >
-            {loading ? 'Deleting...' : 'Yes, Delete'}
+            {loading ? "Đang xóa..." : "Xóa ngay"}
           </button>
         </div>
       </div>

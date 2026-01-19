@@ -402,6 +402,7 @@ export default function AdminTickets() {
           currentSeatNumber={ticketToChange.tickets.map(t => t.seatNumber).join(", ")}
           currentRouteName={ticketToChange.tripInfo.routeName}
           currentPrice={ticketToChange.tickets[0].price}
+          currentDepartureTime={ticketToChange.tripInfo.departureTime}
           routeId={ticketToChange.tripInfo.routeId}
           onSuccess={handleChangeSuccess}
         />

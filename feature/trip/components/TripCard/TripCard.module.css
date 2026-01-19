@@ -1,46 +1,61 @@
-/* Card Container */
 .card {
+  /* [QUAN TRỌNG] Dùng biến này để tự đổi màu theo theme (Trắng ở Light, Xám tối ở Dark) */
   background-color: var(--background-paper);
+
   border-radius: 12px;
-  padding: 20px;
+  /* Thêm viền mỏng để tách biệt card với nền đen */
   border: 1px solid var(--border-gray);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
 
-  /* Viền đỏ bên trái */
-  border-left: 5px solid var(--primary);
+  /* Thêm bóng đổ để tạo chiều sâu, giúp card không bị "chìm" */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  padding: 16px;
+  transition: all 0.2s ease-in-out;
   position: relative;
-  margin-bottom: 16px;
+  overflow: hidden;
 }
 
+/* Hiệu ứng khi di chuột vào card */
 .card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary); /* Viền sáng lên màu chủ đạo khi hover */
 }
 
-/* Header */
+/* Thanh màu đỏ bên trái như trong hình bạn gửi */
+.card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: var(--primary); /* Màu đỏ chủ đạo */
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+/* --- HEADER --- */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  margin-bottom: 16px;
+  padding-left: 8px; /* Cách ra một chút vì có thanh màu đỏ bên trái */
 }
 
 .routeInfo {
   display: flex;
-  gap: 12px;
   align-items: center;
+  gap: 12px;
 }
 
 .routeIcon {
   width: 40px;
   height: 40px;
-  background-color: var(--stat-orange-bg);
-  color: var(--stat-orange-text);
   border-radius: 10px;
+  background-color: var(--bg-hover); /* Màu nền icon icon thay đổi theo theme */
+  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -51,134 +66,110 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 700;
-  color: var(--text-primary);
-  line-height: 1.4;
+  color: var(--text-primary); /* Chữ tự động trắng/đen */
 }
 
 .tripCode {
   font-size: 0.75rem;
   color: var(--text-secondary);
-  background-color: var(--bg-secondary);
-  padding: 2px 6px;
-  border-radius: 4px;
   font-weight: 500;
-  margin-top: 4px;
-  display: inline-block;
 }
 
-/* Badge */
+/* --- BADGES --- */
 .badge {
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  white-space: nowrap;
-}
-.waiting {
-  background-color: var(--badge-waiting-bg);
-  color: var(--badge-waiting-text);
-}
-.running {
-  background-color: var(--badge-running-bg);
-  color: var(--badge-running-text);
-}
-.completed {
-  background-color: var(--badge-completed-bg);
-  color: var(--badge-completed-text);
-}
-.cancelled {
-  background-color: var(--badge-cancelled-bg);
-  color: var(--badge-cancelled-text);
 }
 
-/* --- TIME SECTION (Đã chỉnh sửa đường kẻ đậm hơn) --- */
+.running {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+.waiting {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+.completed {
+  background-color: rgba(107, 114, 128, 0.15);
+  color: #9ca3af;
+  border: 1px solid rgba(107, 114, 128, 0.3);
+}
+.cancelled {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* --- TIME SECTION --- */
 .timeSection {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 0;
+  margin-bottom: 20px;
+  padding: 0 8px;
 }
 
 .timePoint {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  min-width: 60px;
 }
 
 .label {
   font-size: 0.7rem;
-  text-transform: uppercase;
   color: var(--text-secondary);
-  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 2px;
 }
 
 .timeVal {
   font-size: 1.25rem;
+  font-weight: 800;
   color: var(--text-primary);
-  font-weight: 700;
 }
 
 .durationLine {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 12px; /* Tăng khoảng cách icon với dòng kẻ chút xíu */
-  padding: 0 16px;
-  color: var(--border-gray);
+  justify-content: center;
+  margin: 0 16px;
+  color: var(--text-secondary);
+  position: relative;
+  top: 6px;
 }
 
 .line {
+  height: 1px;
+  background-color: var(--border-gray);
   flex: 1;
-  height: 2px; /* [UPDATE] Tăng độ dày từ 1px -> 2px */
-  background-color: var(--border-gray);
-  position: relative;
-  border-radius: 1px;
-}
-
-.line::after {
-  content: "";
-  position: absolute;
-  width: 6px; /* [UPDATE] Tăng kích thước chấm tròn 4px -> 6px */
-  height: 6px; /* [UPDATE] Tăng kích thước chấm tròn 4px -> 6px */
-  background-color: var(--border-gray);
-  border-radius: 50%;
-  /* [UPDATE] Căn giữa chấm tròn theo chiều dọc */
-  top: 50%;
-  transform: translateY(-50%);
-}
-.line:first-child::after {
-  right: 0;
-}
-.line:last-child::after {
-  left: 0;
 }
 
 .clockIcon {
-  font-size: 1.1rem; /* [UPDATE] Tăng icon đồng hồ lên chút cho cân đối */
-  color: var(--text-secondary);
+  margin: 0 8px;
+  font-size: 0.9rem;
 }
 
-/* --- Info Grid --- */
+/* --- INFO GRID --- */
 .infoGrid {
-  background-color: var(--bg-secondary);
-  border: 1px solid var(--border-gray);
-  border-radius: 8px;
-  padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  margin-bottom: 16px;
+  padding-left: 8px;
 }
 
 .infoItem {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--text-primary);
-  font-weight: 500;
 }
 
 .icon {
@@ -186,22 +177,23 @@
   width: 16px;
 }
 
-/* Stats Row */
+/* --- STATS ROW --- */
 .statsRow {
   display: flex;
   gap: 16px;
-  margin-top: 4px;
-  padding-top: 8px;
+  margin-top: 8px;
+  padding-top: 12px;
   border-top: 1px dashed var(--border-gray);
 }
 
 .statItem {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
 }
+
 .statItem b {
   color: var(--text-primary);
   font-weight: 700;
@@ -211,95 +203,89 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  display: inline-block;
 }
 .checkInColor {
-  background-color: var(--stat-green-text);
+  background-color: #22c55e;
 }
 .bookedColor {
-  background-color: var(--primary);
+  background-color: #ef4444;
 }
 .totalColor {
-  background-color: var(--text-secondary);
+  background-color: #9ca3af;
 }
 
-/* Footer */
 .divider {
   border: none;
   border-top: 1px solid var(--border-gray);
-  margin: 0;
+  margin: 0 0 16px 0;
 }
 
+/* --- FOOTER --- */
 .footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-left: 8px;
 }
 
 .price {
   font-size: 0.9rem;
   color: var(--text-secondary);
 }
+
 .price span {
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--primary);
   margin-left: 4px;
 }
 
-/* Status Dropdown */
+/* --- STATUS DROPDOWN --- */
 .statusContainer {
   position: relative;
-  width: 140px;
 }
 
 .statusTrigger {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  background-color: var(--input-bg);
+  gap: 8px;
+  background-color: var(--bg-secondary); /* Màu nền input ở Dark mode */
   border: 1px solid var(--border-gray);
-  border-radius: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s;
   font-size: 0.85rem;
+  font-weight: 600;
   color: var(--text-primary);
+  transition: 0.2s;
 }
 
 .statusTrigger:hover {
-  border-color: var(--text-secondary);
   background-color: var(--bg-hover);
-}
-
-.statusText {
-  font-weight: 600;
-}
-.statusIcon {
-  color: var(--text-secondary);
-  font-size: 0.7rem;
+  border-color: var(--text-secondary);
 }
 
 .statusMenu {
   position: absolute;
   bottom: 100%;
   right: 0;
-  left: 0;
-  background-color: var(--background-paper);
+  margin-bottom: 8px;
+  background-color: var(--background-paper); /* Quan trọng cho Dark Mode */
   border: 1px solid var(--border-gray);
-  border-radius: 6px;
-  box-shadow: var(--modal-shadow);
-  margin-bottom: 6px;
-  z-index: 20;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 4px;
+  min-width: 140px;
+  z-index: 10;
   overflow: hidden;
 }
 
 .statusItem {
-  padding: 10px 12px;
-  cursor: pointer;
+  padding: 8px 12px;
   font-size: 0.85rem;
   color: var(--text-primary);
-  transition: background-color 0.2s;
+  cursor: pointer;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -310,8 +296,8 @@
 }
 
 .statusItem.active {
-  background-color: var(--badge-waiting-bg);
-  color: var(--badge-waiting-text);
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--primary);
   font-weight: 600;
 }
 
@@ -321,28 +307,14 @@
   border-radius: 50%;
 }
 .dotWaiting {
-  background-color: var(--badge-waiting-text);
+  background-color: #3b82f6;
 }
 .dotRunning {
-  background-color: var(--badge-running-text);
+  background-color: #22c55e;
 }
 .dotCompleted {
-  background-color: var(--badge-completed-text);
+  background-color: #9ca3af;
 }
 .dotCancelled {
-  background-color: var(--primary);
-}
-
-@media (max-width: 480px) {
-  .timeVal {
-    font-size: 1.1rem;
-  }
-  .footer {
-    flex-direction: column;
-    gap: 12px;
-    align-items: flex-start;
-  }
-  .statusContainer {
-    width: 100%;
-  }
+  background-color: #ef4444;
 }

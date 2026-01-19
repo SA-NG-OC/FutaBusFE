@@ -53,7 +53,10 @@ export default function AdminDriversPage() {
   const [selectedDriverForAssignment, setSelectedDriverForAssignment] =
     useState<{ id: number; name: string } | null>(null);
 
-  // Fetch stats from API
+  const [loadingRoutes, setLoadingRoutes] = useState(false);
+  const isDataReady = !loading && !loadingRoutes;
+  
+  // --- LOGIC ---
   useEffect(() => {
     const fetchStats = async () => {
       setLoadingStats(true);
@@ -134,11 +137,13 @@ export default function AdminDriversPage() {
         </div>
       )}
 
-      {loading && <p className={styles.loadingText}>Đang tải danh sách...</p>}
+      {(loading || loadingRoutes) && (
+        <p className={styles.loadingText}>Đang tải dữ liệu và cập nhật tuyến...</p>
+      )}
       {error && <p className={styles.errorText}>{error}</p>}
 
       {/* --- DRIVER CARDS GRID --- */}
-      {!loading && !error && (
+      {!error && isDataReady && (
         <>
           <div className={styles.grid}>
             {drivers.map((driver) => (

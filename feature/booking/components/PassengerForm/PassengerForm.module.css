@@ -55,6 +55,12 @@
   color: #9ca3af;
 }
 
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
 .inputError {
   border-color: #ef4444;
 }

@@ -1,6 +1,6 @@
 .pageContainer {
   min-height: 100vh;
-  background-color: var(--background);
+  background-color: transparent;
   transition: background-color 0.2s ease;
   padding-bottom: 40px;
 }

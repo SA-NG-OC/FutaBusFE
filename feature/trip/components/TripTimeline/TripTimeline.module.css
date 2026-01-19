@@ -1,82 +1,95 @@
+/* Container chính dùng Grid */
 .timelineContainer {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 0;
   padding: 10px 0;
   position: relative;
 }
 
-.timelineGroup {
-  display: flex;
-  gap: 20px;
-  position: relative;
+/* --- ĐƯỜNG KẺ DỌC (LINE) --- */
+.timelineContainer::before {
+  content: "";
+  position: absolute;
+  top: 30px;
+  bottom: 30px;
+  left: 40px;
+  width: 2px;
+  /* [FIX] Dùng màu viền (thường là xám nhạt) để hợp với cả Light/Dark */
+  background-color: var(--border-gray);
+  transform: translateX(-50%);
+  z-index: 0;
 }
 
-/* Cột thời gian bên trái */
+.timelineGroup {
+  display: contents;
+}
+
+/* --- CỘT BÊN TRÁI --- */
 .timeColumn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 70px;
   position: relative;
-}
-
-.timeBadge {
-  background-color: var(--background-paper);
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--text-primary);
-  border: 1px solid var(--border-gray);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  z-index: 2;
-  margin-bottom: 4px; /* Khoảng cách tới chấm tròn */
-}
-
-/* Đường kẻ dọc chạy xuyên suốt */
-.timeColumn::after {
-  content: "";
-  position: absolute;
-  top: 35px; /* Bắt đầu ngay dưới timeBadge */
-  bottom: -20px; /* Kéo dài xuống group tiếp theo */
-  width: 2px;
-  background-color: #e5e7eb; /* Màu xám nhạt */
-  left: 50%;
-  transform: translateX(-50%);
   z-index: 1;
+  grid-column: 1;
+  padding-bottom: 32px;
 }
 
-/* Ẩn đường kẻ ở item cuối cùng để không bị lòi ra */
-.timelineGroup:last-child .timeColumn::after {
-  display: none;
+/* [FIX] Time Badge: Nền theo theme, chữ theo theme */
+.timeBadge {
+  background-color: var(--background-default); /* Nền trang web */
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  z-index: 2;
+  margin-bottom: 8px;
 }
 
-/* CHẤM TRÒN (Target Style) */
+/* --- CHẤM TRÒN (DOT) --- */
 .timelineDot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  /* Lõi đỏ */
-  background-color: var(--primary);
-  /* Viền trắng dày tạo khoảng cách */
-  border: 3px solid var(--background-paper);
-  /* Viền đỏ mỏng bên ngoài cùng (box-shadow) */
-  box-shadow: 0 0 0 1px var(--primary);
+  width: 20px;
+  height: 20px;
+  /* [FIX] Nền dot trùng màu nền web để che đường kẻ */
+  background-color: var(--background-default);
 
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 45px; /* Vị trí chấm tròn so với đỉnh */
-  z-index: 3;
+  border: 2px solid var(--primary); /* Viền đỏ */
+  border-radius: 50%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Tạo viền giả trùng màu nền để tách dot khỏi đường kẻ */
+  box-shadow: 0 0 0 4px var(--background-default);
 }
 
-/* Cột Cards bên phải */
+.timelineDot::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background-color: var(--primary);
+  border-radius: 50%;
+}
+
+/* --- CỘT BÊN PHẢI --- */
 .cardsColumn {
-  flex: 1;
+  grid-column: 2;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding-bottom: 30px;
+  padding-bottom: 32px;
+  padding-left: 16px;
+}
+
+/* Loại bỏ padding-bottom ở phần tử cuối */
+.timelineGroup:last-child .timeColumn,
+.timelineGroup:last-child .cardsColumn {
+  padding-bottom: 0;
 }
 
 .emptyState {
@@ -84,4 +97,7 @@
   padding: 40px;
   color: var(--text-secondary);
   font-style: italic;
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px dashed var(--border-gray);
 }
