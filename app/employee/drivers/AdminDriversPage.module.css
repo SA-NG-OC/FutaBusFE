@@ -1,22 +1,22 @@
 /* Container chính của trang */
 .pageContainer {
-  padding: 24px;
+  padding: 0;
   min-height: 100vh;
-  background-color: var(--background);
+  background-color: transparent;
   color: var(--text-primary);
   transition: background-color 0.2s ease;
 }
 
-/* --- FILTER SECTION (Mới) --- */
-/* Thay thế searchContainer cũ bằng layout Grid để chứa cả Search và Filter */
+/* --- FILTER SECTION --- */
 .filterContainer {
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
   margin-bottom: 24px;
+  /* [FIX] Căn đáy để Input và Filter ngang hàng nhau, sửa lỗi so le */
+  align-items: end;
 }
 
-/* Trên màn hình tablet trở lên, Search chiếm 2 phần, Filter chiếm 1 phần */
 @media (min-width: 768px) {
   .filterContainer {
     grid-template-columns: 2fr 1fr;
@@ -53,12 +53,12 @@
   color: var(--input-placeholder);
 }
 
-/* --- STATISTICS BOX (Mới) --- */
+/* --- STATISTICS BOX --- */
 .statsBox {
   margin-bottom: 24px;
   padding: 12px 16px;
   background-color: var(--stat-blue-bg);
-  border: 1px solid var(--border-gray); /* Hoặc border nhẹ của stat */
+  border: 1px solid var(--border-gray);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -95,38 +95,15 @@
   }
 }
 
-/* --- CARD WRAPPER & ASSIGN BUTTON (Mới) --- */
-/* Wrapper để định vị nút Gán tuyến đè lên Card */
+/* --- CARD WRAPPER --- */
 .cardWrapper {
   position: relative;
   height: 100%;
 }
 
-/* Nút Gán tuyến (+ Gán tuyến) */
-.assignButton {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  padding: 6px 12px;
-  font-size: 12px;
-  font-weight: 600;
-  color: white;
-  background-color: var(--primary);
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-  z-index: 10; /* Đảm bảo nút nằm trên Card */
-}
+/* [REMOVED] Đã xóa class .assignButton vì không dùng overlay nữa */
 
-.assignButton:hover {
-  background-color: var(--primary-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-}
-
-/* --- STATES (Loading, Error, Empty) --- */
+/* --- STATES --- */
 .loadingText,
 .errorText {
   text-align: center;

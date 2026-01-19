@@ -93,9 +93,9 @@ export default function TripSchedulingPage() {
             }}
         >
             <PageHeader
-                title="Trip Scheduling"
-                subtitle="Schedule and manage bus trips"
-                actionLabel="Schedule Trip"
+                title="Lịch trình chuyến xe"
+                subtitle="Lập lịch và quản lý các chuyến xe"
+                actionLabel="Tạo chuyến"
                 onAction={() => {
                     fetchSelectionData();
                     setIsCreateModalOpen(true);

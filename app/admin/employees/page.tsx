@@ -29,7 +29,7 @@ export default function AdminEmployeesPage() {
 
   return (
     // [FIX] Dùng bg-[var(--background)] để đồng bộ với globals.css
-    <div className="p-6 min-h-screen bg-[var(--background)] text-[var(--foreground)] transition-colors duration-200">
+    <div className="min-h-screen text-[var(--foreground)] transition-colors duration-200">
       {/* PageHeader bây giờ trong suốt nên sẽ hiện màu nền của thẻ div cha */}
       <PageHeader
         title="Quản lý nhân viên"
@@ -66,7 +66,7 @@ export default function AdminEmployeesPage() {
               <EmployeeCard
                 key={employee.userId}
                 employee={employee}
-                onEdit={() => {}}
+                onEdit={() => { }}
                 onDelete={openDeleteModal}
               />
             ))}
