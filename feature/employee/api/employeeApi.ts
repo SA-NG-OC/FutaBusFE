@@ -1,4 +1,4 @@
-import { api, PageResponse } from '@/shared/utils/apiClient';
+import { api, PageResponse } from "@/shared/utils/apiClient";
 
 // ========== TYPES ==========
 export interface Employee {
@@ -8,10 +8,8 @@ export interface Employee {
   phoneNumber: string;
   avt?: string;
   status: string;
-  role: {
-    roleId: number;
-    roleName: string;
-  };
+  roleId: number;
+  roleName: string;
   createdAt?: string;
   address?: string;
 }
@@ -37,7 +35,11 @@ export const employeeApi = {
   /**
    * Get all employees (users with STAFF role) with pagination and search
    */
-  getAll: async (page: number = 0, size: number = 20, keyword?: string): Promise<PageResponse<Employee>> => {
+  getAll: async (
+    page: number = 0,
+    size: number = 20,
+    keyword?: string,
+  ): Promise<PageResponse<Employee>> => {
     const params: Record<string, string> = {
       page: page.toString(),
       size: size.toString(),
@@ -47,9 +49,9 @@ export const employeeApi = {
       params.keyword = keyword;
     }
 
-    // Filter by STAFF role (roleId = 2)
-    return api.get<PageResponse<Employee>>('/users', { 
-      params: { ...params, roleId: '2' } 
+    // Filter by STAFF role (roleId = 8)
+    return api.get<PageResponse<Employee>>("/users", {
+      params: { ...params, roleId: "8" },
     });
   },
 
@@ -64,26 +66,29 @@ export const employeeApi = {
    * Create new employee with account (STAFF role)
    * Now accepts FormData with avatar file
    */
-  create: async (data: CreateEmployeeRequest, avatarFile?: File): Promise<Employee> => {
+  create: async (
+    data: CreateEmployeeRequest,
+    avatarFile?: File,
+  ): Promise<Employee> => {
     const formData = new FormData();
-    
+
     // Append all form fields
-    formData.append('fullName', data.fullName);
-    formData.append('email', data.email);
-    formData.append('password', data.password);
-    formData.append('phoneNumber', data.phoneNumber);
+    formData.append("fullName", data.fullName);
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+    formData.append("phoneNumber", data.phoneNumber);
     if (data.address) {
-      formData.append('address', data.address);
+      formData.append("address", data.address);
     }
-    
+
     // Append avatar file if provided
     if (avatarFile) {
-      formData.append('avatar', avatarFile);
+      formData.append("avatar", avatarFile);
     }
-    
-    return api.post<Employee>('/users/employees', formData, {
+
+    return api.post<Employee>("/users/employees", formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
   },
@@ -91,7 +96,10 @@ export const employeeApi = {
   /**
    * Update existing employee
    */
-  update: async (id: number, data: UpdateEmployeeRequest): Promise<Employee> => {
+  update: async (
+    id: number,
+    data: UpdateEmployeeRequest,
+  ): Promise<Employee> => {
     return api.put<Employee>(`/users/${id}`, data);
   },
 
