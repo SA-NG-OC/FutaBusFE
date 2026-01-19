@@ -38,14 +38,14 @@ interface SeatMapProps {
   selectedSeats: SelectedSeat[];
   currentUserId: string;
   wsConnected?: boolean;
-  wsLockedSeats?: LockedSeatInfo[]; // NEW: WebSocket locked seats
+  wsLockedSeats?: LockedSeatInfo[];
   onSeatClick?: (
     seatId: number,
     seatNumber: string,
     isSelected: boolean,
   ) => void;
   maxSeats?: number;
-  lockTimers?: Record<number, string>; // seatId -> remaining time string
+  lockTimers?: Record<number, string>;
 }
 
 // Convert API status to local status
@@ -60,7 +60,6 @@ function mapApiStatus(
     case "Booked":
       return "booked";
     case "Held":
-      // Check if held by current user
       if (lockedBy === currentUserId) {
         return "held-by-me";
       }
@@ -81,7 +80,6 @@ function convertApiSeats(
   const wsLockedMap = new Map(wsLockedSeats.map((s) => [s.seatId, s]));
 
   return apiSeats.map((seat) => {
-    // First check WebSocket data for real-time status
     const wsLock = wsLockedMap.get(seat.seatId);
     let lockedBy = seat.lockedBy;
     let lockExpiry = seat.holdExpiry;
@@ -93,7 +91,6 @@ function convertApiSeats(
 
     let status = mapApiStatus(seat.status, lockedBy, currentUserId);
 
-    // If WebSocket shows it's locked, override status
     if (wsLock) {
       if (wsLock.userId === currentUserId) {
         status = "held-by-me";
@@ -102,7 +99,6 @@ function convertApiSeats(
       }
     }
 
-    // Override with selected if it's in our selected list
     if (selectedSeatIds.has(seat.seatId)) {
       status = "selected";
     }
@@ -118,7 +114,6 @@ function convertApiSeats(
   });
 }
 
-// Convert API data to floors
 function convertSeatMapData(
   seatMapData: SeatMapResponse | null | undefined,
   currentUserId: string,
@@ -149,7 +144,6 @@ export default function SeatMap({
   maxSeats = 5,
   lockTimers = {},
 }: SeatMapProps) {
-  // Convert API data to floors with memoization
   const floors = useMemo(
     () =>
       convertSeatMapData(
@@ -163,7 +157,6 @@ export default function SeatMap({
 
   const handleSeatClick = useCallback(
     (seat: Seat) => {
-      // Can't click on booked or held (by others) seats
       if (seat.status === "booked" || seat.status === "held") {
         return;
       }
@@ -171,13 +164,11 @@ export default function SeatMap({
       const isCurrentlySelected =
         seat.status === "selected" || seat.status === "held-by-me";
 
-      // Check max seats limit
       if (!isCurrentlySelected && selectedSeats.length >= maxSeats) {
         alert(`Bạn chỉ có thể chọn tối đa ${maxSeats} ghế`);
         return;
       }
 
-      // Notify parent
       onSeatClick?.(seat.seatId, seat.id, isCurrentlySelected);
     },
     [selectedSeats.length, maxSeats, onSeatClick],
@@ -190,7 +181,6 @@ export default function SeatMap({
         seat.status === "selected" || seat.status === "held-by-me";
       const timer = lockTimers[seat.seatId];
 
-      // Map status to CSS class
       const statusClass =
         seat.status === "held-by-me" ? styles.selected : styles[seat.status];
 
@@ -208,17 +198,19 @@ export default function SeatMap({
                 : `Ghế ${seat.id} - Còn trống`
           }
         >
-          <span className={styles.seatNumber}>{seat.id}</span>
-          {isSelected && timer && (
-            <span className={styles.seatTimer}>{timer}</span>
-          )}
+          {/* Wrapper giúp căn chỉnh số ghế và thời gian */}
+          <div className={styles.seatContent}>
+            <span className={styles.seatNumber}>{seat.id}</span>
+            {isSelected && timer && (
+              <span className={styles.seatTimer}>{timer}</span>
+            )}
+          </div>
         </button>
       );
     },
     [handleSeatClick, lockTimers],
   );
 
-  // Loading state
   if (loading) {
     return (
       <div className={styles.container}>
@@ -230,7 +222,6 @@ export default function SeatMap({
     );
   }
 
-  // No data state
   if (!seatMapData || floors.length === 0) {
     return (
       <div className={styles.container}>
