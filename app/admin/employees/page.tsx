@@ -28,11 +28,13 @@ export default function AdminEmployeesPage() {
   } = useEmployees();
 
   return (
-    <div className="p-4 min-h-screen bg-(--background) text-(--foreground)">
+    // [FIX] Dùng bg-[var(--background)] để đồng bộ với globals.css
+    <div className="p-6 min-h-screen text-[var(--foreground)] transition-colors duration-200">
+      {/* PageHeader bây giờ trong suốt nên sẽ hiện màu nền của thẻ div cha */}
       <PageHeader
-        title="Employee Management"
-        subtitle="Manage staff accounts and permissions"
-        actionLabel="Add Employee"
+        title="Quản lý nhân viên"
+        subtitle="Quản lý tài khoản và phân quyền nhân viên"
+        actionLabel="Thêm nhân viên"
         onAction={openCreateModal}
       />
 
@@ -40,45 +42,57 @@ export default function AdminEmployeesPage() {
       <div className="mb-6 max-w-md">
         <input
           type="text"
-          placeholder="Search by name, email, or phone..."
+          placeholder="Tìm kiếm theo tên, email hoặc SĐT..."
           value={keyword}
           onChange={(e) => handleSearch(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full px-4 py-2 rounded-lg border border-[var(--border-gray)] bg-[var(--input-bg)] text-[var(--input-text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] placeholder-[var(--text-secondary)] transition-colors"
         />
       </div>
 
-      {loading && <p className="text-center py-8">Loading employees...</p>}
-      {error && <p className="text-red-500 text-center py-4">{error}</p>}
+      {loading && (
+        <p className="text-center py-12 text-[var(--text-secondary)]">
+          Đang tải dữ liệu...
+        </p>
+      )}
+      {error && (
+        <p className="text-[var(--primary)] text-center py-4">{error}</p>
+      )}
 
       {/* Employee Cards Grid */}
       {!loading && !error && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {employees.map((employee) => (
               <EmployeeCard
                 key={employee.userId}
                 employee={employee}
-                onEdit={() => {}} // TODO: Implement edit functionality
+                onEdit={() => { }}
                 onDelete={openDeleteModal}
               />
             ))}
           </div>
 
           {employees.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No employees found</p>
-              <p className="text-gray-400 text-sm mt-2">
-                {keyword ? 'Try adjusting your search terms' : 'Click "Add Employee" to create one'}
+            <div className="text-center py-12 bg-[var(--bg-secondary)] rounded-xl border border-[var(--border-gray)] border-dashed">
+              <p className="text-[var(--text-secondary)] text-lg">
+                Không tìm thấy nhân viên nào
+              </p>
+              <p className="text-[var(--text-secondary)] opacity-70 text-sm mt-2">
+                {keyword
+                  ? "Hãy thử thay đổi từ khóa tìm kiếm"
+                  : 'Nhấn "Thêm nhân viên" để tạo tài khoản mới'}
               </p>
             </div>
           )}
 
           {totalPages > 1 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
+            <div className="flex justify-center pb-8">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
           )}
         </>
       )}

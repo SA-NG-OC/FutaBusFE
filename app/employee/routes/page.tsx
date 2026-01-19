@@ -53,12 +53,12 @@ export default function RoutesPage() {
 
                 {/* 2. Header trang */}
                 <PageHeader
-                    title="Route Management"
-                    subtitle="Manage bus routes and stops"
-                    actionLabel="Add Route"
+                    title="Quản lý Tuyến đường"
+                    subtitle="Quản lý danh sách tuyến xe và các điểm dừng"
+                    actionLabel="Thêm tuyến mới"
                     onAction={openAddModal}
                     showSearch={true}
-                    searchPlaceholder="Search routes..."
+                    searchPlaceholder="Tìm kiếm tuyến..."
                     onSearch={handleSearch}
                 />
 

@@ -75,6 +75,7 @@ export default function AdminDriversPage() {
     const [filteredDrivers, setFilteredDrivers] = useState<Driver[]>([]);
     const [driversWithRoutes, setDriversWithRoutes] = useState<Driver[]>([]);
     const [loadingRoutes, setLoadingRoutes] = useState(false);
+    const isDataReady = !loading && !loadingRoutes;
 
     // --- LOGIC FETCH ROUTE & FILTER ---
     useEffect(() => {
@@ -236,11 +237,13 @@ export default function AdminDriversPage() {
                 </div>
             )}
 
-            {loading && <p className={styles.loadingText}>Đang tải danh sách...</p>}
+            {(loading || loadingRoutes) && (
+                <p className={styles.loadingText}>Đang tải dữ liệu và cập nhật tuyến...</p>
+            )}
             {error && <p className={styles.errorText}>{error}</p>}
 
             {/* --- DRIVER TABLE (Thay thế Grid Card) --- */}
-            {!loading && !error && (
+            {!error && isDataReady && (
                 <div className="w-full">
                     {/* Table Container với border và background từ variable */}
                     <div className="overflow-x-auto rounded-lg border border-[var(--border-gray)] bg-[var(--background-paper)] shadow-sm">
@@ -347,8 +350,8 @@ export default function AdminDriversPage() {
                                                                     </span>
                                                                     <span
                                                                         className={`text-[10px] px-1.5 py-0.5 rounded border ${route.preferredRole === "Main"
-                                                                                ? "border-[var(--stat-green-text)] text-[var(--stat-green-text)] bg-[var(--stat-green-bg)]"
-                                                                                : "border-[var(--stat-blue-text)] text-[var(--stat-blue-text)] bg-[var(--stat-blue-bg)]"
+                                                                            ? "border-[var(--stat-green-text)] text-[var(--stat-green-text)] bg-[var(--stat-green-bg)]"
+                                                                            : "border-[var(--stat-blue-text)] text-[var(--stat-blue-text)] bg-[var(--stat-blue-bg)]"
                                                                             }`}
                                                                     >
                                                                         {route.preferredRole}
