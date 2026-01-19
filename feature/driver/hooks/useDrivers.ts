@@ -9,9 +9,14 @@ export const useDrivers = () => {
   // Pagination
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
 
   // Search
   const [keyword, setKeyword] = useState('');
+
+  // Filters
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+  const [routeFilter, setRouteFilter] = useState<number | undefined>(undefined);
 
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,15 +24,21 @@ export const useDrivers = () => {
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
 
   // Fetch drivers
-  const fetchDrivers = useCallback(async (page: number, searchKw: string) => {
+  const fetchDrivers = useCallback(async (
+    page: number, 
+    searchKw: string,
+    status?: string,
+    routeId?: number
+  ) => {
     try {
       setLoading(true);
       setError(null);
 
-      const pageData = await driverApi.getAll(page, 20, searchKw);
+      const pageData = await driverApi.getAll(page, 20, searchKw, status, routeId);
 
       setDrivers(pageData.content);
       setTotalPages(pageData.totalPages);
+      setTotalElements(pageData.totalElements);
       setCurrentPage(pageData.number);
     } catch (err) {
       console.error('Fetch drivers failed', err);
@@ -38,8 +49,8 @@ export const useDrivers = () => {
   }, []);
 
   useEffect(() => {
-    fetchDrivers(currentPage, keyword);
-  }, [currentPage, keyword, fetchDrivers]);
+    fetchDrivers(currentPage, keyword, statusFilter, routeFilter);
+  }, [currentPage, keyword, statusFilter, routeFilter]); // Remove fetchDrivers from deps
 
   // Search
   const handleSearch = (value: string) => {
@@ -84,7 +95,7 @@ export const useDrivers = () => {
       }
 
       closeModal();
-      fetchDrivers(currentPage, keyword);
+      fetchDrivers(currentPage, keyword, statusFilter, routeFilter);
     } catch (err) {
       console.error('Save driver failed', err);
       throw err;
@@ -98,7 +109,7 @@ export const useDrivers = () => {
     try {
       await driverApi.delete(selectedDriver.driverId);
       closeModal();
-      fetchDrivers(currentPage, keyword);
+      fetchDrivers(currentPage, keyword, statusFilter, routeFilter);
     } catch (err) {
       console.error('Delete driver failed', err);
       throw err;
@@ -110,11 +121,21 @@ export const useDrivers = () => {
     try {
       await driverApi.createWithAccount(data, avatarFile);
       closeModal();
-      fetchDrivers(currentPage, keyword);
+      fetchDrivers(currentPage, keyword, statusFilter, routeFilter);
     } catch (err) {
       console.error('Create driver with account failed', err);
       throw err;
     }
+  };
+
+  const handleStatusFilter = (status: string | undefined) => {
+    setStatusFilter(status);
+    setCurrentPage(0);
+  };
+
+  const handleRouteFilter = (routeId: number | undefined) => {
+    setRouteFilter(routeId);
+    setCurrentPage(0);
   };
 
   return {
@@ -123,7 +144,15 @@ export const useDrivers = () => {
     error,
     currentPage,
     totalPages,
+    totalElements,
     keyword,
+    
+    // Filters
+    statusFilter,
+    routeFilter,
+    handleStatusFilter,
+    handleRouteFilter,
+    
     isModalOpen,
     isDeleteModalOpen,
     selectedDriver,

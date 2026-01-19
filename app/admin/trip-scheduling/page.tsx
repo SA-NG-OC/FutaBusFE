@@ -26,6 +26,7 @@ export default function TripSchedulingPage() {
     loading,
     currentPage,
     totalPages,
+    totalElements,
     setPage,
     updateTripStatus,
     fetchTrips,
@@ -114,6 +115,19 @@ export default function TripSchedulingPage() {
         </div>
       ) : (
         <>
+          {/* Total trips count */}
+          {!loading && filteredTrips.length > 0 && (
+            <div style={{ 
+              padding: '12px 16px', 
+              marginBottom: '16px', 
+              backgroundColor: 'var(--background)', 
+              borderRadius: '8px',
+              fontSize: '14px'
+            }}>
+              Tổng số: <strong>{totalElements}</strong> chuyến xe
+            </div>
+          )}
+
           <TripTimeline
             trips={filteredTrips}
             onStatusUpdate={updateTripStatus}

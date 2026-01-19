@@ -1,16 +1,23 @@
 import { api } from '@/shared/utils/apiClient';
 import { PageResponse } from '@/shared/utils';
-import { Vehicle, VehicleRequest } from "../types";
+import { Vehicle, VehicleRequest, VehicleStats } from "../types";
 
 export const vehicleApi = {
   // =====================================================
   // 1️⃣ GET – Lấy danh sách vehicles (phân trang)
-  // URL: GET /vehicles?page={page}&size={size}
+  // URL: GET /vehicles?page={page}&size={size}&status={status}&routeId={routeId}
   // =====================================================
-  getAll: async (page: number, size: number = 10): Promise<PageResponse<Vehicle>> => {
-    return api.get<PageResponse<Vehicle>>('/vehicles', {
-      params: { page, size }
-    });
+  getAll: async (
+    page: number, 
+    size: number = 10, 
+    status?: string, 
+    routeId?: number
+  ): Promise<PageResponse<Vehicle>> => {
+    const params: any = { page, size };
+    if (status) params.status = status;
+    if (routeId) params.routeId = routeId;
+    
+    return api.get<PageResponse<Vehicle>>('/vehicles', { params });
   },
 
   // =====================================================
@@ -44,5 +51,13 @@ export const vehicleApi = {
   delete: async (id: number): Promise<boolean> => {
     await api.delete(`/vehicles/${id}`);
     return true;
+  },
+
+  // =====================================================
+  // 6️⃣ GET – Lấy thống kê vehicles
+  // URL: GET /vehicles/stats
+  // =====================================================
+  getStats: async (): Promise<VehicleStats> => {
+    return api.get<VehicleStats>('/vehicles/stats');
   },
 };

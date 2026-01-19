@@ -58,20 +58,33 @@ export interface DriverSelection {
   phoneNumber: string;
 }
 
+export interface DriverStats {
+  total: number;
+  active: number;
+  onLeave: number;
+  inactive: number;
+}
+
 // ========== API METHODS ==========
 export const driverApi = {
   /**
    * Get all drivers with pagination and search
    */
-  getAll: async (page: number = 0, size: number = 20, keyword?: string): Promise<PageResponse<Driver>> => {
+  getAll: async (
+    page: number = 0, 
+    size: number = 20, 
+    keyword?: string,
+    status?: string,
+    routeId?: number
+  ): Promise<PageResponse<Driver>> => {
     const params: Record<string, string> = {
       page: page.toString(),
       size: size.toString(),
     };
 
-    if (keyword) {
-      params.keyword = keyword;
-    }
+    if (keyword) params.keyword = keyword;
+    if (status) params.status = status;
+    if (routeId) params.routeId = routeId.toString();
 
     return api.get<PageResponse<Driver>>('/drivers', { params });
   },
@@ -140,5 +153,12 @@ export const driverApi = {
    */
   getSelection: async (): Promise<DriverSelection[]> => {
     return api.get<DriverSelection[]>('/drivers/selection');
+  },
+
+  /**
+   * Get driver statistics
+   */
+  getStats: async (): Promise<DriverStats> => {
+    return api.get<DriverStats>('/drivers/stats');
   },
 };

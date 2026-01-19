@@ -15,6 +15,7 @@ export const useRoutes = () => {
     // ===== PAGINATION & SEARCH =====
     const [currentPage, setCurrentPage] = useState<number>(0);
     const [totalPages, setTotalPages] = useState<number>(0);
+    const [totalElements, setTotalElements] = useState<number>(0);
     const [keyword, setKeyword] = useState<string>("");
 
     // ===== MODAL STATE =====
@@ -33,6 +34,7 @@ export const useRoutes = () => {
             // Logic map dữ liệu giữ nguyên như cũ
             setRoutes(pageData.content);
             setTotalPages(pageData.totalPages);
+            setTotalElements(pageData.totalElements);
             setCurrentPage(pageData.number);
 
         } catch (err: any) {
@@ -152,6 +154,7 @@ export const useRoutes = () => {
         error,
         currentPage,
         totalPages,
+        totalElements,
         setCurrentPage,
         keyword,
         handleSearch,

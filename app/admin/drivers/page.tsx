@@ -7,9 +7,8 @@ import CreateDriverModal from "@/feature/driver/components/CreateDriverModal";
 import ConfirmDeleteModal from "@/feature/driver/components/ConfirmDeleteModal";
 import DriverRouteAssignmentModal from "@/feature/driver/components/DriverRouteAssignmentModal/DriverRouteAssignmentModal";
 import { useDrivers } from "@/feature/driver/hooks/useDrivers";
-import { driverRouteAssignmentApi } from "@/feature/driver/api/driverRouteAssignmentApi";
 import RouteFilter from "@/src/components/RouteFilter/RouteFilter";
-import { Driver } from "@/feature/driver/api/driverApi";
+import { DriverStats, driverApi } from "@/feature/driver/api/driverApi";
 import PageHeader from "@/src/components/PageHeader/PageHeader";
 import Pagination from "@/src/components/Pagination/Pagination";
 import styles from "./AdminDriversPage.module.css";
@@ -21,12 +20,15 @@ export default function AdminDriversPage() {
     error,
     currentPage,
     totalPages,
+    totalElements,
     keyword,
     isModalOpen,
     isDeleteModalOpen,
     selectedDriver,
     handleSearch,
     handlePageChange,
+    handleRouteFilter,
+    routeFilter,
     openAddModal,
     openEditModal,
     openDeleteModal,
@@ -36,93 +38,36 @@ export default function AdminDriversPage() {
     handleCreateWithAccount,
   } = useDrivers();
 
+  // --- STATS STATE ---
+  const [stats, setStats] = useState<DriverStats>({
+    total: 0,
+    active: 0,
+    onLeave: 0,
+    inactive: 0,
+  });
+  const [loadingStats, setLoadingStats] = useState(false);
+
   // --- STATE ---
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAssignmentModal, setShowAssignmentModal] = useState(false);
   const [selectedDriverForAssignment, setSelectedDriverForAssignment] =
     useState<{ id: number; name: string } | null>(null);
-  const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
 
-  const [filteredDrivers, setFilteredDrivers] = useState<Driver[]>([]);
-  const [driversWithRoutes, setDriversWithRoutes] = useState<Driver[]>([]);
-  const [loadingRoutes, setLoadingRoutes] = useState(false);
-
-  // --- LOGIC ---
+  // Fetch stats from API
   useEffect(() => {
-    const fetchAssignedRoutes = async () => {
-      if (!drivers.length) return;
-      setLoadingRoutes(true);
+    const fetchStats = async () => {
+      setLoadingStats(true);
       try {
-        const driversWithRoutesData = await Promise.all(
-          drivers.map(async (driver) => {
-            try {
-              const assignments = await driverRouteAssignmentApi.getByDriver(
-                driver.driverId,
-              );
-              const activeRoutes = assignments
-                .filter((a) => {
-                  const startDate = new Date(a.startDate);
-                  const endDate = a.endDate ? new Date(a.endDate) : null;
-                  const today = new Date();
-                  return startDate <= today && (!endDate || endDate >= today);
-                })
-                .map((a) => ({
-                  assignmentId: a.assignmentId,
-                  routeId: a.routeId,
-                  routeName: a.routeName,
-                  origin: a.origin,
-                  destination: a.destination,
-                  preferredRole: a.preferredRole,
-                  priority: a.priority,
-                  startDate: a.startDate,
-                  endDate: a.endDate,
-                }));
-              return { ...driver, activeRoutes };
-            } catch (error) {
-              console.error(
-                `Error fetching routes for driver ${driver.driverId}:`,
-                error,
-              );
-              return { ...driver, activeRoutes: [] };
-            }
-          }),
-        );
-        setDriversWithRoutes(driversWithRoutesData);
-      } catch (error) {
-        console.error("Error fetching driver routes:", error);
+        const statsData = await driverApi.getStats();
+        setStats(statsData);
+      } catch (err) {
+        console.error('Error fetching driver stats:', err);
       } finally {
-        setLoadingRoutes(false);
+        setLoadingStats(false);
       }
     };
-    fetchAssignedRoutes();
-  }, [drivers]);
-
-  useEffect(() => {
-    if (selectedRouteId) {
-      filterDriversByRoute();
-    } else {
-      setFilteredDrivers(driversWithRoutes);
-    }
-  }, [selectedRouteId, driversWithRoutes]);
-
-  const filterDriversByRoute = async () => {
-    if (!selectedRouteId) {
-      setFilteredDrivers(driversWithRoutes);
-      return;
-    }
-    try {
-      const assignments =
-        await driverRouteAssignmentApi.getByRoute(selectedRouteId);
-      const driverIds = assignments.map((a) => a.driverId);
-      const filtered = driversWithRoutes.filter((d) =>
-        driverIds.includes(d.driverId),
-      );
-      setFilteredDrivers(filtered);
-    } catch (error) {
-      console.error("Error filtering drivers:", error);
-      setFilteredDrivers([]);
-    }
-  };
+    fetchStats();
+  }, [drivers]); // Refresh when drivers change
 
   const handleAssignRoute = (driverId: number, driverName: string) => {
     setSelectedDriverForAssignment({ id: driverId, name: driverName });
@@ -130,12 +75,8 @@ export default function AdminDriversPage() {
   };
 
   const handleAssignmentSuccess = async () => {
-    if (selectedRouteId) {
-      await filterDriversByRoute();
-    }
+    // Refresh will be handled by the hook
   };
-
-  const displayDrivers = selectedRouteId ? filteredDrivers : driversWithRoutes;
 
   return (
     <div className={styles.pageContainer}>
@@ -145,6 +86,19 @@ export default function AdminDriversPage() {
         actionLabel="Thêm tài xế"
         onAction={() => setShowCreateModal(true)}
       />
+
+      {/* Total drivers count */}
+      {!loading && !routeFilter && (
+        <div className={styles.statsBox}>
+          <p className={styles.statsText}>
+            Tổng số:{" "}
+            <span className={styles.statsHighlight}>
+              {stats.total}
+            </span>{" "}
+            tài xế
+          </p>
+        </div>
+      )}
 
       {/* --- FILTER SECTION --- */}
       <div className={styles.filterContainer}>
@@ -160,20 +114,20 @@ export default function AdminDriversPage() {
 
         <div className={styles.routeFilterBox}>
           <RouteFilter
-            onRouteSelect={setSelectedRouteId}
-            selectedRouteId={selectedRouteId}
+            onRouteSelect={(routeId) => handleRouteFilter(routeId || undefined)}
+            selectedRouteId={routeFilter || null}
             placeholder="Tất cả tuyến đường"
           />
         </div>
       </div>
 
       {/* --- STATISTICS --- */}
-      {selectedRouteId && (
+      {routeFilter && (
         <div className={styles.statsBox}>
           <p className={styles.statsText}>
             Hiển thị{" "}
             <span className={styles.statsHighlight}>
-              {displayDrivers.length}
+              {drivers.length}
             </span>{" "}
             tài xế thuộc tuyến đang chọn
           </p>
@@ -187,7 +141,7 @@ export default function AdminDriversPage() {
       {!loading && !error && (
         <>
           <div className={styles.grid}>
-            {displayDrivers.map((driver) => (
+            {drivers.map((driver) => (
               <div key={driver.driverId} className={styles.cardWrapper}>
                 <DriverCard
                   driver={driver}
@@ -201,17 +155,17 @@ export default function AdminDriversPage() {
             ))}
           </div>
 
-          {displayDrivers.length === 0 && (
+          {drivers.length === 0 && (
             <div className={styles.emptyState}>
               <p className={styles.emptyTitle}>
-                {selectedRouteId
+                {routeFilter
                   ? "Không có tài xế nào chạy tuyến này"
                   : "Không tìm thấy tài xế"}
               </p>
               <p className={styles.emptySubtitle}>
                 {keyword
                   ? "Thử thay đổi từ khóa tìm kiếm"
-                  : selectedRouteId
+                  : routeFilter
                     ? "Hãy thử chọn tuyến khác hoặc thêm mới"
                     : 'Nhấn "Thêm tài xế" để tạo mới'}
               </p>

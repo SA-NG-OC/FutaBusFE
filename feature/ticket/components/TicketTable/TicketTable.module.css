@@ -128,6 +128,15 @@
   color: var(--stat-green-text);
 }
 
+.changeButton {
+  color: #007bff;
+}
+
+.changeButton:hover:not(:disabled) {
+  background-color: #e7f3ff;
+  color: #0056b3;
+}
+
 .cancelButton {
   color: var(--warning-text);
 }

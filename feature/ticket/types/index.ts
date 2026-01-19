@@ -22,6 +22,7 @@ export interface PassengerInfo {
 
 export interface TripInfo {
   tripId: number;
+  routeId: number;
   routeName: string;
   departureTime: string;
   arrivalTime: string;

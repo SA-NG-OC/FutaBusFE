@@ -9,6 +9,7 @@ interface TicketTableProps {
   onConfirm: (bookingId: number) => Promise<boolean>; // 🔥
   onCancel: (bookingId: number) => Promise<boolean>;
   onView: (ticket: BookingData) => void;
+  onChangeTicket?: (ticket: BookingData) => void;
 }
 
 export const TicketTable: React.FC<TicketTableProps> = ({
@@ -16,6 +17,7 @@ export const TicketTable: React.FC<TicketTableProps> = ({
   onConfirm,
   onCancel,
   onView,
+  onChangeTicket,
 }) => {
   const [processing, setProcessing] = useState<number | null>(null);
 
@@ -96,6 +98,8 @@ export const TicketTable: React.FC<TicketTableProps> = ({
     status === "Pending" || status === "Held";
   const isCancellable = (status: string) =>
     status !== "Cancelled" && status !== "Expired";
+  const isChangeable = (status: string) =>
+    (status === "Paid" || status === "Completed" || status === "Held") && status !== "Cancelled" && status !== "Expired";
 
   return (
     <div className={styles.tableContainer}>
@@ -191,6 +195,35 @@ export const TicketTable: React.FC<TicketTableProps> = ({
                         >
                           <polyline
                             points="20 6 9 17 4 12"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </button>
+                    )}
+
+                    {isChangeable(ticket.bookingStatus) && onChangeTicket && (
+                      <button
+                        className={styles.changeButton}
+                        onClick={() => onChangeTicket(ticket)}
+                        title="Change ticket"
+                      >
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                        >
+                          <polyline
+                            points="23 4 23 10 17 10"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"

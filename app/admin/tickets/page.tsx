@@ -7,10 +7,13 @@ import { BookingData } from "@/feature/ticket/types";
 import styles from "./tickets.module.css";
 // [NEW] Import component đặt vé
 import AdminBookingView from "@/feature/ticket/components/AdminBookingView/AdminBookingView";
+import { TicketChangeModal } from "@/feature/ticket/components/TicketChangeModal/TicketChangeModal";
 
 export default function AdminTickets() {
   // [NEW] State để chuyển đổi chế độ hiển thị
   const [isBookingMode, setIsBookingMode] = useState(false);
+  const [changeModalOpen, setChangeModalOpen] = useState(false);
+  const [ticketToChange, setTicketToChange] = useState<BookingData | null>(null);
 
   // Các state cũ giữ nguyên
   const [page, setPage] = useState(0);
@@ -76,8 +79,22 @@ export default function AdminTickets() {
     setSelectedTicket(ticket);
   };
 
+  const handleChangeTicket = (ticket: BookingData) => {
+    setTicketToChange(ticket);
+    setChangeModalOpen(true);
+  };
+
   const handleCloseModal = () => {
     setSelectedTicket(null);
+  };
+
+  const handleCloseChangeModal = () => {
+    setChangeModalOpen(false);
+    setTicketToChange(null);
+  };
+
+  const handleChangeSuccess = () => {
+    refreshTickets();
   };
 
   const formatPrice = (price: number) => {
@@ -247,6 +264,7 @@ export default function AdminTickets() {
             onConfirm={confirmBooking}
             onCancel={cancelBooking}
             onView={handleView}
+            onChangeTicket={handleChangeTicket}
           />
 
           <div className={styles.pagination}>
@@ -372,6 +390,21 @@ export default function AdminTickets() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Ticket Change Modal */}
+      {ticketToChange && (
+        <TicketChangeModal
+          isOpen={changeModalOpen}
+          onClose={handleCloseChangeModal}
+          ticketId={ticketToChange.tickets[0].ticketId}
+          currentTripId={ticketToChange.tripInfo.tripId}
+          currentSeatNumber={ticketToChange.tickets.map(t => t.seatNumber).join(", ")}
+          currentRouteName={ticketToChange.tripInfo.routeName}
+          currentPrice={ticketToChange.tickets[0].price}
+          routeId={ticketToChange.tripInfo.routeId}
+          onSuccess={handleChangeSuccess}
+        />
       )}
     </div>
   );

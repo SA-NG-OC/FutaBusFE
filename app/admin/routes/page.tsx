@@ -18,6 +18,7 @@ export default function RoutesPage() {
         loading,
         currentPage,
         totalPages,
+        totalElements,
         setCurrentPage,
         handleSearch,
         isModalOpen,
@@ -67,6 +68,19 @@ export default function RoutesPage() {
                     <div className={styles.loading}>Đang tải dữ liệu...</div>
                 ) : (
                     <>
+                        {/* Total routes count */}
+                        {!loading && routes.length > 0 && (
+                            <div style={{ 
+                                padding: '12px 16px', 
+                                marginBottom: '16px', 
+                                backgroundColor: 'var(--background)', 
+                                borderRadius: '8px',
+                                fontSize: '14px'
+                            }}>
+                                Tổng số: <strong>{totalElements}</strong> tuyến đường
+                            </div>
+                        )}
+
                         {routes.length === 0 ? (
                             <div style={{ textAlign: 'center', marginTop: 20, color: '#666' }}>
                                 Không tìm thấy tuyến đường nào.

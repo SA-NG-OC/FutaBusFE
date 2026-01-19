@@ -4,6 +4,7 @@ import {
   BookingData,
   BookingListItem,
 } from "../types";
+import { TicketChangeRequest, TicketChangeResponse } from "../types/ticketChange";
 
 export const ticketApi = {
   // ================================
@@ -121,5 +122,13 @@ export const ticketApi = {
       cancelledCount: number;
       totalCount: number;
     }>("/bookings/my-tickets/count");
+  },
+
+  // ================================
+  // CHANGE TICKET - Admin/Staff change ticket to different trip
+  // PUT /tickets/{ticketId}/change
+  // ================================
+  changeTicket: async (ticketId: number, request: TicketChangeRequest): Promise<TicketChangeResponse> => {
+    return api.put<TicketChangeResponse>(`/tickets/${ticketId}/change`, request);
   },
 };

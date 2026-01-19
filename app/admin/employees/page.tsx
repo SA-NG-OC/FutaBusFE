@@ -14,6 +14,7 @@ export default function AdminEmployeesPage() {
     error,
     currentPage,
     totalPages,
+    totalElements,
     keyword,
     isCreateModalOpen,
     isDeleteModalOpen,
@@ -46,6 +47,13 @@ export default function AdminEmployeesPage() {
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
+
+      {/* Total employees count */}
+      {!loading && employees.length > 0 && (
+        <div className="mb-4 px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-sm">
+          Tổng số: <strong>{totalElements}</strong> nhân viên
+        </div>
+      )}
 
       {loading && <p className="text-center py-8">Loading employees...</p>}
       {error && <p className="text-red-500 text-center py-4">{error}</p>}

@@ -9,6 +9,13 @@ export type Vehicle = {
   status: 'Operational' | 'Inactive' | 'Maintenance' | string;
 };
 
+export type VehicleStats = {
+  total: number;
+  operational: number;
+  maintenance: number;
+  inactive: number;
+};
+
 export type VehicleType = {
   typeId: number;
   typeName: string;

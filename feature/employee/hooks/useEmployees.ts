@@ -9,6 +9,7 @@ export const useEmployees = () => {
   // Pagination
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
 
   // Search
   const [keyword, setKeyword] = useState('');
@@ -29,6 +30,7 @@ export const useEmployees = () => {
 
       setEmployees(pageData.content);
       setTotalPages(pageData.totalPages);
+      setTotalElements(pageData.totalElements);
       setCurrentPage(pageData.number);
     } catch (err) {
       console.error('Fetch employees failed', err);
@@ -122,6 +124,7 @@ export const useEmployees = () => {
     error,
     currentPage,
     totalPages,
+    totalElements,
     keyword,
     isCreateModalOpen,
     isEditModalOpen,

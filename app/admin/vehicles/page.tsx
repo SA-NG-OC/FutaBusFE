@@ -1,13 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useVehicles } from "@/feature/vehicle/hooks/useVehicle";
-import { Vehicle, VehicleRequest, VehicleType } from "@/feature/vehicle/types";
+import { Vehicle, VehicleRequest, VehicleType, VehicleStats } from "@/feature/vehicle/types";
+import { vehicleApi } from "@/feature/vehicle/api/vehicleApi";
 import VehicleTable from "@/feature/vehicle/components/VehicleTable/VehicleTable";
 import VehicleModal from "@/feature/vehicle/components/VehicleModal/VehicleModal";
 import ConfirmDeleteModal from "@/feature/vehicle/components/ConfirmDeleteModal/ConfirmDeleteModal";
 // [NEW] Import Modal Gán tuyến
 import VehicleRouteAssignmentModal from "@/feature/vehicle/components/VehicleRouteAssignmentModal/VehicleRouteAssignmentModal";
-import { vehicleRouteAssignmentApi } from "@/feature/vehicle/api/vehicleRouteAssignmentApi";
 import PageHeader from "@/src/components/PageHeader/PageHeader";
 import styles from "./VehiclePage.module.css";
 // [NEW] Import Filter
@@ -156,6 +156,12 @@ export default function VehiclePage() {
     vehicles,
     loading,
     error,
+    currentPage,
+    totalPages,
+    totalElements,
+    handlePageChange,
+    handleRouteFilter,
+    routeFilter,
     isModalOpen,
     isDeleteModalOpen,
     selectedVehicle,
@@ -167,43 +173,39 @@ export default function VehiclePage() {
     handleDeleteConfirm,
   } = useVehicles();
 
+  // --- STATS STATE ---
+  const [stats, setStats] = useState<VehicleStats>({
+    total: 0,
+    operational: 0,
+    maintenance: 0,
+    inactive: 0,
+  });
+  const [loadingStats, setLoadingStats] = useState(false);
+
   // --- LOGIC ASSIGNMENT (Của bạn bạn) ---
   const [showAssignmentModal, setShowAssignmentModal] = useState(false);
   const [selectedVehicleForAssignment, setSelectedVehicleForAssignment] =
     useState<{ vehicleId: number; licensePlate: string } | null>(null);
-  const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
-  const [filteredVehicles, setFilteredVehicles] = useState<Vehicle[]>([]);
 
-  // Filter logic
+
+  // Fetch stats from API
   useEffect(() => {
-    let cancelled = false;
-    const filterVehiclesByRoute = async () => {
-      if (!selectedRouteId) return;
+    const fetchStats = async () => {
+      setLoadingStats(true);
       try {
-        const assignments =
-          await vehicleRouteAssignmentApi.getByRoute(selectedRouteId);
-        const vehicleIds = assignments.map((a) => a.vehicleId);
-        const filtered = vehicles.filter((v) =>
-          vehicleIds.includes(v.vehicleid),
-        );
-        if (!cancelled) setFilteredVehicles(filtered);
-      } catch (error) {
-        console.error("Error filtering vehicles:", error);
-        if (!cancelled) setFilteredVehicles([]);
+        const statsData = await vehicleApi.getStats();
+        setStats(statsData);
+      } catch (err) {
+        console.error('Error fetching vehicle stats:', err);
+      } finally {
+        setLoadingStats(false);
       }
     };
+    fetchStats();
+  }, [vehicles]); // Refresh when vehicles change
 
-    if (selectedRouteId) {
-      filterVehiclesByRoute();
-    }
-    return () => {
-      cancelled = true;
-    };
-  }, [selectedRouteId, vehicles]);
-
-  // Determine display list
-  const displayVehicles = selectedRouteId ? filteredVehicles : vehicles;
-  const tableVehicles = displayVehicles.map(convertToTableData);
+  // Convert vehicles to table data
+  const tableVehicles = vehicles.map(convertToTableData);
 
   // Handlers
   const handleEditClick = (tableVehicle: VehicleTableData) => {
@@ -281,19 +283,19 @@ export default function VehiclePage() {
       {/* --- FILTER SECTION (Mới - CSS Module) --- */}
       <div className={styles.filterSection}>
         <RouteFilter
-          onRouteSelect={setSelectedRouteId}
-          selectedRouteId={selectedRouteId}
+          onRouteSelect={(routeId) => handleRouteFilter(routeId || undefined)}
+          selectedRouteId={routeFilter || null}
           placeholder="Lọc theo tuyến đường"
         />
       </div>
 
       {/* Statistics (Hiển thị khi lọc) */}
-      {selectedRouteId && (
+      {routeFilter && (
         <div className={styles.statsBox}>
           <p className={styles.statsText}>
             Hiển thị{" "}
             <span className={styles.statsHighlight}>
-              {displayVehicles.length}
+              {vehicles.length}
             </span>{" "}
             xe được gắn vào tuyến đã chọn
           </p>
@@ -329,7 +331,7 @@ export default function VehiclePage() {
                     Tổng số xe
                   </p>
                   <p className={`${styles.statValue} ${styles.valueBlue}`}>
-                    {vehicles.length}
+                    {totalElements}
                   </p>
                 </div>
               </div>
@@ -360,11 +362,7 @@ export default function VehiclePage() {
                     Đang hoạt động
                   </p>
                   <p className={`${styles.statValue} ${styles.valueGreen}`}>
-                    {
-                      vehicles.filter(
-                        (v) => v.status.toLowerCase() === "operational",
-                      ).length
-                    }
+                    {stats.operational}
                   </p>
                 </div>
               </div>
@@ -395,11 +393,7 @@ export default function VehiclePage() {
                     Bảo trì
                   </p>
                   <p className={`${styles.statValue} ${styles.valueYellow}`}>
-                    {
-                      vehicles.filter(
-                        (v) => v.status.toLowerCase() === "maintenance",
-                      ).length
-                    }
+                    {stats.maintenance}
                   </p>
                 </div>
               </div>
@@ -430,11 +424,7 @@ export default function VehiclePage() {
                     Không hoạt động
                   </p>
                   <p className={`${styles.statValue} ${styles.valueRed}`}>
-                    {
-                      vehicles.filter(
-                        (v) => v.status.toLowerCase() === "inactive",
-                      ).length
-                    }
+                    {stats.inactive}
                   </p>
                 </div>
               </div>
@@ -442,7 +432,6 @@ export default function VehiclePage() {
           </div>
         </div>
 
-        {/* Vehicle Table */}
         <div className="py-6">
           <VehicleTable
             vehicles={tableVehicles}
@@ -451,10 +440,10 @@ export default function VehiclePage() {
             onDeleteVehicle={handleDeleteClick}
             // [NEW] Truyền prop để bật nút Gán tuyến
             onAssignRoute={handleAssignRouteClick}
-            currentPage={1}
-            totalPages={1}
-            totalElements={displayVehicles.length}
-            onPageChange={(page) => console.log("Page change:", page)}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalElements={totalElements}
+            onPageChange={handlePageChange}
           />
         </div>
       </div>
