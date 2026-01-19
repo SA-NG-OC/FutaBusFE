@@ -26,6 +26,7 @@ export interface TripInfo {
   departureTime: string;
   arrivalTime: string;
   vehicleInfo?: string;
+  vehicleTypeName?: string; // ✅ Vehicle type from backend
   driverName: string;
   pickupLocationName?: string;
   dropoffLocationName?: string;

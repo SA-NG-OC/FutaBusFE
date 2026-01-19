@@ -6,7 +6,7 @@ import TicketDetail from "@/feature/ticket/components/TicketDetail";
 import BookingList from "@/feature/ticket/components/BookingList";
 import PrintableTicket from "@/feature/ticket/components/PrintableTicket";
 import { ticketApi } from "@/feature/ticket/api/ticketApi";
-import { BookingListItem, TicketInfo } from "@/feature/ticket/types";
+import { BookingListItem, TicketInfo, BookingData } from "@/feature/ticket/types";
 import styles from "./page.module.css";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -88,7 +88,15 @@ export default function TicketLookupPage() {
   };
 
   const handleSearchByCode = async (ticketCode: string) => {
-    const booking = await ticketApi.getTicketDetailByCode(ticketCode) as BookingListItem;
+    console.log("🔍 [Ticket Lookup] Searching by ticket code:", ticketCode);
+    
+    // api.get() already unwraps ApiResponse and returns data directly
+    const booking = await ticketApi.getBookingByTicketCode(ticketCode);
+    console.log("✅ [Ticket Lookup] Booking data:", booking);
+
+    if (!booking || !booking.tickets) {
+      throw new Error("Không tìm thấy thông tin vé");
+    }
 
     // Find the ticket with matching ticketCode
     const ticket = booking.tickets.find((t) => t.ticketCode === ticketCode);
@@ -97,116 +105,128 @@ export default function TicketLookupPage() {
       throw new Error("Không tìm thấy vé trong booking");
     }
 
-      const mappedData: TicketDetailData = {
-        bookingCode: booking.bookingCode,
-        status: booking.bookingStatus,
-        qrCode: ticket.ticketCode,
-        fromLocation:
-          booking.tripInfo.routeName.split("→")[0]?.trim() ||
-          booking.tripInfo.pickupLocation ||
-          "",
-        toLocation:
-          booking.tripInfo.routeName.split("→")[1]?.trim() ||
-          booking.tripInfo.dropoffLocation ||
-          "",
-        departureDate: new Date(
-          booking.tripInfo.departureTime,
-        ).toLocaleDateString("vi-VN"),
-        departureTime: new Date(
-          booking.tripInfo.departureTime,
-        ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
-        duration: `${Math.round(
-          (new Date(booking.tripInfo.arrivalTime).getTime() -
-            new Date(booking.tripInfo.departureTime).getTime()) /
-            (1000 * 60 * 60),
-        )}h`,
-        vehicleType: "Limousine",
-        licensePlate: booking.tripInfo.vehiclePlate || "N/A",
-        driverName: booking.tripInfo.driverName,
-        customerName: ticket.passenger?.fullName || booking.customerName,
-        customerPhone: ticket.passenger?.phoneNumber || booking.customerPhone,
-        customerEmail: ticket.passenger?.email || booking.customerEmail,
-        customerIdCard: "",
-        seatNumber: ticket.seatNumber,
-        seatFloor: `Tầng ${ticket.floorNumber}`,
-        pickupLocation: booking.tripInfo.pickupLocation || "",
-        pickupTime: new Date(
-          booking.tripInfo.pickupTime || booking.tripInfo.departureTime,
-        ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
-        dropoffLocation: booking.tripInfo.dropoffLocation || "",
-        dropoffTime: new Date(
-          booking.tripInfo.dropoffTime || booking.tripInfo.arrivalTime,
-        ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
-      };
+    const tripInfo = booking.tripInfo || {};
+    const routeParts = tripInfo.routeName?.split(/\s*[-→]\s*/) || [];
 
-      setTicketData(mappedData);
-      setViewState("ticketDetail");
+    const mappedData: TicketDetailData = {
+      bookingCode: booking.bookingCode,
+      status: booking.bookingStatus,
+      qrCode: ticket.ticketCode, // ✅ Use ticket code for QR
+      fromLocation:
+        tripInfo.pickupLocation ||
+        routeParts[0] || "",
+      toLocation:
+        tripInfo.dropoffLocation ||
+        routeParts[1] || "",
+      departureDate: new Date(
+        tripInfo.departureTime,
+      ).toLocaleDateString("vi-VN"),
+      departureTime: new Date(
+        tripInfo.departureTime,
+      ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+      duration: `${Math.max(1, Math.round(
+        (new Date(tripInfo.arrivalTime).getTime() -
+          new Date(tripInfo.departureTime).getTime()) /
+          (1000 * 60 * 60),
+      ))}h`,
+      vehicleType: tripInfo.vehicleTypeName || "Limousine",
+      licensePlate: tripInfo.vehiclePlate || "N/A",
+      driverName: tripInfo.driverName || "N/A",
+      customerName: ticket.passenger?.fullName || booking.customerName,
+      customerPhone: ticket.passenger?.phoneNumber || booking.customerPhone,
+      customerEmail: ticket.passenger?.email || booking.customerEmail,
+      customerIdCard: "",
+      seatNumber: ticket.seatNumber,
+      seatFloor: ticket.floorNumber ? `Tầng ${ticket.floorNumber}` : "N/A",
+      pickupLocation: tripInfo.pickupLocation || "",
+      pickupTime: new Date(
+        tripInfo.pickupTime || tripInfo.departureTime,
+      ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+      dropoffLocation: tripInfo.dropoffLocation || "",
+      dropoffTime: new Date(
+        tripInfo.dropoffTime || tripInfo.arrivalTime,
+      ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+    };
+
+    console.log("🎫 [Ticket Lookup] Mapped ticket data:", mappedData);
+    setTicketData(mappedData);
+    setViewState("ticketDetail");
   };
 
-  // New function to search by booking code (from my-ticket page)
+  // Search by booking code (from URL parameter)
   const handleSearchByBookingCode = async (bookingCode: string) => {
     setLoading(true);
     setError(null);
 
     try {
-      const booking = await ticketApi.getBookingByCode(bookingCode) as BookingListItem;
+      console.log("🔍 [Ticket Lookup] Searching by booking code:", bookingCode);
+      
+      // api.get() already unwraps ApiResponse and returns data directly
+      const booking = await ticketApi.getBookingByCode(bookingCode);
+      console.log("✅ [Ticket Lookup] Booking data:", booking);
+
+      if (!booking || !booking.tickets) {
+        throw new Error("Không tìm thấy thông tin booking");
+      }
 
       // Get the first ticket from the booking
       const firstTicket = booking.tickets[0];
 
-        if (!firstTicket) {
-          throw new Error("Không tìm thấy vé trong booking");
-        }
+      if (!firstTicket) {
+        throw new Error("Không tìm thấy vé trong booking");
+      }
 
-        const mappedData: TicketDetailData = {
-          bookingCode: booking.bookingCode,
-          status: booking.bookingStatus,
-          qrCode: firstTicket.ticketCode,
-          fromLocation:
-            booking.tripInfo.routeName.split("→")[0]?.trim() ||
-            booking.tripInfo.pickupLocation ||
-            "",
-          toLocation:
-            booking.tripInfo.routeName.split("→")[1]?.trim() ||
-            booking.tripInfo.dropoffLocation ||
-            "",
-          departureDate: new Date(
-            booking.tripInfo.departureTime,
-          ).toLocaleDateString("vi-VN"),
-          departureTime: new Date(
-            booking.tripInfo.departureTime,
-          ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
-          duration: `${Math.round(
-            (new Date(booking.tripInfo.arrivalTime).getTime() -
-              new Date(booking.tripInfo.departureTime).getTime()) /
-              (1000 * 60 * 60),
-          )}h`,
-          vehicleType: "Limousine",
-          licensePlate: booking.tripInfo.vehiclePlate || "N/A",
-          driverName: booking.tripInfo.driverName,
-          customerName: firstTicket.passenger?.fullName || booking.customerName,
-          customerPhone:
-            firstTicket.passenger?.phoneNumber || booking.customerPhone,
-          customerEmail: firstTicket.passenger?.email || booking.customerEmail,
-          customerIdCard: "",
-          seatNumber: booking.tickets
-            .map((t: TicketInfo) => t.seatNumber)
-            .join(", "),
-          seatFloor: `Tầng ${firstTicket.floorNumber}`,
-          pickupLocation: booking.tripInfo.pickupLocation || "",
-          pickupTime: new Date(
-            booking.tripInfo.pickupTime || booking.tripInfo.departureTime,
-          ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
-          dropoffLocation: booking.tripInfo.dropoffLocation || "",
-          dropoffTime: new Date(
-            booking.tripInfo.dropoffTime || booking.tripInfo.arrivalTime,
-          ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
-        };
+      const tripInfo = booking.tripInfo || {};
+      const routeParts = tripInfo.routeName?.split(/\s*[-→]\s*/) || [];
 
-        setTicketData(mappedData);
-        setViewState("ticketDetail");
+      const mappedData: TicketDetailData = {
+        bookingCode: booking.bookingCode,
+        status: booking.bookingStatus,
+        qrCode: firstTicket.ticketCode, // ✅ Use ticket code for QR
+        fromLocation:
+          tripInfo.pickupLocation ||
+          routeParts[0] || "",
+        toLocation:
+          tripInfo.dropoffLocation ||
+          routeParts[1] || "",
+        departureDate: new Date(
+          tripInfo.departureTime,
+        ).toLocaleDateString("vi-VN"),
+        departureTime: new Date(
+          tripInfo.departureTime,
+        ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+        duration: `${Math.max(1, Math.round(
+          (new Date(tripInfo.arrivalTime).getTime() -
+            new Date(tripInfo.departureTime).getTime()) /
+            (1000 * 60 * 60),
+        ))}h`,
+        vehicleType: tripInfo.vehicleTypeName || "Limousine",
+        licensePlate: tripInfo.vehiclePlate || "N/A",
+        driverName: tripInfo.driverName || "N/A",
+        customerName: firstTicket.passenger?.fullName || booking.customerName,
+        customerPhone:
+          firstTicket.passenger?.phoneNumber || booking.customerPhone,
+        customerEmail: firstTicket.passenger?.email || booking.customerEmail,
+        customerIdCard: "",
+        seatNumber: booking.tickets
+          .map((t: TicketInfo) => t.seatNumber)
+          .join(", "),
+        seatFloor: firstTicket.floorNumber ? `Tầng ${firstTicket.floorNumber}` : "N/A",
+        pickupLocation: tripInfo.pickupLocation || "",
+        pickupTime: new Date(
+          tripInfo.pickupTime || tripInfo.departureTime,
+        ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+        dropoffLocation: tripInfo.dropoffLocation || "",
+        dropoffTime: new Date(
+          tripInfo.dropoffTime || tripInfo.arrivalTime,
+        ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+      };
+
+      console.log("🎫 [Ticket Lookup] Mapped ticket data:", mappedData);
+      setTicketData(mappedData);
+      setViewState("ticketDetail");
     } catch (err) {
-      console.error("Error fetching booking:", err);
+      console.error("❌ [Ticket Lookup] Error fetching booking:", err);
       setError(
         err instanceof Error
           ? err.message
@@ -219,9 +239,13 @@ export default function TicketLookupPage() {
   };
 
   const handleSearchByPhone = async (phone: string) => {
-    const bookings = await ticketApi.getBookingsByPhone(phone) as BookingListItem[];
+    console.log("🔍 [Ticket Lookup] Searching by phone:", phone);
+    
+    // api.get() already unwraps ApiResponse and returns data directly
+    const bookings = await ticketApi.getBookingsByPhone(phone);
+    console.log("✅ [Ticket Lookup] Phone search result:", bookings);
 
-    if (bookings && bookings.length > 0) {
+    if (bookings && Array.isArray(bookings) && bookings.length > 0) {
       setBookingList(bookings);
       setViewState("bookingList");
     } else {
@@ -231,9 +255,13 @@ export default function TicketLookupPage() {
   };
 
   const handleSearchByEmail = async (email: string) => {
-    const bookings = await ticketApi.getBookingsByEmail(email) as BookingListItem[];
+    console.log("🔍 [Ticket Lookup] Searching by email:", email);
+    
+    // api.get() already unwraps ApiResponse and returns data directly
+    const bookings = await ticketApi.getBookingsByEmail(email);
+    console.log("✅ [Ticket Lookup] Email search result:", bookings);
 
-    if (bookings && bookings.length > 0) {
+    if (bookings && Array.isArray(bookings) && bookings.length > 0) {
       setBookingList(bookings);
       setViewState("bookingList");
     } else {

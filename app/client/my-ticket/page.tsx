@@ -64,11 +64,11 @@ export default function MyTicketsPage() {
     setLoadingTicket(true);
     try {
       console.log("📡 [handleViewDetails] Calling API with ticketCode...");
-      const response = await ticketApi.getBookingByTicketCode(ticketCode);
-      console.log("✅ [handleViewDetails] API Response:", response);
+      const booking = await ticketApi.getBookingByTicketCode(ticketCode);
+      console.log("✅ [handleViewDetails] API Response (unwrapped):", booking);
 
-      if (response && response.success && response.data) {
-        const booking = response.data;
+      // api.get() already unwraps ApiResponse and returns data directly
+      if (booking && booking.bookingCode) {
         console.log("📦 [handleViewDetails] Booking data:", booking);
         console.log("🚌 [handleViewDetails] TripInfo:", booking.tripInfo);
         
@@ -137,7 +137,7 @@ export default function MyTicketsPage() {
         setIsModalOpen(true);
         console.log("✅ [handleViewDetails] Modal state set - isModalOpen: true");
       } else {
-        console.error("❌ [handleViewDetails] API response failed or no data:", response);
+        console.error("❌ [handleViewDetails] No booking data received:", booking);
         alert("Không thể tải thông tin vé. Vui lòng thử lại.");
       }
     } catch (err) {

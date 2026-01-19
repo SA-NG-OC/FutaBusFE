@@ -70,9 +70,27 @@
 /* QR Code */
 .qrSection {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
   padding: 2rem 1.5rem;
   border-bottom: 1px solid var(--border-gray);
+}
+
+.qrError {
+  padding: 1rem;
+  color: var(--badge-delayed-text);
+  background: var(--badge-delayed-bg);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.qrCodeText {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.5px;
 }
 
 /* Content Grid - 2 columns */
