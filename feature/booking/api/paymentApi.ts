@@ -37,9 +37,9 @@ export interface CreateBookingRequest {
   customerName: string;
   customerPhone: string;
   customerEmail?: string;
-  pickupAddress?: string | null;
-  dropoffAddress?: string | null;
-  specialNote?: string | null;
+  // pickupAddress?: string | null;
+  // dropoffAddress?: string | null;
+  // specialNote?: string | null;
   isGuestBooking?: boolean;
   guestSessionId?: string;
   // notes?: string;
