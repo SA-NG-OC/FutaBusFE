@@ -13,9 +13,9 @@
 
 /* Sidebar */
 .filterbar {
-    background: #fff;
+
     border-radius: 12px;
-    padding: 16px;
+
     position: sticky;
     top: 16px;
     display: none; /* Hidden by default on mobile */
