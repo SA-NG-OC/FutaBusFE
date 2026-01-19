@@ -1,17 +1,22 @@
+/* ProfilePage.module.css */
+
 .container {
   padding: 24px;
   max-width: 1000px;
   margin: 0 auto;
+  /* Đảm bảo nền khớp với theme */
+  background-color: transparent; 
+  color: var(--text-primary);
 }
 
 .pageTitle {
   font-size: 24px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: var(--text-primary);
   margin-bottom: 24px;
 }
 
-/* Loading */
+/* --- Loading --- */
 .loadingContainer {
   display: flex;
   flex-direction: column;
@@ -19,10 +24,13 @@
   justify-content: center;
   height: 400px;
   gap: 16px;
+  color: var(--text-secondary);
 }
 
 .spinner {
   animation: spin 1s linear infinite;
+  font-size: 24px;
+  color: var(--primary);
 }
 
 @keyframes spin {
@@ -30,7 +38,7 @@
   to { transform: rotate(360deg); }
 }
 
-/* Alerts */
+/* --- Alerts --- */
 .errorAlert,
 .successAlert {
   padding: 12px 16px;
@@ -39,26 +47,34 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  font-weight: 500;
 }
 
 .errorAlert {
-  background: #fee2e2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
+  background-color: var(--warning-bg);
+  color: var(--warning-text);
+  border: 1px solid var(--warning-border);
 }
 
 .successAlert {
-  background: #d1fae5;
-  color: #059669;
-  border: 1px solid #a7f3d0;
+  background-color: var(--stat-green-bg);
+  color: var(--stat-green-text);
+  /* Dùng text color làm border mờ cho đồng bộ */
+  border: 1px solid currentColor; 
 }
 
 .alertIcon {
   cursor: pointer;
   margin-left: auto;
+  opacity: 0.8;
+  transition: opacity 0.2s;
 }
 
-/* Layout */
+.alertIcon:hover {
+  opacity: 1;
+}
+
+/* --- Layout --- */
 .profileLayout {
   display: grid;
   grid-template-columns: 300px 1fr;
@@ -71,12 +87,13 @@
   }
 }
 
-/* Avatar Section */
+/* --- Avatar Section --- */
 .avatarSection {
-  background: white;
+  background: var(--background-paper);
   border-radius: 12px;
   padding: 32px 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-gray);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -93,7 +110,9 @@
   height: 150px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid #f3f4f6;
+  /* Viền ngoài cùng màu với nền trang để tạo hiệu ứng tách biệt */
+  border: 4px solid var(--bg-secondary);
+  background-color: var(--bg-secondary);
 }
 
 .avatarUploadBtn {
@@ -102,51 +121,53 @@
   right: 8px;
   width: 40px;
   height: 40px;
-  background: #D83E3E;
-  color: white;
+  background: var(--primary);
+  color: #ffffff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: background 0.2s;
+  border: 2px solid var(--background-paper); /* Viền trắng/đen quanh nút */
 }
 
 .avatarUploadBtn:hover {
-  background: #8B1A1A;
+  background: var(--primary-hover);
 }
 
 .userName {
   font-size: 20px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: var(--text-primary);
   text-align: center;
   margin: 0;
 }
 
+/* --- Role Badges --- */
 .roleBadge {
   padding: 6px 16px;
   border-radius: 20px;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .roleBadge.admin {
-  background: #fef3c7;
-  color: #d97706;
+  background: var(--stat-orange-bg);
+  color: var(--stat-orange-text);
 }
 
 .roleBadge.staff {
-  background: #dbeafe;
-  color: #2563eb;
+  background: var(--stat-blue-bg);
+  color: var(--stat-blue-text);
 }
 
 .roleBadge.customer {
-  background: #d1fae5;
-  color: #059669;
+  background: var(--stat-green-bg);
+  color: var(--stat-green-text);
 }
 
-/* Info Section */
+/* --- Info Section --- */
 .infoSection {
   display: flex;
   flex-direction: column;
@@ -154,10 +175,11 @@
 }
 
 .infoCard {
-  background: white;
+  background: var(--background-paper);
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-gray);
 }
 
 .cardHeader {
@@ -166,13 +188,13 @@
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-gray);
 }
 
 .cardHeader h3 {
   font-size: 18px;
   font-weight: 600;
-  color: #1a1a2e;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -182,20 +204,21 @@
   gap: 8px;
   padding: 8px 16px;
   background: transparent;
-  border: 1px solid #D83E3E;
-  color: #D83E3E;
+  border: 1px solid var(--primary);
+  color: var(--primary);
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
   transition: all 0.2s;
+  font-weight: 500;
 }
 
 .editBtn:hover {
-  background: #D83E3E;
-  color: white;
+  background: var(--primary);
+  color: #ffffff;
 }
 
-/* Info Grid */
+/* --- Info Grid --- */
 .infoGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -216,7 +239,7 @@
 
 .infoLabel {
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -225,16 +248,17 @@
 .infoValue {
   font-size: 15px;
   font-weight: 500;
-  color: #1a1a2e;
+  color: var(--text-primary);
 }
 
-/* Edit Form */
+/* --- Edit Form & Inputs --- */
 .editForm,
 .passwordForm {
-  background: white;
+  background: var(--background-paper);
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-gray);
 }
 
 .formGrid {
@@ -258,29 +282,37 @@
 .formGroup label {
   font-size: 14px;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-primary);
 }
 
 .formGroup input {
   padding: 10px 14px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--input-text);
   border-radius: 6px;
   font-size: 14px;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.formGroup input::placeholder {
+  color: var(--input-placeholder);
 }
 
 .formGroup input:focus {
   outline: none;
-  border-color: #D83E3E;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--input-focus);
 }
 
+/* --- Actions --- */
 .formActions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border-gray);
 }
 
 .cancelBtn {
@@ -288,9 +320,9 @@
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background: #f3f4f6;
-  border: 1px solid #d1d5db;
-  color: #6b7280;
+  background: var(--btn-cancel-bg);
+  border: 1px solid var(--border-gray);
+  color: var(--text-secondary);
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
@@ -298,7 +330,8 @@
 }
 
 .cancelBtn:hover {
-  background: #e5e7eb;
+  background: var(--btn-cancel-hover);
+  color: var(--text-primary);
 }
 
 .cancelBtn:disabled {
@@ -311,9 +344,9 @@
   align-items: center;
   gap: 8px;
   padding: 10px 20px;
-  background: #D83E3E;
+  background: var(--primary);
   border: none;
-  color: white;
+  color: #ffffff;
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
@@ -322,17 +355,18 @@
 }
 
 .saveBtn:hover {
-  background: #8B1A1A;
+  background: var(--primary-hover);
 }
 
 .saveBtn:disabled {
   cursor: not-allowed;
   opacity: 0.6;
+  background: var(--primary-light);
 }
 
-/* Security Section */
+/* --- Security Section --- */
 .securityNote {
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 14px;
   line-height: 1.6;
   margin: 0;

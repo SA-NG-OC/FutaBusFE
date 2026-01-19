@@ -6,48 +6,65 @@ import { usePathname } from 'next/navigation';
 import styles from './AdminSidebar.module.css';
 import {
     FaBus, FaRoute, FaTicketAlt, FaUserTie, FaUsers,
-    FaChartBar, FaSignOutAlt, FaBars, FaTimes, FaMapMarkerAlt, FaHistory
+    FaChartBar, FaSignOutAlt, FaBars, FaTimes, FaMapMarkerAlt, FaHistory, FaCogs, FaUserShield
 } from 'react-icons/fa';
 import { MdDashboard, MdSchedule } from 'react-icons/md';
 
-// 1. Định nghĩa danh sách menu cho ADMIN (Full quyền)
+// 1. ADMIN (IT System Admin): Chỉ quản lý hệ thống, tài khoản và log
+// Giáo viên yêu cầu: Bảo trì, hỗ trợ, không nghiệp vụ.
 const ADMIN_MENU = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: <MdDashboard /> },
-    { name: 'Vehicles', path: '/admin/vehicles', icon: <FaBus /> },
-    { name: 'Routes', path: '/admin/routes', icon: <FaRoute /> },
-    { name: 'Locations', path: '/admin/locations', icon: <FaMapMarkerAlt /> },
-    { name: 'Trip Scheduling', path: '/admin/trip-scheduling', icon: <MdSchedule /> },
-    { name: 'Tickets', path: '/admin/tickets', icon: <FaTicketAlt /> },
-    { name: 'Drivers', path: '/admin/drivers', icon: <FaUserTie /> },
-    { name: 'Employees', path: '/admin/employees', icon: <FaUsers /> },
-    { name: 'Customers', path: '/admin/customers', icon: <FaUsers /> },
-    { name: 'Reports', path: '/admin/reports', icon: <FaChartBar /> },
-    { name: 'Audit Logs', path: '/admin/audit-logs', icon: <FaHistory /> },
-    //{ name: 'Notifications', path: '/admin/notifications', icon: <FaBell /> },
+    { name: 'System Users', path: '/admin/employees', icon: <FaUserShield /> }, // Quản lý tài khoản Manager/Employee
+    { name: 'Audit Logs', path: '/admin/audit-logs', icon: <FaHistory /> }, // Tra cứu lịch sử lỗi/tác động
+    // Có thể thêm System Settings nếu có
+    // { name: 'Settings', path: '/admin/settings', icon: <FaCogs /> },
 ];
 
-// 2. Định nghĩa danh sách menu cho EMPLOYEE (Ít quyền hơn - Theo HTML mới của bạn)
-// Lưu ý: Mình đã đổi path thành /employee/... nếu bạn dùng chung route thì sửa lại nhé
+// 2. MANAGER (Quản lý vận hành): Thừa hưởng các quyền quản lý nghiệp vụ từ Admin cũ
+const MANAGER_MENU = [
+    { name: 'Dashboard', path: '/manager/dashboard', icon: <MdDashboard /> },
+    { name: 'Vehicles', path: '/manager/vehicles', icon: <FaBus /> },
+    { name: 'Routes', path: '/manager/routes', icon: <FaRoute /> },
+    { name: 'Locations', path: '/manager/locations', icon: <FaMapMarkerAlt /> },
+    { name: 'Trip Scheduling', path: '/manager/trip-scheduling', icon: <MdSchedule /> },
+    { name: 'Tickets', path: '/manager/tickets', icon: <FaTicketAlt /> }, // Quản lý vé (Hủy/Duyệt/Check)
+    { name: 'Drivers', path: '/manager/drivers', icon: <FaUserTie /> },
+    { name: 'Customers', path: '/manager/customers', icon: <FaUsers /> }, // CRM
+    { name: 'Reports', path: '/manager/reports', icon: <FaChartBar /> }, // Xem doanh thu
+];
+
+// 3. EMPLOYEE (Nhân viên): Tác nghiệp cụ thể (Bán vé, xem lịch)
 const EMPLOYEE_MENU = [
     { name: 'Dashboard', path: '/employee/dashboard', icon: <MdDashboard /> },
-    { name: 'Routes', path: '/employee/routes', icon: <FaRoute /> },
-    { name: 'Trip Scheduling', path: '/employee/trip-scheduling', icon: <MdSchedule /> },
-    { name: 'Tickets', path: '/employee/tickets', icon: <FaTicketAlt /> },
-    { name: 'Drivers', path: '/employee/drivers', icon: <FaUserTie /> },
-    //{ name: 'Notifications', path: '/employee/notifications', icon: <FaBell /> },
+    { name: 'Trip Scheduling', path: '/employee/trip-scheduling', icon: <MdSchedule /> }, // Xem lịch để tư vấn
+    { name: 'Tickets Sales', path: '/employee/tickets', icon: <FaTicketAlt /> }, // Bán vé là chính
+    { name: 'Routes', path: '/employee/routes', icon: <FaRoute /> }, // Tra cứu tuyến
+    { name: 'Drivers', path: '/employee/drivers', icon: <FaUserTie /> }, // Tra cứu thông tin tài xế (nếu cần liên lạc)
 ];
 
-// Định nghĩa kiểu dữ liệu cho Props (mặc định là admin nếu không truyền gì)
+// Định nghĩa kiểu dữ liệu cho Props
 interface SidebarProps {
-    role?: 'admin' | 'employee';
+    role?: 'admin' | 'manager' | 'employee';
 }
 
 const AdminSidebar = ({ role = 'admin' }: SidebarProps) => {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
 
-    // Tự động chọn menu dựa trên role được truyền vào
-    const menuItems = role === 'employee' ? EMPLOYEE_MENU : ADMIN_MENU;
+    // Logic chọn menu
+    let menuItems;
+    switch (role) {
+        case 'manager':
+            menuItems = MANAGER_MENU;
+            break;
+        case 'employee':
+            menuItems = EMPLOYEE_MENU;
+            break;
+        case 'admin':
+        default:
+            menuItems = ADMIN_MENU;
+            break;
+    }
 
     // Close sidebar when route changes
     useEffect(() => {
@@ -58,6 +75,13 @@ const AdminSidebar = ({ role = 'admin' }: SidebarProps) => {
     }, [pathname]);
 
     const toggleSidebar = () => setIsOpen(!isOpen);
+
+    // Hàm hiển thị tên Role cho đẹp trên giao diện
+    const getRoleDisplayName = () => {
+        if (role === 'admin') return 'System Admin';
+        if (role === 'manager') return 'Operations Manager';
+        return 'Staff';
+    }
 
     return (
         <>
@@ -89,12 +113,12 @@ const AdminSidebar = ({ role = 'admin' }: SidebarProps) => {
                             <p className={styles['brand-name']}>
                                 FUBA<span className={styles['brand-highlight']}>Bus</span>
                             </p>
-                            <p className={styles['brand-subtitle']}>Management Panel</p>
+                            <p className={styles['brand-subtitle']}>{getRoleDisplayName()}</p>
                         </div>
                     </div>
                 </div>
 
-                {/* Navigation Section (Render Dynamic dựa trên role) */}
+                {/* Navigation Section */}
                 <nav className={styles['sidebar-navigation']}>
                     {menuItems.map((item) => {
                         // Logic kiểm tra active link

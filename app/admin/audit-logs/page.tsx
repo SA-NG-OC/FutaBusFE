@@ -86,26 +86,26 @@ export default function AuditLogsPage() {
       {/* Header */}
       <div className={styles.header}>
         <div>
-          <h1>Audit Logs</h1>
-          <p>Track all system activities and user actions</p>
+          <h1>Nhật ký hệ thống</h1>
+          <p>Theo dõi toàn bộ hoạt động và thao tác người dùng</p>
         </div>
         <button className={styles.filterButton} onClick={refreshLogs}>
-          🔄 Refresh
+          🔄 Làm mới
         </button>
       </div>
 
       {/* Stats Bar */}
       <div className={styles.statsBar}>
         <div className={styles.statCard}>
-          <h3>Total Logs</h3>
+          <h3>Tổng số log</h3>
           <div className={styles.value}>{totalElements}</div>
         </div>
         <div className={styles.statCard}>
-          <h3>Current Page</h3>
+          <h3>Trang hiện tại</h3>
           <div className={styles.value}>{currentPage + 1}</div>
         </div>
         <div className={styles.statCard}>
-          <h3>Total Pages</h3>
+          <h3>Tổng số trang</h3>
           <div className={styles.value}>{totalPages}</div>
         </div>
       </div>
@@ -114,47 +114,51 @@ export default function AuditLogsPage() {
       <div className={styles.filterSection}>
         <div className={styles.filterGrid}>
           <div className={styles.filterGroup}>
-            <label>User ID</label>
+            <label>ID người dùng</label>
             <input
               type="number"
-              placeholder="Filter by user ID"
+              placeholder="Lọc theo ID người dùng"
               value={filterForm.userId}
               onChange={(e) => handleFilterChange("userId", e.target.value)}
             />
           </div>
+
           <div className={styles.filterGroup}>
-            <label>Action</label>
+            <label>Hành động</label>
             <select
               value={filterForm.action}
               onChange={(e) => handleFilterChange("action", e.target.value)}
             >
-              <option value="">All Actions</option>
-              <option value="CREATE">Create</option>
-              <option value="UPDATE">Update</option>
-              <option value="DELETE">Delete</option>
-              <option value="LOGIN">Login</option>
-              <option value="LOGOUT">Logout</option>
+              <option value="">Tất cả</option>
+              <option value="CREATE">Tạo mới</option>
+              <option value="UPDATE">Cập nhật</option>
+              <option value="DELETE">Xóa</option>
+              <option value="LOGIN">Đăng nhập</option>
+              <option value="LOGOUT">Đăng xuất</option>
             </select>
           </div>
+
           <div className={styles.filterGroup}>
-            <label>Table Name</label>
+            <label>Tên bảng</label>
             <input
               type="text"
-              placeholder="Filter by table"
+              placeholder="Lọc theo bảng"
               value={filterForm.tableName}
               onChange={(e) => handleFilterChange("tableName", e.target.value)}
             />
           </div>
+
           <div className={styles.filterGroup}>
-            <label>Start Date</label>
+            <label>Từ ngày</label>
             <input
               type="datetime-local"
               value={filterForm.startDate}
               onChange={(e) => handleFilterChange("startDate", e.target.value)}
             />
           </div>
+
           <div className={styles.filterGroup}>
-            <label>End Date</label>
+            <label>Đến ngày</label>
             <input
               type="datetime-local"
               value={filterForm.endDate}
@@ -162,35 +166,36 @@ export default function AuditLogsPage() {
             />
           </div>
         </div>
+
         <div className={styles.filterActions}>
           <button className={`${styles.filterButton} ${styles.clearButton}`} onClick={clearFilters}>
-            Clear Filters
+            Xóa bộ lọc
           </button>
           <button className={`${styles.filterButton} ${styles.applyButton}`} onClick={applyFilters}>
-            Apply Filters
+            Áp dụng
           </button>
         </div>
       </div>
 
-      {/* Loading State */}
+      {/* Loading */}
       {loading && (
         <div className={styles.loading}>
           <div className={styles.spinner}></div>
-          <p>Loading audit logs...</p>
+          <p>Đang tải nhật ký...</p>
         </div>
       )}
 
-      {/* Error State */}
+      {/* Error */}
       {error && !loading && (
         <div className={styles.error}>
-          <p>Error: {error}</p>
+          <p>Lỗi: {error}</p>
         </div>
       )}
 
-      {/* Empty State */}
+      {/* Empty */}
       {!loading && !error && logs.length === 0 && (
         <div className={styles.empty}>
-          <p>No audit logs found</p>
+          <p>Không có nhật ký nào</p>
         </div>
       )}
 
@@ -200,15 +205,15 @@ export default function AuditLogsPage() {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Log ID</th>
-                <th>User</th>
-                <th>Role</th>
-                <th>Action</th>
-                <th>Table</th>
-                <th>Record ID</th>
-                <th>IP Address</th>
-                <th>Date & Time</th>
-                <th>Actions</th>
+                <th>ID Log</th>
+                <th>Người dùng</th>
+                <th>Vai trò</th>
+                <th>Hành động</th>
+                <th>Bảng</th>
+                <th>ID bản ghi</th>
+                <th>IP</th>
+                <th>Thời gian</th>
+                <th>Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -216,11 +221,9 @@ export default function AuditLogsPage() {
                 <tr key={log.logId}>
                   <td>#{log.logId}</td>
                   <td>
-                    <div>
-                      <strong>{log.userName}</strong>
-                      <br />
-                      <small style={{ color: "#666" }}>{log.userEmail}</small>
-                    </div>
+                    <strong>{log.userName}</strong>
+                    <br />
+                    <small style={{ color: "#666" }}>{log.userEmail}</small>
                   </td>
                   <td>
                     <span className={styles.roleBadge}>{log.userRole}</span>
@@ -236,7 +239,7 @@ export default function AuditLogsPage() {
                   <td>{formatDateTime(log.createdAt)}</td>
                   <td>
                     <button className={styles.viewButton} onClick={() => handleViewDetails(log)}>
-                      View Details
+                      Xem chi tiết
                     </button>
                   </td>
                 </tr>
@@ -247,7 +250,7 @@ export default function AuditLogsPage() {
           {/* Pagination */}
           <div className={styles.pagination}>
             <div className={styles.paginationInfo}>
-              Showing {logs.length} of {totalElements} logs
+              Hiển thị {logs.length}/{totalElements} log
             </div>
             <div className={styles.paginationButtons}>
               <button
@@ -255,17 +258,17 @@ export default function AuditLogsPage() {
                 onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage === 0}
               >
-                Previous
+                Trước
               </button>
               <span style={{ padding: "8px 16px" }}>
-                Page {currentPage + 1} of {totalPages}
+                Trang {currentPage + 1} / {totalPages}
               </span>
               <button
                 className={styles.paginationButton}
                 onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage >= totalPages - 1}
               >
-                Next
+                Sau
               </button>
             </div>
           </div>
@@ -277,65 +280,76 @@ export default function AuditLogsPage() {
         <div className={styles.modal} onClick={closeModal}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h2>Audit Log Details</h2>
+              <h2>Chi tiết nhật ký</h2>
               <button className={styles.closeButton} onClick={closeModal}>
                 ×
               </button>
             </div>
+
             <div className={styles.modalBody}>
               <div className={styles.detailRow}>
-                <div className={styles.detailLabel}>Log ID:</div>
+                <div className={styles.detailLabel}>ID Log:</div>
                 <div className={styles.detailValue}>#{selectedLog.logId}</div>
               </div>
+
               <div className={styles.detailRow}>
-                <div className={styles.detailLabel}>User:</div>
+                <div className={styles.detailLabel}>Người dùng:</div>
                 <div className={styles.detailValue}>
                   {selectedLog.userName} ({selectedLog.userEmail})
                 </div>
               </div>
+
               <div className={styles.detailRow}>
-                <div className={styles.detailLabel}>User ID:</div>
+                <div className={styles.detailLabel}>ID người dùng:</div>
                 <div className={styles.detailValue}>{selectedLog.userId}</div>
               </div>
+
               <div className={styles.detailRow}>
-                <div className={styles.detailLabel}>Role:</div>
+                <div className={styles.detailLabel}>Vai trò:</div>
                 <div className={styles.detailValue}>{selectedLog.userRole}</div>
               </div>
+
               <div className={styles.detailRow}>
-                <div className={styles.detailLabel}>Action:</div>
+                <div className={styles.detailLabel}>Hành động:</div>
                 <div className={styles.detailValue}>
                   <span className={`${styles.actionBadge} ${getActionBadgeClass(selectedLog.action)}`}>
                     {selectedLog.action}
                   </span>
                 </div>
               </div>
+
               <div className={styles.detailRow}>
-                <div className={styles.detailLabel}>Table Name:</div>
+                <div className={styles.detailLabel}>Tên bảng:</div>
                 <div className={styles.detailValue}>{selectedLog.tableName}</div>
               </div>
+
               <div className={styles.detailRow}>
-                <div className={styles.detailLabel}>Record ID:</div>
-                <div className={styles.detailValue}>{selectedLog.recordId || "N/A"}</div>
+                <div className={styles.detailLabel}>ID bản ghi:</div>
+                <div className={styles.detailValue}>{selectedLog.recordId || "Không có"}</div>
               </div>
+
               <div className={styles.detailRow}>
-                <div className={styles.detailLabel}>IP Address:</div>
+                <div className={styles.detailLabel}>Địa chỉ IP:</div>
                 <div className={styles.detailValue}>{selectedLog.ipAddress}</div>
               </div>
+
               <div className={styles.detailRow}>
-                <div className={styles.detailLabel}>Timestamp:</div>
+                <div className={styles.detailLabel}>Thời gian:</div>
                 <div className={styles.detailValue}>{formatDateTime(selectedLog.createdAt)}</div>
               </div>
+
               {selectedLog.oldValue && (
                 <div className={styles.detailRow}>
-                  <div className={styles.detailLabel}>Old Value:</div>
+                  <div className={styles.detailLabel}>Giá trị cũ:</div>
                   <div className={styles.detailValue}>
                     <div className={styles.codeBlock}>{selectedLog.oldValue}</div>
                   </div>
                 </div>
               )}
+
               {selectedLog.newValue && (
                 <div className={styles.detailRow}>
-                  <div className={styles.detailLabel}>New Value:</div>
+                  <div className={styles.detailLabel}>Giá trị mới:</div>
                   <div className={styles.detailValue}>
                     <div className={styles.codeBlock}>{selectedLog.newValue}</div>
                   </div>

@@ -70,12 +70,12 @@ export default function RoutesPage() {
                     <>
                         {/* Total routes count */}
                         {!loading && routes.length > 0 && (
-                            <div style={{ 
-                                padding: '12px 16px', 
-                                marginBottom: '16px', 
-                                backgroundColor: 'var(--background)', 
+                            <div style={{
+                                padding: '0',
+                                marginBottom: '5px',
                                 borderRadius: '8px',
-                                fontSize: '14px'
+                                fontSize: '20px',
+                                fontFamily: 'var(--font-sans), "Arimo", sans-serif'
                             }}>
                                 Tổng số: <strong>{totalElements}</strong> tuyến đường
                             </div>
