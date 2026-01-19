@@ -2,7 +2,7 @@
 .pageContainer {
   padding: 24px;
   min-height: 100vh;
-  background-color: var(--background);
+  background-color: transparent;
   color: var(--text-primary);
   transition: background-color 0.2s ease;
 }

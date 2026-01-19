@@ -39,7 +39,7 @@ const DashboardView = () => {
     };
 
     return (
-        <div className="w-full bg-[var(--background)] text-[var(--foreground)] transition-colors duration-200">
+        <div className="w-full text-[var(--foreground)] transition-colors duration-200">
             {/* Header: Tiêu đề trang */}
             <PageHeader
                 title="Tổng quan hệ thống"
