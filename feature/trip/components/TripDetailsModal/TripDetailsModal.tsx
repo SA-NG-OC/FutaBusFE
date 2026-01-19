@@ -300,7 +300,17 @@ const TripDetailsModal = ({
                 <span
                   className={`${styles.statusBadge} ${getStatusClass(currentTrip.status)}`}
                 >
-                  {currentTrip.status}
+                  {currentTrip.status === "Running"
+                    ? "Đang chạy"
+                    : currentTrip.status === "Waiting"
+                      ? "Đang chờ"
+                      : currentTrip.status === "Completed"
+                        ? "Hoàn thành"
+                        : currentTrip.status === "Cancelled"
+                          ? "Đã hủy"
+                          : currentTrip.status === "Delayed"
+                            ? "Bị hoãn"
+                            : currentTrip.status}
                 </span>
               </div>
             </div>

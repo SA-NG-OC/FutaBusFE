@@ -67,8 +67,8 @@ const DeleteTripModal = ({
         {/* Body */}
         <div className={styles.body}>
           <p className={styles.confirmText}>
-            Bạn có chắc chắn muốn xóa chuyến{" "}
-            <strong>{trip.routeName}</strong> (#{trip.tripId}) không?
+            Bạn có chắc chắn muốn xóa chuyến <strong>{trip.routeName}</strong>{" "}
+            (#{trip.tripId}) không?
           </p>
 
           {/* Summary Info Box */}
@@ -99,8 +99,8 @@ const DeleteTripModal = ({
 
           {/* Warning Box */}
           <div className={styles.warningBox}>
-            <strong>Cảnh báo:</strong> Chuyến đi này sẽ bị xóa vĩnh viễn.
-            Những hành khách đã đặt chuyến cần được thông báo.
+            <strong>Cảnh báo:</strong> Chuyến đi này sẽ bị xóa vĩnh viễn. Những
+            hành khách đã đặt chuyến cần được thông báo.
           </div>
         </div>
 

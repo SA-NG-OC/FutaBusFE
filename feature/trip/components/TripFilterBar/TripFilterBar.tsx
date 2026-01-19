@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { format, addDays, subDays } from "date-fns";
 import { vi } from "date-fns/locale";
 import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css"; // Import CSS gốc của thư viện
+import "react-calendar/dist/Calendar.css";
 import {
   FaChevronLeft,
   FaChevronRight,
@@ -15,7 +15,7 @@ import styles from "./TripFilterBar.module.css";
 
 // Status options for filtering
 const STATUS_OPTIONS = [
-  { value: "", label: "All Statuses" },
+  { value: "", label: "Tất cả" },
   { value: "Waiting", label: "Waiting" },
   { value: "Running", label: "Running" },
   { value: "Completed", label: "Completed" },
@@ -41,7 +41,6 @@ const TripFilterBar = ({
   const [showCalendar, setShowCalendar] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
 
-  // Xử lý click ra ngoài để đóng lịch
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -57,7 +56,7 @@ const TripFilterBar = ({
 
   const handleDateChange = (value: any) => {
     onDateChange(value as Date);
-    setShowCalendar(false); // Chọn xong tự đóng
+    setShowCalendar(false);
   };
 
   const handlePrevDay = () => onDateChange(subDays(currentDate, 1));
@@ -72,13 +71,13 @@ const TripFilterBar = ({
           <FaSearch className={styles.searchIcon} />
           <input
             type="text"
-            placeholder="Search by route name..."
+            placeholder="Tìm kiếm chuyến..."
             className={styles.searchInput}
             onChange={(e) => onSearch(e.target.value)}
           />
         </div>
         <button className={styles.clearBtn} onClick={handleToday}>
-          Today
+          Hôm nay
         </button>
       </div>
 
