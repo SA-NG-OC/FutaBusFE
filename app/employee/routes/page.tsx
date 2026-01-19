@@ -1,6 +1,115 @@
+'use client';
 
-export default function AdminCustomers() {
+import React from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+import PageHeader from '@/src/components/PageHeader/PageHeader';
+import RouteCard from '@/feature/route/components/RouteCard/RouteCard';
+import Pagination from '@/src/components/Pagination/Pagination';
+import { useRoutes } from '@/feature/route/hooks/useRoutes';
+import styles from './page.module.css';
+import RouteModal from '@/feature/route/components/RouteModal/RouteModal';
+import ConfirmDeleteModal from '@/feature/route/components/ConfirmDeleteModal/ConfirmDeleteModal';
+
+export default function RoutesPage() {
+    const {
+        routes,
+        loading,
+        currentPage,
+        totalPages,
+        setCurrentPage,
+        handleSearch,
+        isModalOpen,
+        isDeleteModalOpen,
+        selectedRoute,
+        openAddModal,
+        openEditModal,
+        openDeleteModal,
+        closeModal,
+        handleSaveRoute,
+        handleDeleteConfirm
+    } = useRoutes();
+
     return (
-        <div> Lorem ipsum, dolor sit amet consectetur adipisicing elit. Dignissimos blanditiis veniam culpa cupiditate adipisci aut!</div>
+        // 1. Dùng Fragment (<>...</>) bọc ngoài cùng
+        <>
+            {/* Đặt ToastContainer Ở ĐÂY - Nằm ngoài thẻ div style.container */}
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
+
+            {/* Layout chính của trang bắt đầu từ đây */}
+            <div className={styles.container}>
+
+                {/* 2. Header trang */}
+                <PageHeader
+                    title="Route Management"
+                    subtitle="Manage bus routes and stops"
+                    actionLabel="Add Route"
+                    onAction={openAddModal}
+                    showSearch={true}
+                    searchPlaceholder="Search routes..."
+                    onSearch={handleSearch}
+                />
+
+                {/* 3. Nội dung chính */}
+                {loading ? (
+                    <div className={styles.loading}>Loading routes...</div>
+                ) : (
+                    <>
+                        {routes.length === 0 ? (
+                            <div style={{ textAlign: 'center', marginTop: 20, color: '#666' }}>
+                                No routes found.
+                            </div>
+                        ) : (
+                            <div className={styles['grid-list']}>
+                                {routes.map((route) => (
+                                    <RouteCard
+                                        key={route.routeId}
+                                        data={route}
+                                        onEdit={openEditModal}
+                                        onDelete={openDeleteModal}
+                                    />
+                                ))}
+                            </div>
+                        )}
+
+                        {routes.length > 0 && (
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={setCurrentPage}
+                            />
+                        )}
+                    </>
+                )}
+
+                {/* 4. Các Modals */}
+                <RouteModal
+                    isOpen={isModalOpen}
+                    onClose={closeModal}
+                    onSubmit={handleSaveRoute}
+                    initialData={selectedRoute}
+                    title={selectedRoute ? 'Edit Route' : 'Add New Route'}
+                />
+
+                <ConfirmDeleteModal
+                    isOpen={isDeleteModalOpen}
+                    onClose={closeModal}
+                    onConfirm={handleDeleteConfirm}
+                    itemName={selectedRoute?.routeName}
+                />
+            </div>
+        </>
     );
 }

@@ -18,6 +18,7 @@ export interface GetTripsParams {
   search?: string;
   originId?: number;
   destId?: number;
+  routeId?: number;
   date?: string; // yyyy-MM-dd
 
   minPrice?: number;
@@ -31,68 +32,73 @@ export interface GetTripsParams {
 export const tripApi = {
 
   getTripsForBooking: async ({
-  page = 0,
-  size = 10,
+    page = 0,
+    size = 10,
 
-  sortBy = "departureTime",
-  sortDir = "asc",
+    sortBy = "departureTime",
+    sortDir = "asc",
 
-  search,
-  originId,
-  destId,
-  date,
+    search,
+    originId,
+    destId,
+    routeId, // <--- 1. Thêm routeId vào destructuring
+    date,
 
-  minPrice,
-  maxPrice,
+    minPrice,
+    maxPrice,
 
-  timeRanges,
-  vehicleTypes,
-}: GetTripsParams): Promise<PageResponse<TripData>> => {
-  const params: any = {
-    page,
-    size,
-    sortBy,
-    sortDir,
-  };
+    timeRanges,
+    vehicleTypes,
+  }: GetTripsParams): Promise<PageResponse<TripData>> => {
+    const params: any = {
+      page,
+      size,
+      sortBy,
+      sortDir,
+    };
 
-  // search
-  if (search?.trim()) params.search = search;
+    // search
+    if (search?.trim()) params.search = search;
 
-  // location
-  if (originId) params.originId = originId;
-  if (destId) params.destId = destId;
+    // location & route
+    if (originId) params.originId = originId;
+    if (destId) params.destId = destId;
+    if (routeId) params.routeId = routeId; // <--- 2. Gán routeId vào params
 
-  // date
-  if (date) params.date = date;
+    // date
+    if (date) params.date = date;
 
-  // price filter
-  if (minPrice !== undefined) params.minPrice = minPrice;
-  if (maxPrice !== undefined) params.maxPrice = maxPrice;
+    // price filter
+    if (minPrice !== undefined) params.minPrice = minPrice;
+    if (maxPrice !== undefined) params.maxPrice = maxPrice;
 
-  // Build query string manually for array parameters
-  const queryParams = new URLSearchParams();
-  
-  // Add basic params
-  Object.keys(params).forEach(key => {
-    queryParams.append(key, params[key]);
-  });
+    // Build query string manually for array parameters
+    const queryParams = new URLSearchParams();
 
-  // time ranges (multiple) - repeat param for each value
-  if (timeRanges?.length) {
-    timeRanges.forEach(range => {
-      queryParams.append('timeRanges', range);
+    // Add basic params
+    Object.keys(params).forEach(key => {
+      // Đảm bảo không append null/undefined
+      if (params[key] !== undefined && params[key] !== null) {
+        queryParams.append(key, params[key]);
+      }
     });
-  }
 
-  // vehicle types (multiple) - repeat param for each value
-  if (vehicleTypes?.length) {
-    vehicleTypes.forEach(type => {
-      queryParams.append('vehicleTypes', type);
-    });
-  }
+    // time ranges (multiple)
+    if (timeRanges?.length) {
+      timeRanges.forEach(range => {
+        queryParams.append('timeRanges', range);
+      });
+    }
 
-  return api.get<PageResponse<TripData>>(`/trips?${queryParams.toString()}`);
-},
+    // vehicle types (multiple)
+    if (vehicleTypes?.length) {
+      vehicleTypes.forEach(type => {
+        queryParams.append('vehicleTypes', type);
+      });
+    }
+
+    return api.get<PageResponse<TripData>>(`/trips?${queryParams.toString()}`);
+  },
 
 
   // 1. Get List Trips (Admin/Employee - with status filter)
@@ -101,16 +107,18 @@ export const tripApi = {
     size = 10,
     status,
     date,
+    routeId,
   }: any): Promise<PageResponse<TripData>> => {
     const params: any = { page, size, sort: "departureTime,asc" };
-    
+
     // If status is provided and not empty, send as array
     // If empty string or null, backend will default to ["Waiting", "Running"]
     if (status && status !== "") {
       params.statuses = status; // Single status, backend expects List<String>
     }
-    
+
     if (date) params.date = date;
+    if (routeId) params.routeId = routeId;
 
     return api.get<PageResponse<TripData>>("/trips", { params });
   },

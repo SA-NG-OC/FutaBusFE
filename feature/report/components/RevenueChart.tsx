@@ -29,7 +29,10 @@ const RevenueChart = ({ data }: { data: ChartDataRes[] }) => {
                         <Tooltip
                             contentStyle={{ backgroundColor: 'var(--background-paper)', borderColor: 'var(--border-gray)', borderRadius: '8px' }}
                             itemStyle={{ color: 'var(--foreground)' }}
-                            formatter={(value: number | undefined) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)}
+                            // SỬA Ở ĐÂY: Thêm (value ?? 0) để đảm bảo luôn là số
+                            formatter={(value: number | undefined) =>
+                                new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value ?? 0)
+                            }
                         />
                         <Line
                             type="monotone"

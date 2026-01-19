@@ -53,23 +53,23 @@ export default function RoutesPage() {
 
                 {/* 2. Header trang */}
                 <PageHeader
-                    title="Route Management"
-                    subtitle="Manage bus routes and stops"
-                    actionLabel="Add Route"
+                    title="Quản lý Tuyến đường"
+                    subtitle="Quản lý danh sách tuyến xe và các điểm dừng"
+                    actionLabel="Thêm tuyến mới"
                     onAction={openAddModal}
                     showSearch={true}
-                    searchPlaceholder="Search routes..."
+                    searchPlaceholder="Tìm kiếm tuyến..."
                     onSearch={handleSearch}
                 />
 
                 {/* 3. Nội dung chính */}
                 {loading ? (
-                    <div className={styles.loading}>Loading routes...</div>
+                    <div className={styles.loading}>Đang tải dữ liệu...</div>
                 ) : (
                     <>
                         {routes.length === 0 ? (
                             <div style={{ textAlign: 'center', marginTop: 20, color: '#666' }}>
-                                No routes found.
+                                Không tìm thấy tuyến đường nào.
                             </div>
                         ) : (
                             <div className={styles['grid-list']}>
@@ -100,7 +100,7 @@ export default function RoutesPage() {
                     onClose={closeModal}
                     onSubmit={handleSaveRoute}
                     initialData={selectedRoute}
-                    title={selectedRoute ? 'Edit Route' : 'Add New Route'}
+                    title={selectedRoute ? 'Cập nhật tuyến' : 'Thêm tuyến mới'}
                 />
 
                 <ConfirmDeleteModal

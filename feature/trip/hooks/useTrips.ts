@@ -17,6 +17,7 @@ interface FetchTripsParams {
   page: number;
   status?: string;
   date?: string | null;
+  routeId?: number;
 }
 
 // ============================================
@@ -32,6 +33,7 @@ interface FetchTripsForBookingParams {
   search?: string;
   originId?: number;
   destId?: number;
+  routeId?: number;
   date?: string;
 
   minPrice?: number;
@@ -108,6 +110,7 @@ export const useTrips = () => {
         page: params.page,
         status: params.status,
         date: params.date,
+        routeId: params.routeId,
       });
 
       if (data && Array.isArray(data.content)) {

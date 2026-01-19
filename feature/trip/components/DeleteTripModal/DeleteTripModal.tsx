@@ -35,14 +35,12 @@ const DeleteTripModal = ({
     setIsDeleting(true);
     try {
       await onConfirm();
-      // Modal sẽ được đóng bởi parent sau khi xóa thành công
     } catch (error) {
       console.error(error);
       setIsDeleting(false);
     }
   };
 
-  // Format tiền tệ
   const formatCurrency = (val: number) =>
     new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -58,8 +56,8 @@ const DeleteTripModal = ({
             <FaExclamationTriangle className={styles.warningIcon} />
           </div>
           <div className={styles.headerText}>
-            <h3>Confirm Delete</h3>
-            <p>This action cannot be undo</p>
+            <h3>Xác nhận xóa</h3>
+            <p>Hành động này không thể hoàn tác</p>
           </div>
           <button className={styles.closeBtn} onClick={onClose}>
             <FaTimes />
@@ -69,8 +67,8 @@ const DeleteTripModal = ({
         {/* Body */}
         <div className={styles.body}>
           <p className={styles.confirmText}>
-            Are you sure you want to delete trip{" "}
-            <strong>{trip.routeName}</strong> (#{trip.tripId})?
+            Bạn có chắc chắn muốn xóa chuyến{" "}
+            <strong>{trip.routeName}</strong> (#{trip.tripId}) không?
           </p>
 
           {/* Summary Info Box */}
@@ -101,9 +99,8 @@ const DeleteTripModal = ({
 
           {/* Warning Box */}
           <div className={styles.warningBox}>
-            <strong>Warning:</strong> This will permanently delete the trip
-            schedule. Any passengers who have booked this trip will need to be
-            notified.
+            <strong>Cảnh báo:</strong> Chuyến đi này sẽ bị xóa vĩnh viễn.
+            Những hành khách đã đặt chuyến cần được thông báo.
           </div>
         </div>
 
@@ -114,7 +111,7 @@ const DeleteTripModal = ({
             onClick={onClose}
             disabled={isDeleting}
           >
-            Cancel
+            Hủy
           </button>
           <button
             className={styles.deleteBtn}
@@ -122,10 +119,10 @@ const DeleteTripModal = ({
             disabled={isDeleting}
           >
             {isDeleting ? (
-              "Deleting..."
+              "Đang xóa..."
             ) : (
               <>
-                <FaTrash /> Delete Trip
+                <FaTrash /> Xóa chuyến
               </>
             )}
           </button>

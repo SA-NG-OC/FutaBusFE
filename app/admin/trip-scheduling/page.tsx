@@ -6,7 +6,7 @@ import TripFilterBar from "@/feature/trip/components/TripFilterBar/TripFilterBar
 import TripTimeline from "@/feature/trip/components/TripTimeline/TripTimeline";
 import Pagination from "@/src/components/Pagination/Pagination";
 import TripModal from "@/feature/trip/components/TripModal/TripModal";
-import TripDetailsModal from "@/feature/trip/components/TripDetailsModal/TripDetailsModal"; // Import Modal chi tiết
+import TripDetailsModal from "@/feature/trip/components/TripDetailsModal/TripDetailsModal";
 import { useTrips } from "@/feature/trip/hooks/useTrips";
 import { format } from "date-fns";
 import { TripFormData, TripData } from "@/feature/trip/types";
@@ -14,16 +14,13 @@ import { TripFormData, TripData } from "@/feature/trip/types";
 export default function TripSchedulingPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState(""); // "" = All statuses (default: Waiting + Running)
+  const [selectedStatus, setSelectedStatus] = useState("");
 
-  // State quản lý Modal Tạo Mới
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  // State quản lý Modal Chi Tiết
   const [selectedTrip, setSelectedTrip] = useState<TripData | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
-  // Hook logic
   const {
     trips,
     loading,
@@ -40,12 +37,10 @@ export default function TripSchedulingPage() {
     subDrivers,
     fetchSelectionData,
     loadingSelection,
-    // Lấy thêm 2 hàm mới từ hook
     deleteTrip,
     updateTripInfo,
   } = useTrips();
 
-  // Load trips khi đổi ngày hoặc đổi trang hoặc đổi status
   useEffect(() => {
     const dateStr = format(selectedDate, "yyyy-MM-dd");
     fetchTrips({
@@ -55,7 +50,6 @@ export default function TripSchedulingPage() {
     });
   }, [selectedDate, currentPage, selectedStatus, fetchTrips]);
 
-  // Client-side search
   const filteredTrips = trips.filter((t) =>
     t.routeName.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -69,9 +63,8 @@ export default function TripSchedulingPage() {
     }
   };
 
-  // Xử lý khi click vào Card trên Timeline
   const handleCardClick = (trip: TripData) => {
-    fetchSelectionData(); // Load data cho dropdown trong modal chi tiết
+    fetchSelectionData();
     setSelectedTrip(trip);
     setIsDetailsModalOpen(true);
   };
@@ -86,9 +79,9 @@ export default function TripSchedulingPage() {
       }}
     >
       <PageHeader
-        title="Trip Scheduling"
-        subtitle="Schedule and manage bus trips"
-        actionLabel="Schedule Trip"
+        title="Lịch trình chuyến xe"
+        subtitle="Lập lịch và quản lý các chuyến xe"
+        actionLabel="Tạo chuyến"
         onAction={() => {
           fetchSelectionData();
           setIsCreateModalOpen(true);
@@ -105,7 +98,7 @@ export default function TripSchedulingPage() {
         selectedStatus={selectedStatus}
         onStatusChange={(status) => {
           setSelectedStatus(status);
-          setPage(0); // Reset to first page when changing status
+          setPage(0);
         }}
       />
 
@@ -117,14 +110,14 @@ export default function TripSchedulingPage() {
             color: "var(--text-gray)",
           }}
         >
-          Loading timeline...
+          Đang tải lịch trình...
         </div>
       ) : (
         <>
           <TripTimeline
             trips={filteredTrips}
             onStatusUpdate={updateTripStatus}
-            onCardClick={handleCardClick} // Truyền sự kiện click xuống
+            onCardClick={handleCardClick}
           />
 
           {totalPages > 1 && (
@@ -145,7 +138,7 @@ export default function TripSchedulingPage() {
         </>
       )}
 
-      {/* Modal Tạo Chuyến Mới */}
+      {/* Modal tạo chuyến mới */}
       <TripModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
@@ -157,7 +150,7 @@ export default function TripSchedulingPage() {
         isLoading={isCreating || loadingSelection}
       />
 
-      {/* Modal Chi Tiết Trip (Edit/Delete) */}
+      {/* Modal chi tiết chuyến (sửa / xóa) */}
       <TripDetailsModal
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}

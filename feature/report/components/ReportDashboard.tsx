@@ -16,7 +16,8 @@ const ReportDashboard = () => {
     const [filter, setFilter] = useState({ month: currentMonth, year: currentYear });
     const [isExporting, setIsExporting] = useState(false);
 
-    const { summary, weeklyRevenue, shiftRevenue, topRoutes, loading } = useReportData(filter.month, filter.year);
+    const { summary, weeklyRevenue, shiftRevenue, topRoutes, loading } =
+        useReportData(filter.month, filter.year);
 
     const handleFilterChange = (key: 'month' | 'year', value: number) => {
         setFilter(prev => ({ ...prev, [key]: value }));
@@ -26,13 +27,13 @@ const ReportDashboard = () => {
         try {
             setIsExporting(true); // Bắt đầu loading
 
-            // Gọi API export (hàm này sẽ mất vài giây để download file)
+            // Gọi API export (hàm này sẽ mất vài giây để tải file)
             await reportApi.exportReport({ month: filter.month, year: filter.year });
 
         } catch (error) {
             alert("Lỗi khi xuất báo cáo. Vui lòng thử lại.");
         } finally {
-            setIsExporting(false); // Kết thúc loading (chạy kể cả khi lỗi)
+            setIsExporting(false); // Kết thúc loading
         }
     };
 
@@ -50,7 +51,9 @@ const ReportDashboard = () => {
 
                 {/* Loading Overlay */}
                 {loading && !summary && (
-                    <div className="text-center py-20 text-[var(--text-gray)]">Loading dashboard data...</div>
+                    <div className="text-center py-20 text-[var(--text-gray)]">
+                        Đang tải dữ liệu bảng điều khiển...
+                    </div>
                 )}
 
                 {/* Main Content */}
@@ -66,19 +69,21 @@ const ReportDashboard = () => {
 
                     {/* Bottom Section: Top Routes & (Optional) Payment Method */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Routes take up 2/3 space or full if no payment chart */}
+                        {/* Routes chiếm toàn bộ chiều ngang */}
                         <div className="lg:col-span-2">
                             <TopRoutesTable routes={topRoutes} />
                         </div>
 
-                        {/* Placeholder for Payment Methods (API not provided in prompt, using placeholder UI to match image layout)
+                        {/* Placeholder phương thức thanh toán (API chưa có)
                         <div className="bg-[var(--background-paper)] p-6 rounded-xl border border-[var(--border-gray)] shadow-sm flex flex-col items-center justify-center">
-                            <h3 className="w-full text-lg font-semibold text-[var(--foreground)] mb-4 text-left">Payment Methods</h3>
+                            <h3 className="w-full text-lg font-semibold text-[var(--foreground)] mb-4 text-left">
+                                Phương thức thanh toán
+                            </h3>
                             <div className="w-48 h-48 rounded-full border-8 border-[var(--bg-beige)] flex items-center justify-center text-[var(--text-gray)]">
-                                Chart Placeholder
+                                Biểu đồ đang cập nhật
                             </div>
                             <p className="text-sm text-[var(--text-gray)] mt-4 text-center">
-                                (Data source pending update)
+                                (Dữ liệu sẽ được bổ sung sau)
                             </p>
                         </div> */}
                     </div>
