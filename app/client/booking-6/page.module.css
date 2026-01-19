@@ -5,7 +5,7 @@
 .backButton button {
   background: none;
   border: none;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 14px;
   cursor: pointer;
   padding: 8px 0;
@@ -16,20 +16,20 @@
 }
 
 .backButton button:hover {
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
-/* Timer Banner */
+/* ================= Timer Banner ================= */
 .timerBanner {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  background: #fef3c7;
-  border: 1px solid #fcd34d;
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
   border-radius: 8px;
   margin-bottom: 20px;
-  color: #92400e;
+  color: var(--warning-text);
   font-size: 14px;
 }
 
@@ -37,17 +37,17 @@
   font-size: 18px;
 }
 
-/* Error Banner */
+/* ================= Error Banner ================= */
 .errorBanner {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
   border-radius: 8px;
   margin-bottom: 20px;
-  color: #991b1b;
+  color: var(--warning-text);
   font-size: 14px;
 }
 
@@ -60,15 +60,16 @@
   background: none;
   border: none;
   font-size: 20px;
-  color: #991b1b;
+  color: var(--warning-text);
   cursor: pointer;
   padding: 0 4px;
 }
 
 .errorClose:hover {
-  color: #7f1d1d;
+  color: var(--brand-dark-red);
 }
 
+/* ================= Layout ================= */
 .container {
   display: grid;
   grid-template-columns: 1fr 380px;
@@ -89,9 +90,10 @@
   gap: 16px;
 }
 
+/* ================= Confirm Button ================= */
 .confirmButton {
-  background: #ef4444;
-  color: white;
+  background: var(--primary);
+  color: var(--text-white);
   border: none;
   border-radius: 8px;
   padding: 14px 24px;
@@ -106,26 +108,26 @@
 }
 
 .confirmButton:hover:not(:disabled) {
-  background: #dc2626;
+  background: var(--primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  box-shadow: 0 4px 12px rgba(216, 62, 62, 0.3);
 }
 
 .confirmButton:disabled {
-  background: #d1d5db;
+  background: var(--btn-cancel-bg);
   cursor: not-allowed;
   opacity: 0.6;
 }
 
 .securityNote {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-secondary);
   text-align: center;
   margin: 0;
   line-height: 1.5;
 }
 
-/* Processing Container */
+/* ================= Processing ================= */
 .processingContainer {
   min-height: 60vh;
   display: flex;
@@ -134,7 +136,7 @@
 }
 
 .processingCard {
-  background: white;
+  background: var(--background-paper);
   border-radius: 16px;
   padding: 40px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -150,16 +152,17 @@
 .processingText {
   font-size: 16px;
   font-weight: 500;
-  color: #1f2937;
+  color: var(--text-primary);
   margin-bottom: 8px;
 }
 
 .processingNote {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--text-secondary);
   margin: 0;
 }
 
+/* ================= Responsive ================= */
 @media (max-width: 1024px) {
   .container {
     grid-template-columns: 1fr;

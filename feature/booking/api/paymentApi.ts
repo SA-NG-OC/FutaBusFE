@@ -56,6 +56,34 @@ export interface BookingResponse {
   createdAt: string;
 }
 
+export interface BookingDetailResponse {
+  bookingId: number;
+  bookingCode: string;
+  bookingStatus: string;
+  totalAmount: number;
+  holdExpiry: string;
+  remainingSeconds: number;
+  customerName: string;
+  customerPhone: string;
+  tripInfo: {
+    tripId: number;
+    routeName: string;
+    departureTime: string;
+    arrivalTime: string;
+  };
+  tickets: Array<{
+    ticketId: number;
+    seatNumber: string;
+    passengerName: string;
+  }>;
+}
+
+export interface MomoPaymentByCodeResponse {
+  payUrl: string;
+  qrCodeUrl: string;
+  deeplink: string;
+}
+
 export interface CounterBookingRequest {
   tripId: number;
   seatIds: number[];
@@ -110,11 +138,25 @@ export const paymentApi = {
   },
 
   // =====================================================
-  // 📋 GET BOOKING BY CODE - Lấy booking theo mã
+  // 📋 GET BOOKING BY CODE - Lấy booking theo mã (cho retry payment)
   // URL: GET /bookings/code/{bookingCode}
   // =====================================================
-  getBookingByCode: async (bookingCode: string): Promise<BookingResponse> => {
-    return api.get<BookingResponse>(`/bookings/code/${bookingCode}`);
+  getBookingByCode: async (
+    bookingCode: string,
+  ): Promise<BookingDetailResponse> => {
+    return api.get<BookingDetailResponse>(`/bookings/code/${bookingCode}`);
+  },
+
+  // =====================================================
+  // 💳 CREATE MOMO PAYMENT BY CODE - Tạo thanh toán MoMo từ booking code
+  // URL: POST /payments/momo/create-by-code/{bookingCode}
+  // =====================================================
+  createMomoPaymentByCode: async (
+    bookingCode: string,
+  ): Promise<MomoPaymentByCodeResponse> => {
+    return api.post<MomoPaymentByCodeResponse>(
+      `/payments/momo/create-by-code/${bookingCode}`,
+    );
   },
 
   // API dành riêng cho Admin bán vé tại quầy (1 phát ăn ngay: Book + Confirm + Paid)
