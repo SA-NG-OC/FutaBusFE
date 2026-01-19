@@ -37,10 +37,10 @@ export default function TripSearch({ onSearch }: TripSearchProps) {
   const { locations, fetchLocations } = useRoutes();
 
   const [originId, setOriginId] = useState<string>(
-    searchParams?.get("originId") || ""
+    searchParams?.get("originId") || "",
   );
   const [destId, setDestId] = useState<string>(
-    searchParams?.get("destId") || ""
+    searchParams?.get("destId") || "",
   );
   // Default date to today if not specified
   const [date, setDate] = useState(searchParams?.get("date") || getTodayDate());
@@ -112,8 +112,8 @@ export default function TripSearch({ onSearch }: TripSearchProps) {
       backgroundColor: state.isSelected
         ? "#D83E3E"
         : state.isFocused
-        ? "#fef2f2"
-        : "white",
+          ? "#fef2f2"
+          : "white",
       color: state.isSelected ? "white" : "#1f2937",
       cursor: "pointer",
       "&:active": {
@@ -146,7 +146,9 @@ export default function TripSearch({ onSearch }: TripSearchProps) {
           <Select
             instanceId="origin-select"
             options={locationOptions}
-            value={locationOptions.find((opt) => opt.value === originId) || null}
+            value={
+              locationOptions.find((opt) => opt.value === originId) || null
+            }
             onChange={(option) => setOriginId(option?.value || "")}
             placeholder="Nhập hoặc chọn điểm đi..."
             isClearable

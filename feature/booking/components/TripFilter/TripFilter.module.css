@@ -11,7 +11,7 @@
 
 /* Dark mode for container */
 :global(.dark) .container {
-  background-color: #1f2937;
+  background-color: #1e293b;
 }
 
 /* Header section */
@@ -99,6 +99,43 @@
 }
 
 :global(.dark) .input:focus {
+  box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.4);
+}
+
+/* Select styles */
+.select {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #111827;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+.select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.3);
+}
+
+/* Dark mode for select */
+:global(.dark) .select {
+  border-color: #4b5563;
+  background-color: #374151;
+  color: #f9fafb;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+}
+
+:global(.dark) .select:focus {
   box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.4);
 }
 
