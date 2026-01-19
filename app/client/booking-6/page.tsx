@@ -206,9 +206,24 @@ export default function ClientBookingCheckoutPage() {
       };
 
       console.log("=== DEBUG: Passenger Data ===");
-      console.log("pickupAddress:", passengerData.pickupAddress, "length:", passengerData.pickupAddress.length);
-      console.log("dropoffAddress:", passengerData.dropoffAddress, "length:", passengerData.dropoffAddress.length);
-      console.log("specialNote:", passengerData.specialNote, "length:", passengerData.specialNote.length);
+      console.log(
+        "pickupAddress:",
+        passengerData.pickupAddress,
+        "length:",
+        passengerData.pickupAddress.length,
+      );
+      console.log(
+        "dropoffAddress:",
+        passengerData.dropoffAddress,
+        "length:",
+        passengerData.dropoffAddress.length,
+      );
+      console.log(
+        "specialNote:",
+        passengerData.specialNote,
+        "length:",
+        passengerData.specialNote.length,
+      );
       console.log("=== DEBUG: Request Data ===");
       console.log(JSON.stringify(requestData, null, 2));
 
@@ -431,16 +446,7 @@ export default function ClientBookingCheckoutPage() {
             disabled={!isFormValid || isProcessing}
           >
             {paymentMethod === "momo" ? (
-              <>
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png"
-                  alt="MoMo"
-                  width={24}
-                  height={24}
-                  style={{ borderRadius: 4, marginRight: 8 }}
-                />
-                Thanh toán với MoMo
-              </>
+              <>Thanh toán với MoMo</>
             ) : paymentMethod === "bypass" ? (
               <>
                 <span style={{ marginRight: 8 }}>⚡</span>

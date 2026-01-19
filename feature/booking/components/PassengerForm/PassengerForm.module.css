@@ -1,5 +1,5 @@
 .container {
-  background: white;
+  background: var(--background-paper);
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -8,21 +8,27 @@
 .title {
   font-size: 18px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary);
   margin-bottom: 20px;
 }
 
+/* ================= Auto Fill Note ================= */
 .autoFillNote {
-  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-  border: 1px solid #10b981;
+  background: linear-gradient(
+    135deg,
+    var(--status-active-bg) 0%,
+    var(--bg-hover) 100%
+  );
+  border: 1px solid var(--status-active-text);
   border-radius: 8px;
   padding: 12px 16px;
   margin-bottom: 20px;
   font-size: 14px;
-  color: #047857;
+  color: var(--status-active-text);
   font-weight: 500;
 }
 
+/* ================= Form ================= */
 .formGroup {
   margin-bottom: 18px;
 }
@@ -31,28 +37,29 @@
   display: block;
   font-size: 14px;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-primary);
   margin-bottom: 6px;
 }
 
 .input {
   width: 100%;
   padding: 10px 14px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--input-border);
   border-radius: 6px;
   font-size: 14px;
-  color: #1f2937;
+  background: var(--input-bg);
+  color: var(--input-text);
   transition: all 0.2s;
 }
 
 .input:focus {
   outline: none;
-  border-color: #ef4444;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--input-focus);
 }
 
 .input::placeholder {
-  color: #9ca3af;
+  color: var(--input-placeholder);
 }
 
 .textarea {
@@ -62,21 +69,26 @@
 }
 
 .inputError {
-  border-color: #ef4444;
+  border-color: var(--primary);
 }
 
 .error {
   display: block;
-  color: #ef4444;
+  color: var(--primary);
   font-size: 12px;
   margin-top: 4px;
 }
 
+/* ================= Register Prompt ================= */
 .registerPrompt {
   margin-top: 20px;
   padding: 16px;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border: 1px solid #f59e0b;
+  background: linear-gradient(
+    135deg,
+    var(--warning-bg) 0%,
+    var(--icon-warning-bg) 100%
+  );
+  border: 1px solid var(--warning-border);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -90,7 +102,7 @@
 .registerLink {
   background: none;
   border: none;
-  color: #d97706;
+  color: var(--warning-text);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -100,9 +112,10 @@
 }
 
 .registerLink:hover {
-  color: #b45309;
+  color: var(--brand-dark-red);
 }
 
+/* ================= Responsive ================= */
 @media (max-width: 768px) {
   .container {
     padding: 16px;

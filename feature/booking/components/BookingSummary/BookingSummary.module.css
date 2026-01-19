@@ -1,5 +1,5 @@
 .container {
-  background: white;
+  background: var(--background-paper);
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -11,7 +11,7 @@
 .title {
   font-size: 18px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary);
   margin-bottom: 16px;
 }
 
@@ -29,20 +29,20 @@
 
 .label {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--text-secondary);
   flex-shrink: 0;
 }
 
 .value {
   font-size: 14px;
-  color: #1f2937;
+  color: var(--text-primary);
   font-weight: 500;
   text-align: right;
 }
 
 .divider {
   height: 1px;
-  background: #e5e7eb;
+  background: var(--border-gray);
   margin: 16px 0;
 }
 
@@ -57,18 +57,18 @@
 .totalLabel {
   font-size: 16px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .totalValue {
   font-size: 20px;
   font-weight: 700;
-  color: #ef4444;
+  color: var(--primary);
 }
 
 .disclaimer {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--text-gray);
   line-height: 1.5;
   text-align: center;
   margin-top: 12px;
