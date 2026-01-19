@@ -2,15 +2,11 @@
 
 import React from 'react';
 import styles from './EmployeeHeader.module.css';
-import { useTheme } from '../../../src/context/ThemeContext'; // Import context theme cũ
-// Import bộ icon Feather (Fi) nhìn thanh mảnh giống ảnh mẫu
+import { useTheme } from '../../../src/context/ThemeContext';
+// Chỉ import những icon cần dùng
 import {
-    FiFlag,
-    FiMaximize,
-    FiStar,
     FiMoon,
     FiSun,
-    FiBell
 } from 'react-icons/fi';
 
 const EmployeeHeader = () => {
@@ -23,32 +19,17 @@ const EmployeeHeader = () => {
                 {/* --- LEFT: Welcome Text --- */}
                 <div className={styles['welcome-section']}>
                     <h2 className={styles['welcome-title']}>
-                        Welcome Alex <span role="img" aria-label="wave">👋</span>
+                        Welcome Staff <span role="img" aria-label="wave">👋</span>
                     </h2>
                     <p className={styles['welcome-subtitle']}>
-                        Have a good day, baby.
+                        Have a good day.
                     </p>
                 </div>
 
                 {/* --- RIGHT: Action Icons --- */}
                 <div className={styles['header-actions']}>
 
-                    {/* 1. Flag Icon */}
-                    <button className={styles['icon-button']} title="Language">
-                        <FiFlag size={20} />
-                    </button>
-
-                    {/* 2. Fullscreen Icon */}
-                    <button className={styles['icon-button']} title="Fullscreen">
-                        <FiMaximize size={20} />
-                    </button>
-
-                    {/* 3. Star Icon */}
-                    <button className={styles['icon-button']} title="Favorites">
-                        <FiStar size={20} />
-                    </button>
-
-                    {/* 4. Theme Toggle (Chức năng hoạt động) */}
+                    {/* 1. Theme Toggle */}
                     <button
                         className={styles['icon-button']}
                         onClick={toggleTheme}
@@ -57,15 +38,10 @@ const EmployeeHeader = () => {
                         {theme === 'dark' ? <FiSun size={20} /> : <FiMoon size={20} />}
                     </button>
 
-                    {/* 5. Notification Icon */}
-                    <button className={`${styles['icon-button']} ${styles['notification-button']}`}>
-                        <FiBell size={20} />
-                        <span className={styles['notification-badge']}>3</span>
-                    </button>
-
-                    {/* 6. Avatar */}
+                    {/* 2. Avatar */}
                     <button className={styles['avatar-button']}>
-                        <span className={styles['avatar-text']}>AU</span>
+                        {/* Có thể đổi chữ AU thành ST (Staff) hoặc lấy từ user login */}
+                        <span className={styles['avatar-text']}>ST</span>
                     </button>
 
                 </div>

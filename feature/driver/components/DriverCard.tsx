@@ -1,30 +1,37 @@
-import { Driver } from '../api/driverApi';
-import Image from 'next/image';
-import styles from './DriverCard.module.css';
+import { Driver } from "../api/driverApi";
+import Image from "next/image";
+import { FaEdit, FaTrash, FaRoute } from "react-icons/fa"; // Import thêm icons
+import styles from "./DriverCard.module.css";
 
 interface DriverCardProps {
   driver: Driver;
   onEdit: (driver: Driver) => void;
   onDelete: (driver: Driver) => void;
+  onAssignRoute?: (driverId: number, driverName: string) => void;
 }
 
-export default function DriverCard({ driver, onEdit, onDelete }: DriverCardProps) {
+export default function DriverCard({
+  driver,
+  onEdit,
+  onDelete,
+  onAssignRoute,
+}: DriverCardProps) {
   const getInitials = (name: string) => {
     return name
-      .split(' ')
+      .split(" ")
       .map((n) => n[0])
-      .join('')
+      .join("")
       .toUpperCase()
       .substring(0, 2);
   };
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'active':
+      case "active":
         return styles.statusActive;
-      case 'inactive':
+      case "inactive":
         return styles.statusInactive;
-      case 'on leave':
+      case "on leave":
         return styles.statusLeave;
       default:
         return styles.statusDefault;
@@ -34,7 +41,9 @@ export default function DriverCard({ driver, onEdit, onDelete }: DriverCardProps
   const isLicenseExpiringSoon = () => {
     const expiryDate = new Date(driver.licenseExpiry);
     const today = new Date();
-    const daysUntilExpiry = Math.floor((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    const daysUntilExpiry = Math.floor(
+      (expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+    );
     return daysUntilExpiry <= 30 && daysUntilExpiry >= 0;
   };
 
@@ -93,16 +102,18 @@ export default function DriverCard({ driver, onEdit, onDelete }: DriverCardProps
           <span className={styles.icon}>📅</span>
           <span>
             Expires: {new Date(driver.licenseExpiry).toLocaleDateString()}
-            {isLicenseExpired() && <span className={styles.expired}> (Expired)</span>}
+            {isLicenseExpired() && (
+              <span className={styles.expired}> (Expired)</span>
+            )}
             {isLicenseExpiringSoon() && !isLicenseExpired() && (
-              <span className={styles.expiringSoon}> (Expiring Soon)</span>
+              <span className={styles.expiringSoon}> (Soon)</span>
             )}
           </span>
         </div>
       </div>
 
       {/* Active Routes */}
-      {driver.activeRoutes && driver.activeRoutes.length > 0 && (
+      {driver.activeRoutes && driver.activeRoutes.length > 0 ? (
         <div className={styles.section}>
           <h4 className={styles.sectionTitle}>Active Routes</h4>
           <div className={styles.routes}>
@@ -110,7 +121,9 @@ export default function DriverCard({ driver, onEdit, onDelete }: DriverCardProps
               <div key={route.assignmentId} className={styles.routeItem}>
                 <div className={styles.routeHeader}>
                   <span className={styles.routeName}>{route.routeName}</span>
-                  <span className={`${styles.role} ${route.preferredRole === 'Main' ? styles.roleMain : styles.roleBackup}`}>
+                  <span
+                    className={`${styles.role} ${route.preferredRole === "Main" ? styles.roleMain : styles.roleBackup}`}
+                  >
                     {route.preferredRole}
                   </span>
                 </div>
@@ -118,28 +131,48 @@ export default function DriverCard({ driver, onEdit, onDelete }: DriverCardProps
                   <span className={styles.routePath}>
                     {route.origin} → {route.destination}
                   </span>
-                  <span className={styles.priority}>Priority: {route.priority}</span>
+                  <span className={styles.priority}>
+                    Prio: {route.priority}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      )}
-
-      {driver.activeRoutes && driver.activeRoutes.length === 0 && (
+      ) : (
         <div className={styles.noRoutes}>
           <span className={styles.icon}>🚌</span>
-          <span>No active routes assigned</span>
+          <span>Chưa được phân công tuyến</span>
         </div>
       )}
 
       {/* Actions */}
       <div className={styles.actions}>
-        <button onClick={() => onEdit(driver)} className={styles.btnEdit}>
-          ✏️ Edit
+        {/* Nút Gán Tuyến - Đặt ở đây cho đẹp và dễ bấm */}
+        {onAssignRoute && (
+          <button
+            onClick={() => onAssignRoute(driver.driverId, driver.fullName)}
+            className={styles.btnAssign}
+            title="Gắn tuyến mới"
+          >
+            <FaRoute /> Gắn tuyến
+          </button>
+        )}
+
+        <button
+          onClick={() => onEdit(driver)}
+          className={styles.btnEdit}
+          title="Sửa"
+        >
+          <FaEdit /> Sửa
         </button>
-        <button onClick={() => onDelete(driver)} className={styles.btnDelete}>
-          🗑️ Delete
+
+        <button
+          onClick={() => onDelete(driver)}
+          className={styles.btnDelete}
+          title="Xóa"
+        >
+          <FaTrash /> Xóa
         </button>
       </div>
     </div>

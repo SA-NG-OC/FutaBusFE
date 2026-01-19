@@ -5,6 +5,7 @@ export interface TripData {
   routeName: string;
   vehicleInfo: string;
   driverName: string;
+  subDriverName?: string | null;
   date: string; // yyyy-MM-dd
   departureTime: string; // HH:mm:ss
   arrivalTime: string; // HH:mm:ss
@@ -38,7 +39,7 @@ export interface TripFormData {
   routeId: string;
   vehicleId: string;
   driverId: string;
-  subDriverId: string;
+  subDriverId: string | null;
   date: string;
   departureTime: string;
   price: number;

@@ -199,13 +199,31 @@ function PaymentResultContent() {
             {error || "Giao dịch không thể hoàn tất"}
           </p>
 
+          {orderId && (
+            <p className={styles.retryInfo}>
+              Đơn hàng của bạn vẫn còn hiệu lực. Bạn có thể thử thanh toán lại
+              trước khi hết hạn.
+            </p>
+          )}
+
           <div className={styles.actions}>
-            <button
-              className={styles.primaryButton}
-              onClick={() => router.back()}
-            >
-              Thử lại
-            </button>
+            {orderId ? (
+              <button
+                className={styles.primaryButton}
+                onClick={() =>
+                  router.push(`/client/payment/retry?orderId=${orderId}`)
+                }
+              >
+                Thử lại
+              </button>
+            ) : (
+              <button
+                className={styles.primaryButton}
+                onClick={() => router.back()}
+              >
+                Quay lại
+              </button>
+            )}
             <button
               className={styles.secondaryButton}
               onClick={() => router.push("/client/booking")}

@@ -28,7 +28,7 @@ const RouteModal = ({ isOpen, onClose, onSubmit, initialData, title }: RouteModa
     const [locationOptions, setLocationOptions] = useState<SelectOption[]>([]);
     const [isLoadingOptions, setIsLoadingOptions] = useState(false);
 
-    // 1. Fetch danh sách địa điểm (Giữ nguyên, thêm log để debug)
+    // 1. Fetch danh sách địa điểm (Giữ nguyên)
     useEffect(() => {
         if (isOpen) {
             const fetchOptions = async () => {
@@ -46,7 +46,7 @@ const RouteModal = ({ isOpen, onClose, onSubmit, initialData, title }: RouteModa
                         label: loc.locationName
                     }));
 
-                    console.log("Loaded Options:", locOpts); // Kiểm tra xem danh sách có đúng không
+                    console.log("Loaded Options:", locOpts);
                     setLocationOptions(locOpts);
                 } catch (error) {
                     console.error("Failed to load options", error);
@@ -58,43 +58,33 @@ const RouteModal = ({ isOpen, onClose, onSubmit, initialData, title }: RouteModa
         }
     }, [isOpen]);
 
-    // 2. Điền dữ liệu vào Form (Logic tìm kiếm thông minh hơn)
+    // 2. Điền dữ liệu vào Form (Logic tìm kiếm thông minh hơn - Giữ nguyên)
     useEffect(() => {
-        // Chỉ chạy khi Modal mở, options đã load xong, và có dữ liệu edit
         if (isOpen && locationOptions.length > 0 && initialData) {
             console.log("Editing Data:", initialData);
 
-            // --- A. Điền Text/Number ---
             setValue('routeName', initialData.routeName);
             setValue('distance', initialData.distance);
             setValue('estimatedDuration', initialData.estimatedDuration);
 
-            // --- B. Hàm Helper để tìm Option bất chấp hoa/thường/khoảng trắng ---
             const findOption = (nameToFind: string | undefined) => {
                 if (!nameToFind) return null;
-
-                // Chuẩn hóa: chữ thường + cắt khoảng trắng 2 đầu
                 const normalizedSearch = nameToFind.toLowerCase().trim();
-
                 return locationOptions.find(opt =>
                     opt.label.toLowerCase().trim() === normalizedSearch
                 );
             };
 
-            // --- C. Tìm Điểm Đi & Đến ---
             const originOpt = findOption(initialData.originName);
             const destOpt = findOption(initialData.destinationName);
 
-            // Debug: Nếu không tìm thấy thì log ra để biết tại sao
             if (!originOpt) console.warn(`Không tìm thấy Origin: "${initialData.originName}" trong options`);
             if (!destOpt) console.warn(`Không tìm thấy Dest: "${initialData.destinationName}" trong options`);
 
             setValue('originId', originOpt || null);
             setValue('destinationId', destOpt || null);
 
-            // --- D. Xử lý Điểm Dừng (Intermediate Stops) ---
             if (initialData.stopNames && Array.isArray(initialData.stopNames)) {
-
                 const normalizedOrigin = initialData.originName?.toLowerCase().trim();
                 const normalizedDestination = initialData.destinationName?.toLowerCase().trim();
 
@@ -116,9 +106,7 @@ const RouteModal = ({ isOpen, onClose, onSubmit, initialData, title }: RouteModa
                 setValue('intermediateStopIds', uniqueStops);
             }
 
-
         } else if (isOpen && !initialData) {
-            // Reset form khi Add New
             reset({
                 routeName: '',
                 distance: '',
@@ -132,7 +120,6 @@ const RouteModal = ({ isOpen, onClose, onSubmit, initialData, title }: RouteModa
 
     if (!isOpen) return null;
 
-    // ... (Phần handleFormSubmit và return JSX giữ nguyên như cũ)
     const handleFormSubmit = (data: any) => {
         const payload = {
             routeName: data.routeName,
@@ -159,34 +146,28 @@ const RouteModal = ({ isOpen, onClose, onSubmit, initialData, title }: RouteModa
                 : 'none',
             minHeight: '38px',
         }),
-
         placeholder: (base: any) => ({
             ...base,
             color: 'var(--text-gray)',
         }),
-
         singleValue: (base: any) => ({
             ...base,
             color: 'var(--input-text)',
         }),
-
         input: (base: any) => ({
             ...base,
             color: 'var(--input-text)',
         }),
-
         menu: (base: any) => ({
             ...base,
             backgroundColor: 'var(--input-bg)',
             color: 'var(--input-text)',
             zIndex: 9999,
         }),
-
         menuList: (base: any) => ({
             ...base,
             backgroundColor: 'var(--input-bg)',
         }),
-
         option: (base: any, state: any) => ({
             ...base,
             backgroundColor: state.isSelected
@@ -199,18 +180,15 @@ const RouteModal = ({ isOpen, onClose, onSubmit, initialData, title }: RouteModa
                 : 'var(--input-text)',
             cursor: 'pointer',
         }),
-
         multiValue: (base: any) => ({
             ...base,
             backgroundColor: 'var(--badge-bg)',
             borderRadius: '4px',
         }),
-
         multiValueLabel: (base: any) => ({
             ...base,
             color: 'var(--badge-text)',
         }),
-
         multiValueRemove: (base: any) => ({
             ...base,
             color: 'var(--badge-text)',
@@ -230,6 +208,7 @@ const RouteModal = ({ isOpen, onClose, onSubmit, initialData, title }: RouteModa
                 </button>
 
                 <div className={styles['modal-header']}>
+                    {/* Title được truyền từ props, nếu muốn Việt hóa cả title thì sửa từ component cha, hoặc map lại ở đây */}
                     <h2 className={styles['modal-title']}>{title}</h2>
                 </div>
 
@@ -237,31 +216,31 @@ const RouteModal = ({ isOpen, onClose, onSubmit, initialData, title }: RouteModa
 
                     {/* Route Name */}
                     <div className={styles['form-field']}>
-                        <label className={styles['form-label']}>Route Name <span style={{ color: 'red' }}>*</span></label>
-                        <input {...register('routeName', { required: true })} className={styles['form-input']} placeholder="Ex: HCM - Da Lat Express" />
+                        <label className={styles['form-label']}>Tên tuyến <span style={{ color: 'red' }}>*</span></label>
+                        <input {...register('routeName', { required: true })} className={styles['form-input']} placeholder="Ví dụ: HCM - Đà Lạt Express" />
                     </div>
 
                     {/* Origin & Dest */}
                     <div className={styles['form-row']}>
                         <div className={styles['form-field']}>
-                            <label className={styles['form-label']}>Start Point <span style={{ color: 'red' }}>*</span></label>
+                            <label className={styles['form-label']}>Điểm đi <span style={{ color: 'red' }}>*</span></label>
                             <Controller
                                 name="originId"
                                 control={control}
                                 rules={{ required: true }}
                                 render={({ field }) => (
-                                    <Select {...field} options={locationOptions} isLoading={isLoadingOptions} placeholder="Select origin..." styles={customStyles} />
+                                    <Select {...field} options={locationOptions} isLoading={isLoadingOptions} placeholder="Chọn điểm đi..." styles={customStyles} />
                                 )}
                             />
                         </div>
                         <div className={styles['form-field']}>
-                            <label className={styles['form-label']}>End Point <span style={{ color: 'red' }}>*</span></label>
+                            <label className={styles['form-label']}>Điểm đến <span style={{ color: 'red' }}>*</span></label>
                             <Controller
                                 name="destinationId"
                                 control={control}
                                 rules={{ required: true }}
                                 render={({ field }) => (
-                                    <Select {...field} options={locationOptions} isLoading={isLoadingOptions} placeholder="Select destination..." styles={customStyles} />
+                                    <Select {...field} options={locationOptions} isLoading={isLoadingOptions} placeholder="Chọn điểm đến..." styles={customStyles} />
                                 )}
                             />
                         </div>
@@ -270,30 +249,30 @@ const RouteModal = ({ isOpen, onClose, onSubmit, initialData, title }: RouteModa
                     {/* Distance & Time */}
                     <div className={styles['form-row']}>
                         <div className={styles['form-field']}>
-                            <label className={styles['form-label']}>Distance (km)</label>
+                            <label className={styles['form-label']}>Khoảng cách (km)</label>
                             <input type="number" step="0.1" {...register('distance', { required: true })} className={styles['form-input']} />
                         </div>
                         <div className={styles['form-field']}>
-                            <label className={styles['form-label']}>Est. Time (mins)</label>
+                            <label className={styles['form-label']}>Thời gian dự kiến (phút)</label>
                             <input type="number" {...register('estimatedDuration', { required: true })} className={styles['form-input']} />
                         </div>
                     </div>
 
                     {/* Stops */}
                     <div className={styles['form-field']}>
-                        <label className={styles['form-label']}>Intermediate Stops</label>
+                        <label className={styles['form-label']}>Các điểm dừng</label>
                         <Controller
                             name="intermediateStopIds"
                             control={control}
                             render={({ field }) => (
-                                <Select {...field} isMulti options={locationOptions} isLoading={isLoadingOptions} placeholder="Select stops..." styles={customStyles} closeMenuOnSelect={false} />
+                                <Select {...field} isMulti options={locationOptions} isLoading={isLoadingOptions} placeholder="Chọn các điểm dừng..." styles={customStyles} closeMenuOnSelect={false} />
                             )}
                         />
                     </div>
 
                     <div className={styles['button-group']}>
-                        <button type="button" className={`${styles.btn} ${styles['btn-cancel']}`} onClick={onClose}>Cancel</button>
-                        <button type="submit" className={`${styles.btn} ${styles['btn-update']}`}>{initialData ? 'Update Route' : 'Save Route'}</button>
+                        <button type="button" className={`${styles.btn} ${styles['btn-cancel']}`} onClick={onClose}>Hủy</button>
+                        <button type="submit" className={`${styles.btn} ${styles['btn-update']}`}>{initialData ? 'Cập nhật tuyến' : 'Lưu tuyến'}</button>
                     </div>
                 </form>
             </div>
@@ -301,4 +280,4 @@ const RouteModal = ({ isOpen, onClose, onSubmit, initialData, title }: RouteModa
     );
 };
 
-export default RouteModal;
+export default RouteModal;  

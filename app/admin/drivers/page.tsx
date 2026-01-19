@@ -5,14 +5,11 @@ import DriverCard from "@/feature/driver/components/DriverCard";
 import DriverModal from "@/feature/driver/components/DriverModal";
 import CreateDriverModal from "@/feature/driver/components/CreateDriverModal";
 import ConfirmDeleteModal from "@/feature/driver/components/ConfirmDeleteModal";
-// [NEW] Import Modal gán tuyến
 import DriverRouteAssignmentModal from "@/feature/driver/components/DriverRouteAssignmentModal/DriverRouteAssignmentModal";
 import { useDrivers } from "@/feature/driver/hooks/useDrivers";
-// [NEW] Import API và Filter
 import { driverRouteAssignmentApi } from "@/feature/driver/api/driverRouteAssignmentApi";
 import RouteFilter from "@/src/components/RouteFilter/RouteFilter";
 import { Driver } from "@/feature/driver/api/driverApi";
-
 import PageHeader from "@/src/components/PageHeader/PageHeader";
 import Pagination from "@/src/components/Pagination/Pagination";
 import styles from "./AdminDriversPage.module.css";
@@ -39,25 +36,21 @@ export default function AdminDriversPage() {
     handleCreateWithAccount,
   } = useDrivers();
 
-  // --- STATE CHO TÍNH NĂNG GÁN TUYẾN (Của bạn bạn) ---
+  // --- STATE ---
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAssignmentModal, setShowAssignmentModal] = useState(false);
   const [selectedDriverForAssignment, setSelectedDriverForAssignment] =
     useState<{ id: number; name: string } | null>(null);
   const [selectedRouteId, setSelectedRouteId] = useState<number | null>(null);
 
-  // State quản lý danh sách filter
   const [filteredDrivers, setFilteredDrivers] = useState<Driver[]>([]);
   const [driversWithRoutes, setDriversWithRoutes] = useState<Driver[]>([]);
   const [loadingRoutes, setLoadingRoutes] = useState(false);
 
-  // --- LOGIC FETCH ROUTE & FILTER (Giữ lại logic của bạn bạn) ---
-
-  // 1. Fetch assigned routes for all drivers
+  // --- LOGIC ---
   useEffect(() => {
     const fetchAssignedRoutes = async () => {
       if (!drivers.length) return;
-
       setLoadingRoutes(true);
       try {
         const driversWithRoutesData = await Promise.all(
@@ -101,11 +94,9 @@ export default function AdminDriversPage() {
         setLoadingRoutes(false);
       }
     };
-
     fetchAssignedRoutes();
   }, [drivers]);
 
-  // 2. Filter logic
   useEffect(() => {
     if (selectedRouteId) {
       filterDriversByRoute();
@@ -144,7 +135,6 @@ export default function AdminDriversPage() {
     }
   };
 
-  // Quyết định danh sách hiển thị
   const displayDrivers = selectedRouteId ? filteredDrivers : driversWithRoutes;
 
   return (
@@ -156,9 +146,8 @@ export default function AdminDriversPage() {
         onAction={() => setShowCreateModal(true)}
       />
 
-      {/* --- FILTER SECTION (Merged) --- */}
+      {/* --- FILTER SECTION --- */}
       <div className={styles.filterContainer}>
-        {/* Search Bar */}
         <div className={styles.searchBox}>
           <input
             type="text"
@@ -169,7 +158,6 @@ export default function AdminDriversPage() {
           />
         </div>
 
-        {/* Route Filter */}
         <div className={styles.routeFilterBox}>
           <RouteFilter
             onRouteSelect={setSelectedRouteId}
@@ -179,7 +167,7 @@ export default function AdminDriversPage() {
         </div>
       </div>
 
-      {/* --- STATISTICS (Của bạn bạn - Đã chuyển sang CSS Module) --- */}
+      {/* --- STATISTICS --- */}
       {selectedRouteId && (
         <div className={styles.statsBox}>
           <p className={styles.statsText}>
@@ -205,18 +193,10 @@ export default function AdminDriversPage() {
                   driver={driver}
                   onEdit={openEditModal}
                   onDelete={openDeleteModal}
+                  onAssignRoute={handleAssignRoute} // Truyền prop vào Card, KHÔNG render nút ở đây
                 />
 
-                {/* Nút Gán tuyến (Overlay Button) */}
-                <button
-                  onClick={() =>
-                    handleAssignRoute(driver.driverId, driver.fullName)
-                  }
-                  className={styles.assignButton}
-                  title="Gắn tuyến cho tài xế này"
-                >
-                  + Gắn tuyến
-                </button>
+                {/* [ĐÃ XÓA] Nút Gán tuyến Overlay đỏ cũ ở đây */}
               </div>
             ))}
           </div>
