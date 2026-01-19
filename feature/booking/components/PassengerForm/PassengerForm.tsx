@@ -12,22 +12,31 @@ export interface PassengerData {
   name: string;
   phone: string;
   email: string;
+  pickupAddress: string;
+  dropoffAddress: string;
+  specialNote: string;
 }
 
 export default function PassengerForm({ onFormChange }: PassengerFormProps) {
   const { user, isAuthenticated } = useAuth();
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
-  
+
   const [formData, setFormData] = useState<PassengerData>({
     name: "",
     phone: "",
     email: "",
+    pickupAddress: "",
+    dropoffAddress: "",
+    specialNote: "",
   });
 
   const [errors, setErrors] = useState({
     name: "",
     phone: "",
     email: "",
+    pickupAddress: "",
+    dropoffAddress: "",
+    specialNote: "",
   });
 
   // Auto-fill user info if logged in
@@ -37,6 +46,9 @@ export default function PassengerForm({ onFormChange }: PassengerFormProps) {
         name: user.fullName || "",
         phone: user.phoneNumber || "",
         email: user.email || "",
+        pickupAddress: "",
+        dropoffAddress: "",
+        specialNote: "",
       };
       setFormData(autoFilledData);
       validateForm(autoFilledData);
@@ -48,6 +60,9 @@ export default function PassengerForm({ onFormChange }: PassengerFormProps) {
       name: "",
       phone: "",
       email: "",
+      pickupAddress: "",
+      dropoffAddress: "",
+      specialNote: "",
     };
 
     if (!data.name.trim()) {
@@ -66,11 +81,24 @@ export default function PassengerForm({ onFormChange }: PassengerFormProps) {
       newErrors.email = "Email không hợp lệ";
     }
 
+    // pickupAddress, dropoffAddress, and specialNote are optional - no validation needed
+
     setErrors(newErrors);
 
     const isValid = !newErrors.name && !newErrors.phone && !newErrors.email;
 
     if (onFormChange) {
+      console.log("🔄 PassengerForm - Calling onFormChange with:", {
+        isValid,
+        data: {
+          name: data.name,
+          phone: data.phone,
+          email: data.email,
+          pickupAddress: data.pickupAddress,
+          dropoffAddress: data.dropoffAddress,
+          specialNote: data.specialNote,
+        },
+      });
       onFormChange(isValid, data);
     }
 
@@ -80,6 +108,10 @@ export default function PassengerForm({ onFormChange }: PassengerFormProps) {
   const handleChange = (field: keyof PassengerData, value: string) => {
     const newData = { ...formData, [field]: value };
     setFormData(newData);
+
+    // Debug log to verify data updates
+    console.log(`📝 PassengerForm - ${field} changed:`, value);
+
     validateForm(newData);
   };
 
@@ -135,6 +167,48 @@ export default function PassengerForm({ onFormChange }: PassengerFormProps) {
           onChange={(e) => handleChange("email", e.target.value)}
         />
         {errors.email && <span className={styles.error}>{errors.email}</span>}
+      </div>
+
+      <div className={styles.formGroup}>
+        <label className={styles.label}>Địa chỉ đón (tùy chọn)</label>
+        <input
+          type="text"
+          className={`${styles.input} ${errors.pickupAddress ? styles.inputError : ""}`}
+          placeholder="Nhập địa chỉ đón"
+          value={formData.pickupAddress}
+          onChange={(e) => handleChange("pickupAddress", e.target.value)}
+        />
+        {errors.pickupAddress && (
+          <span className={styles.error}>{errors.pickupAddress}</span>
+        )}
+      </div>
+
+      <div className={styles.formGroup}>
+        <label className={styles.label}>Địa chỉ trả (tùy chọn)</label>
+        <input
+          type="text"
+          className={`${styles.input} ${errors.dropoffAddress ? styles.inputError : ""}`}
+          placeholder="Nhập địa chỉ trả"
+          value={formData.dropoffAddress}
+          onChange={(e) => handleChange("dropoffAddress", e.target.value)}
+        />
+        {errors.dropoffAddress && (
+          <span className={styles.error}>{errors.dropoffAddress}</span>
+        )}
+      </div>
+
+      <div className={styles.formGroup}>
+        <label className={styles.label}>Ghi chú đặc biệt (tùy chọn)</label>
+        <textarea
+          className={`${styles.input} ${styles.textarea} ${errors.specialNote ? styles.inputError : ""}`}
+          placeholder="Nhập ghi chú nếu có (ví dụ: cần trợ giúp với hành lý, yêu cầu ghế đặc biệt...)"
+          value={formData.specialNote}
+          onChange={(e) => handleChange("specialNote", e.target.value)}
+          rows={3}
+        />
+        {errors.specialNote && (
+          <span className={styles.error}>{errors.specialNote}</span>
+        )}
       </div>
 
       {/* Register prompt for guests */}

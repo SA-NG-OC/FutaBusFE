@@ -189,10 +189,26 @@ export default function ClientBookingCheckoutPage() {
         customerName: passengerData.name,
         customerPhone: passengerData.phone,
         customerEmail: passengerData.email || undefined,
+        pickupAddress: passengerData.pickupAddress || null,
+        dropoffAddress: passengerData.dropoffAddress || null,
+        specialNote: passengerData.specialNote || null,
         isGuestBooking: isGuest,
         guestSessionId: isGuest ? bookingInfo.userId : undefined,
+        passengers: bookingInfo.selectedSeats.map((seat) => ({
+          seatId: seat.seatId,
+          fullName: passengerData.name,
+          phoneNumber: passengerData.phone,
+          email: passengerData.email || undefined,
+          pickupAddress: passengerData.pickupAddress || null,
+          dropoffAddress: passengerData.dropoffAddress || null,
+          specialNote: passengerData.specialNote || null,
+        })),
       };
 
+      console.log("=== DEBUG: Passenger Data ===");
+      console.log("pickupAddress:", passengerData.pickupAddress, "length:", passengerData.pickupAddress.length);
+      console.log("dropoffAddress:", passengerData.dropoffAddress, "length:", passengerData.dropoffAddress.length);
+      console.log("specialNote:", passengerData.specialNote, "length:", passengerData.specialNote.length);
       console.log("=== DEBUG: Request Data ===");
       console.log(JSON.stringify(requestData, null, 2));
 
@@ -248,26 +264,28 @@ export default function ClientBookingCheckoutPage() {
       } else if (paymentMethod === "bypass") {
         // Bypass payment - instant confirmation
         setProcessingStep("Đang xác nhận thanh toán...");
-        
+
         const confirmedBooking = await paymentApi.bypassPayment(
           bookingResponse.bookingId,
         );
-        
+
         console.log("Bypass payment completed:", confirmedBooking);
-        
+
         // Cleanup session storage
         sessionStorage.removeItem("bookingInfo");
         sessionStorage.removeItem("selectedSeats");
         sessionStorage.removeItem("seatHoldExpiry");
-        
+
         // Disconnect WebSocket
         wsContext.unsubscribeFromTrip();
-        
+
         // Redirect to success page
         setProcessingStep("Thanh toán thành công! Đang chuyển hướng...");
         await new Promise((resolve) => setTimeout(resolve, 500));
-        
-        router.push(`/client/payment/result?orderId=${bookingResponse.bookingCode}&resultCode=0&message=Thanh%20to%C3%A1n%20th%C3%A0nh%20c%C3%B4ng&bypass=true`);
+
+        router.push(
+          `/client/payment/result?orderId=${bookingResponse.bookingCode}&resultCode=0&message=Thanh%20to%C3%A1n%20th%C3%A0nh%20c%C3%B4ng&bypass=true`,
+        );
       } else {
         // Other payment methods (not implemented yet)
         setError("Phương thức thanh toán này chưa được hỗ trợ");
@@ -434,10 +452,9 @@ export default function ClientBookingCheckoutPage() {
           </button>
 
           <p className={styles.securityNote}>
-            {paymentMethod === "bypass" 
+            {paymentMethod === "bypass"
               ? "⚠️ Chế độ Demo: Bỏ qua thanh toán thực, vé sẽ được xác nhận ngay lập tức."
-              : "🔒 Giao dịch được bảo mật bởi MoMo. Chúng tôi không lưu trữ thông tin thanh toán của bạn."
-            }
+              : "🔒 Giao dịch được bảo mật bởi MoMo. Chúng tôi không lưu trữ thông tin thanh toán của bạn."}
           </p>
         </div>
       </div>
