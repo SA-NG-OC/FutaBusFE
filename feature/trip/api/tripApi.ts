@@ -95,7 +95,7 @@ export const tripApi = {
 },
 
 
-  // 1. Get List Trips
+  // 1. Get List Trips (Admin/Employee - with status filter)
   getTrips: async ({
     page = 0,
     size = 10,
@@ -103,7 +103,13 @@ export const tripApi = {
     date,
   }: any): Promise<PageResponse<TripData>> => {
     const params: any = { page, size, sort: "departureTime,asc" };
-    if (status && status !== "ALL") params.status = status;
+    
+    // If status is provided and not empty, send as array
+    // If empty string or null, backend will default to ["Waiting", "Running"]
+    if (status && status !== "") {
+      params.statuses = status; // Single status, backend expects List<String>
+    }
+    
     if (date) params.date = date;
 
     return api.get<PageResponse<TripData>>("/trips", { params });

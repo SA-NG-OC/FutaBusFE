@@ -14,6 +14,7 @@ import { TripFormData, TripData } from "@/feature/trip/types";
 export default function TripSchedulingPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState(""); // "" = All statuses (default: Waiting + Running)
 
   // State quản lý Modal Tạo Mới
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -44,15 +45,15 @@ export default function TripSchedulingPage() {
     updateTripInfo,
   } = useTrips();
 
-  // Load trips khi đổi ngày hoặc đổi trang
+  // Load trips khi đổi ngày hoặc đổi trang hoặc đổi status
   useEffect(() => {
     const dateStr = format(selectedDate, "yyyy-MM-dd");
     fetchTrips({
       page: currentPage,
-      status: "",
+      status: selectedStatus,
       date: dateStr,
     });
-  }, [selectedDate, currentPage, fetchTrips]);
+  }, [selectedDate, currentPage, selectedStatus, fetchTrips]);
 
   // Client-side search
   const filteredTrips = trips.filter((t) =>
@@ -101,6 +102,11 @@ export default function TripSchedulingPage() {
           setPage(0);
         }}
         onSearch={setSearchTerm}
+        selectedStatus={selectedStatus}
+        onStatusChange={(status) => {
+          setSelectedStatus(status);
+          setPage(0); // Reset to first page when changing status
+        }}
       />
 
       {loading ? (

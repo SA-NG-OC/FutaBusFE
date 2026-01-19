@@ -5,8 +5,6 @@ import {
   BookingListItem,
 } from "../types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-
 export const ticketApi = {
   // ================================
   // GET ALL BOOKINGS (Admin table)
@@ -32,13 +30,23 @@ export const ticketApi = {
 
   // ================================
   // LOOKUP BY BOOKING CODE (Customer)
+  // GET /bookings/code/{bookingCode}
   // ================================
-  getBookingByCode: async (bookingCode: string) => {
-    return api.get(`/bookings/code/${bookingCode}`);
+  getBookingByCode: async (bookingCode: string): Promise<BookingData> => {
+    return api.get<BookingData>(`/bookings/code/${bookingCode}`);
+  },
+
+  // ================================
+  // LOOKUP BY TICKET CODE (Customer) ✨ NEW
+  // GET /bookings/ticket/{ticketCode}
+  // ================================
+  getBookingByTicketCode: async (ticketCode: string): Promise<BookingData> => {
+    return api.get<BookingData>(`/bookings/ticket/${ticketCode}`);
   },
 
   // ================================
   // SEARCH BY PHONE
+  // GET /bookings/phone/{phone}
   // ================================
   getBookingsByPhone: async (phone: string): Promise<BookingListItem[]> => {
     return api.get<BookingListItem[]>(`/bookings/phone/${phone}`);
@@ -46,6 +54,7 @@ export const ticketApi = {
 
   // ================================
   // SEARCH BY EMAIL
+  // GET /bookings/email/{email}
   // ================================
   getBookingsByEmail: async (email: string): Promise<BookingListItem[]> => {
     return api.get<BookingListItem[]>(`/bookings/email/${encodeURIComponent(email)}`);
@@ -53,30 +62,31 @@ export const ticketApi = {
 
   // ================================
   // GET BY CUSTOMER ID
+  // GET /bookings/customer/{customerId}
   // ================================
-  getBookingsByCustomer: async (customerId: number) => {
-    return api.get(`/bookings/customer/${customerId}`);
+  getBookingsByCustomer: async (customerId: number): Promise<BookingListItem[]> => {
+    return api.get<BookingListItem[]>(`/bookings/customer/${customerId}`);
   },
 
   // ================================
-  // 🔥 ADMIN CONFIRM BOOKING
-  // Backend: POST /bookings/{bookingId}/confirm
+  // ADMIN CONFIRM BOOKING
+  // POST /bookings/{bookingId}/confirm
   // ================================
   confirmBooking: async (bookingId: number): Promise<BookingData> => {
     return api.post<BookingData>(`/bookings/${bookingId}/confirm`);
   },
 
   // ================================
-  // 🔥 CANCEL BOOKING
-  // Backend: POST /bookings/{bookingId}/cancel?userId=
+  // CANCEL BOOKING
+  // POST /bookings/{bookingId}/cancel?userId=
   // ================================
-  cancelBooking: async (bookingId: number, userId: number = 1): Promise<void> => {
-    return api.post<void>(`/bookings/${bookingId}/cancel?userId=${userId}`);
+  cancelBooking: async (bookingId: number, userId: number): Promise<{ success: boolean; message: string }> => {
+    return api.post<{ success: boolean; message: string }>(`/bookings/${bookingId}/cancel?userId=${userId}`);
   },
 
   // ================================
-  // 🎫 MY TICKETS - Get user's bookings with filter
-  // Backend: GET /bookings/my-tickets?status=&page=&size=
+  // MY TICKETS - Get user's bookings with filter
+  // GET /bookings/my-tickets?status=&page=&size=
   // ================================
   getMyTickets: async (
     status?: "Upcoming" | "Completed" | "Cancelled",
@@ -96,8 +106,8 @@ export const ticketApi = {
   },
 
   // ================================
-  // 📊 MY TICKETS COUNT - Get ticket counts by status
-  // Backend: GET /bookings/my-tickets/count
+  // MY TICKETS COUNT - Get ticket counts by status
+  // GET /bookings/my-tickets/count
   // ================================
   getMyTicketsCount: async (): Promise<{
     upcomingCount: number;
@@ -111,39 +121,5 @@ export const ticketApi = {
       cancelledCount: number;
       totalCount: number;
     }>("/bookings/my-tickets/count");
-  },
-
-  // ================================
-  // GET TICKET DETAIL BY CODE
-  // ================================
-  getTicketDetailByCode: async (ticketCode: string): Promise<BookingListItem> => {
-    return api.get<BookingListItem>(`/bookings/ticket/${ticketCode}`);
-  },
-
-  getTicketQrImage: async (ticketCode: string): Promise<Blob> => {
-    const res = await fetch(`${API_BASE_URL}/tickets/${ticketCode}/qr`, {
-      method: "GET",
-    });
-
-    if (!res.ok) {
-      throw new Error("Failed to load QR code image");
-    }
-    return res.blob();
-  },
-
-  exportTicketPdf: async (ticketId: number, token?: string): Promise<Blob> => {
-    const headers: HeadersInit = {};
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
-    const res = await fetch(`${API_BASE_URL}/tickets/${ticketId}/pdf`, {
-      method: "GET",
-      headers: headers,
-    });
-
-    if (!res.ok) {
-      throw new Error("Failed to export ticket PDF");
-    }
-    return res.blob();
   },
 };

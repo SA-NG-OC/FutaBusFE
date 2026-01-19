@@ -27,6 +27,12 @@ export default function MyTicketsPage() {
   const [selectedTicket, setSelectedTicket] = useState<any>(null);
   const [loadingTicket, setLoadingTicket] = useState(false);
 
+  // Debug: Log modal state changes
+  React.useEffect(() => {
+    console.log("🔄 [Modal State] isModalOpen changed:", isModalOpen);
+    console.log("🔄 [Modal State] selectedTicket:", selectedTicket);
+  }, [isModalOpen, selectedTicket]);
+
   // Redirect or show login modal if not authenticated
   React.useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -52,52 +58,64 @@ export default function MyTicketsPage() {
     refetch,
   } = useMyTickets(token);
 
-  const handleViewDetails = async (bookingCode: string) => {
-    console.log("View details for booking:", bookingCode);
+  const handleViewDetails = async (ticketCode: string) => {
+    console.log("🎫 [handleViewDetails] START - Ticket code:", ticketCode);
 
     setLoadingTicket(true);
     try {
-      const response = await ticketApi.getBookingByCode(bookingCode);
+      console.log("📡 [handleViewDetails] Calling API with ticketCode...");
+      const response = await ticketApi.getBookingByTicketCode(ticketCode);
+      console.log("✅ [handleViewDetails] API Response:", response);
 
       if (response && response.success && response.data) {
         const booking = response.data;
-        const firstTicket = booking.tickets[0];
+        console.log("📦 [handleViewDetails] Booking data:", booking);
+        console.log("🚌 [handleViewDetails] TripInfo:", booking.tripInfo);
+        
+        const firstTicket = booking.tickets?.[0];
+        console.log("🎟️ [handleViewDetails] First ticket:", firstTicket);
 
         if (!firstTicket) {
+          console.error("❌ [handleViewDetails] No tickets found in booking");
           alert("Không tìm thấy vé trong booking");
           return;
         }
 
+        // Safely access tripInfo with fallbacks
+        const tripInfo = booking.tripInfo || {};
+        console.log("🔍 [handleViewDetails] Processing tripInfo...", tripInfo);
+        
         // Parse route name - support both " - " and " → " separators
-        const routeParts = booking.tripInfo?.routeName?.split(/\s*[-→]\s*/) || [];
-        const fromLocation = booking.tripInfo?.pickupLocation ||
-            booking.tripInfo?.pickupLocationName ||
+        const routeParts = tripInfo.routeName?.split(/\s*[-→]\s*/) || [];
+        const fromLocation = tripInfo.pickupLocation ||
+            tripInfo.pickupLocationName ||
             routeParts[0] || "N/A";
-        const toLocation = booking.tripInfo?.dropoffLocation ||
-            booking.tripInfo?.dropoffLocationName ||
+        const toLocation = tripInfo.dropoffLocation ||
+            tripInfo.dropoffLocationName ||
             routeParts[1] || "N/A";
 
-        // Map data to modal format
+        console.log("📍 [handleViewDetails] Locations - From:", fromLocation, "To:", toLocation);
+
+        // Map data to modal format - use tripInfo with null safety
+        const departureTime = tripInfo.departureTime ? new Date(tripInfo.departureTime) : new Date();
+        const arrivalTime = tripInfo.arrivalTime ? new Date(tripInfo.arrivalTime) : new Date();
+        const pickupTime = tripInfo.pickupTime ? new Date(tripInfo.pickupTime) : departureTime;
+        const dropoffTime = tripInfo.dropoffTime ? new Date(tripInfo.dropoffTime) : arrivalTime;
+        
+        console.log("⏰ [handleViewDetails] Times - Departure:", departureTime, "Arrival:", arrivalTime);
+
         const ticketData = {
           bookingCode: booking.bookingCode,
           status: booking.bookingStatus,
-          qrCode: firstTicket.ticketCode,
+          qrCode: firstTicket.ticketCode, // ✅ Using ticketCode for QR
           fromLocation: fromLocation,
           toLocation: toLocation,
-          departureDate: new Date(
-            booking.tripInfo.departureTime,
-          ).toLocaleDateString("vi-VN"),
-          departureTime: new Date(
-            booking.tripInfo.departureTime,
-          ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
-          duration: `${Math.round(
-            (new Date(booking.tripInfo.arrivalTime).getTime() -
-              new Date(booking.tripInfo.departureTime).getTime()) /
-              (1000 * 60 * 60),
-          )}h`,
-          vehicleType: "Limousine",
-          licensePlate: booking.tripInfo.vehiclePlate || "N/A",
-          driverName: booking.tripInfo.driverName || "N/A",
+          departureDate: departureTime.toLocaleDateString("vi-VN"),
+          departureTime: departureTime.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+          duration: `${Math.max(1, Math.round((arrivalTime.getTime() - departureTime.getTime()) / (1000 * 60 * 60)))}h`,
+          vehicleType: tripInfo.vehicleTypeName || "Limousine",
+          licensePlate: tripInfo.vehiclePlate || "N/A",
+          driverName: tripInfo.driverName || "N/A",
           customerName: firstTicket.passenger?.fullName || booking.customerName,
           customerPhone:
             firstTicket.passenger?.phoneNumber || booking.customerPhone,
@@ -105,23 +123,26 @@ export default function MyTicketsPage() {
           customerIdCard: "",
           seatNumber: booking.tickets.map((t: any) => t.seatNumber).join(", "),
           seatFloor: firstTicket.floorNumber ? `Tầng ${firstTicket.floorNumber}` : "N/A",
-          pickupLocation: booking.tripInfo.pickupLocation || fromLocation,
-          pickupTime: new Date(
-            booking.tripInfo.pickupTime || booking.tripInfo.departureTime,
-          ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
-          dropoffLocation: booking.tripInfo.dropoffLocation || toLocation,
-          dropoffTime: new Date(
-            booking.tripInfo.dropoffTime || booking.tripInfo.arrivalTime,
-          ).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+          pickupLocation: tripInfo.pickupLocation || fromLocation,
+          pickupTime: pickupTime.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+          dropoffLocation: tripInfo.dropoffLocation || toLocation,
+          dropoffTime: dropoffTime.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
         };
 
+        console.log("🎫 [handleViewDetails] Mapped ticketData:", ticketData);
+        console.log("🔑 [handleViewDetails] QR Code (ticketCode):", ticketData.qrCode);
+
+        console.log("🎬 [handleViewDetails] Setting selectedTicket and opening modal...");
         setSelectedTicket(ticketData);
         setIsModalOpen(true);
+        console.log("✅ [handleViewDetails] Modal state set - isModalOpen: true");
       } else {
+        console.error("❌ [handleViewDetails] API response failed or no data:", response);
         alert("Không thể tải thông tin vé. Vui lòng thử lại.");
       }
     } catch (err) {
-      console.error("Error fetching ticket details:", err);
+      console.error("💥 [handleViewDetails] EXCEPTION:", err);
+      console.error("💥 [handleViewDetails] Error stack:", err instanceof Error ? err.stack : "N/A");
       alert(
         err instanceof Error
           ? err.message
@@ -129,6 +150,7 @@ export default function MyTicketsPage() {
       );
     } finally {
       setLoadingTicket(false);
+      console.log("🏁 [handleViewDetails] END");
     }
   };
 
@@ -251,6 +273,7 @@ export default function MyTicketsPage() {
               key={booking.bookingId}
               bookingId={booking.bookingId}
               bookingReference={booking.bookingCode}
+              ticketCode={booking.tickets[0]?.ticketCode || booking.bookingCode}
               status={
                 activeTab === "Upcoming"
                   ? "Upcoming"
@@ -271,7 +294,7 @@ export default function MyTicketsPage() {
               })}
               seats={booking.tickets.map((t) => t.seatNumber).join(", ")}
               price={booking.totalAmount}
-              onViewDetails={() => handleViewDetails(booking.bookingCode)}
+              onViewDetails={() => handleViewDetails(booking.tickets[0]?.ticketCode || booking.bookingCode)}
               onCancel={handleCancelBooking}
             />
             );
@@ -328,7 +351,10 @@ export default function MyTicketsPage() {
       {/* Ticket Detail Modal */}
       <TicketDetailModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          console.log("🚪 [Modal] Close button clicked");
+          setIsModalOpen(false);
+        }}
         ticket={selectedTicket}
       />
 

@@ -216,3 +216,40 @@
   color: white !important;
   box-shadow: 0 2px 8px rgba(216, 62, 62, 0.4);
 }
+
+/* --- Status Filter Buttons --- */
+.statusFilter {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+.statusBtn {
+  padding: 8px 16px;
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+  background-color: var(--background-paper);
+  color: var(--text-gray);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.statusBtn:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--text-gray);
+}
+
+.statusBtnActive {
+  background-color: var(--primary) !important;
+  color: white !important;
+  border-color: var(--primary) !important;
+  font-weight: 600;
+}
+
+.statusBtnActive:hover {
+  background-color: var(--primary) !important;
+  opacity: 0.9;
+}

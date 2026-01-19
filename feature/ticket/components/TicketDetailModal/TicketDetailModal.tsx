@@ -43,7 +43,15 @@ export default function TicketDetailModal({
   const ticketRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  if (!isOpen || !ticket) return null;
+  // Debug logging
+  console.log("🎫 [TicketDetailModal] Render - isOpen:", isOpen, "ticket:", ticket);
+
+  if (!isOpen || !ticket) {
+    console.log("❌ [TicketDetailModal] Not rendering - isOpen:", isOpen, "ticket:", !!ticket);
+    return null;
+  }
+
+  console.log("✅ [TicketDetailModal] Rendering modal with ticket:", ticket.bookingCode);
 
   const getStatusColor = (status: string) => {
     switch (status.toUpperCase()) {

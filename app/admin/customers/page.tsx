@@ -1,6 +1,5 @@
+import CustomerManagement from '@/feature/user/components/CustomerManagement';
 
-export default function AdminCustomers() {
-    return (
-        <div> Lorem ipsum, dolor sit amet consectetur adipisicing elit. Dignissimos blanditiis veniam culpa cupiditate adipisci aut!</div>
-    );
+export default function AdminCustomersPage() {
+  return <CustomerManagement />;
 }

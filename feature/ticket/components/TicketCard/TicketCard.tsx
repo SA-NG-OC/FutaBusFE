@@ -5,6 +5,7 @@ import { QRCodeCanvas } from "qrcode.react";
 
 export interface TicketCardProps {
   bookingReference: string;
+  ticketCode: string; // ✅ Ticket code for QR
   status: "Upcoming" | "Completed" | "Cancelled";
   from: string;
   to: string;
@@ -19,6 +20,7 @@ export interface TicketCardProps {
 
 export default function TicketCard({
   bookingReference,
+  ticketCode,
   status,
   from,
   to,
@@ -164,7 +166,7 @@ export default function TicketCard({
 
         <div className={styles.rightSection}>
           <div className={styles.qrCode}>
-            <QRCodeCanvas value={bookingReference} size={120} level="H" />
+            <QRCodeCanvas value={ticketCode} size={120} level="H" />
           </div>
           <button
             className={styles.detailsButtonMobile}

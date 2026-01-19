@@ -13,16 +13,30 @@ import {
 } from "react-icons/fa";
 import styles from "./TripFilterBar.module.css";
 
+// Status options for filtering
+const STATUS_OPTIONS = [
+  { value: "", label: "All Statuses" },
+  { value: "Waiting", label: "Waiting" },
+  { value: "Running", label: "Running" },
+  { value: "Completed", label: "Completed" },
+  { value: "Cancelled", label: "Cancelled" },
+  { value: "Delayed", label: "Delayed" },
+];
+
 interface TripFilterBarProps {
   currentDate: Date;
   onDateChange: (date: Date) => void;
   onSearch: (term: string) => void;
+  selectedStatus?: string;
+  onStatusChange?: (status: string) => void;
 }
 
 const TripFilterBar = ({
   currentDate,
   onDateChange,
   onSearch,
+  selectedStatus = "",
+  onStatusChange,
 }: TripFilterBarProps) => {
   const [showCalendar, setShowCalendar] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -105,6 +119,23 @@ const TripFilterBar = ({
           <FaChevronRight />
         </button>
       </div>
+
+      {/* Status Filter Buttons */}
+      {onStatusChange && (
+        <div className={styles.statusFilter}>
+          {STATUS_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              className={`${styles.statusBtn} ${
+                selectedStatus === option.value ? styles.statusBtnActive : ""
+              }`}
+              onClick={() => onStatusChange(option.value)}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -44,7 +44,6 @@ export default function EmployeeLayout({
         >
           {children}
         </main>
-        <main>{children}</main>
       </div>
     </div>
   );
