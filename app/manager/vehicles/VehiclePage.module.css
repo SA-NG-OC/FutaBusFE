@@ -39,7 +39,45 @@
 
 /* --- FILTER SECTION (Mới) --- */
 .filterSection {
-  padding: 0 ;
+  padding: 0 24px 16px 24px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+}
+
+.filterLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.filterSelect {
+  padding: 10px 12px;
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.filterSelect:hover {
+  border-color: var(--primary-color);
+}
+
+.filterSelect:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(216, 62, 62, 0.1);
 }
 
 /* --- STATS BOX (Mới) --- */

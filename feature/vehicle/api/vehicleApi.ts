@@ -55,9 +55,11 @@ export const vehicleApi = {
 
   // =====================================================
   // 6️⃣ GET – Lấy thống kê vehicles
-  // URL: GET /vehicles/stats
+  // URL: GET /vehicles/stats?routeId={routeId}
   // =====================================================
-  getStats: async (): Promise<VehicleStats> => {
-    return api.get<VehicleStats>('/vehicles/stats');
+  getStats: async (routeId?: number): Promise<VehicleStats> => {
+    const params: any = {};
+    if (routeId) params.routeId = routeId;
+    return api.get<VehicleStats>('/vehicles/stats', { params });
   },
 };

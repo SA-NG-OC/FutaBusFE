@@ -162,6 +162,8 @@ export default function VehiclePage() {
     handlePageChange,
     handleRouteFilter,
     routeFilter,
+    handleStatusFilter,
+    statusFilter,
     isModalOpen,
     isDeleteModalOpen,
     selectedVehicle,
@@ -193,7 +195,7 @@ export default function VehiclePage() {
     const fetchStats = async () => {
       setLoadingStats(true);
       try {
-        const statsData = await vehicleApi.getStats();
+        const statsData = await vehicleApi.getStats(routeFilter);
         setStats(statsData);
       } catch (err) {
         console.error('Error fetching vehicle stats:', err);
@@ -202,7 +204,7 @@ export default function VehiclePage() {
       }
     };
     fetchStats();
-  }, [vehicles]); // Refresh when vehicles change
+  }, [vehicles, routeFilter]); // Refresh when vehicles or routeFilter change
 
   // Convert vehicles to table data
   const tableVehicles = vehicles.map(convertToTableData);
@@ -282,6 +284,22 @@ export default function VehiclePage() {
 
       {/* --- FILTER SECTION (Mới - CSS Module) --- */}
       <div className={styles.filterSection}>
+        {/* Status Filter */}
+        <div className={styles.filterGroup}>
+          <label className={styles.filterLabel}>Trạng thái:</label>
+          <select
+            className={styles.filterSelect}
+            value={statusFilter || ''}
+            onChange={(e) => handleStatusFilter(e.target.value || undefined)}
+          >
+            <option value="">Tất cả trạng thái</option>
+            <option value="ACTIVE">Đang hoạt động</option>
+            <option value="MAINTENANCE">Đang bảo trì</option>
+            <option value="INACTIVE">Không hoạt động</option>
+          </select>
+        </div>
+
+        {/* Route Filter */}
         <RouteFilter
           onRouteSelect={(routeId) => handleRouteFilter(routeId || undefined)}
           selectedRouteId={routeFilter || null}

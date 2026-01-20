@@ -12,6 +12,8 @@ export default function ClientPage() {
     useEffect(() => {
         if (isAuthenticated && user?.role.roleName === 'ADMIN') {
             router.push('/admin/dashboard');
+        } else if (isAuthenticated && user?.role.roleName === 'MANAGER') {
+            router.push('/manager/dashboard');
         } else if (isAuthenticated && user?.role.roleName === 'STAFF') {
             router.push('/employee/dashboard');
         } else if (isAuthenticated && user?.role.roleName === 'DRIVER') {

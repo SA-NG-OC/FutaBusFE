@@ -19,7 +19,7 @@ export interface User {
   avt?: string; // Avatar URL from backend
   role: {
     roleId: number;
-    roleName: "ADMIN" | "USER" | "DRIVER" | "STAFF";
+    roleName: "ADMIN" | "MANAGER" | "USER" | "DRIVER" | "STAFF";
   };
   status: string;
 }
@@ -185,12 +185,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           roleId:
             role === "ADMIN"
               ? 100
-              : role === "DRIVER"
-                ? 101
-                : role === "STAFF"
-                  ? 8
-                  : 102,
-          roleName: role as "ADMIN" | "USER" | "DRIVER" | "STAFF",
+              : role === "MANAGER"
+                ? 99
+                : role === "DRIVER"
+                  ? 101
+                  : role === "STAFF"
+                    ? 8
+                    : 102,
+          roleName: role as "ADMIN" | "MANAGER" | "USER" | "DRIVER" | "STAFF",
         },
         status: "Active",
       };

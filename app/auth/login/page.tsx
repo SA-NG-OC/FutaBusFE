@@ -89,6 +89,9 @@ export default function LoginPage() {
         if (user.role.roleName === 'ADMIN') {
           console.log('[LoginPage] Redirecting to admin dashboard');
           router.push('/admin/dashboard');
+        } else if (user.role.roleName === 'MANAGER') {
+          console.log('[LoginPage] Redirecting to manager dashboard');
+          router.push('/manager/dashboard');
         } else if (user.role.roleName === 'DRIVER') {
           console.log('[LoginPage] Redirecting to driver dashboard');
           router.push('/employee/dashboard');

@@ -15,7 +15,7 @@ export default function AdminLayout({
     <WebSocketProvider>
       <div className={styles.container}>
         {/* 1. Sidebar */}
-        <AdminSidebar />
+        <AdminSidebar role="admin" />
 
         {/* 2. Main Area */}
         <div className={styles["main-area"]}>
